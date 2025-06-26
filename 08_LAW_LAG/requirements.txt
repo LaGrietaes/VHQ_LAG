@@ -1,0 +1,29 @@
+# Core Dependencies (aligned with TALENT_LAG)
+python-dotenv==1.0.1
+loguru==0.7.3
+pydantic==2.5.3
+sqlalchemy==2.0.27  # For legal database
+aiosqlite==0.19.0   # Async SQLite support
+fastapi==0.109.1    # For form integration
+uvicorn==0.27.0
+
+# Document Processing
+opencv-python==4.9.0.80  # For ID recognition
+pytesseract==0.3.10     # OCR engine
+pdf2image==1.17.0       # PDF processing
+reportlab==4.1.0        # PDF generation
+python-docx==1.1.0      # For contract templates
+pypdf2==3.0.1          # PDF manipulation
+
+# Biometric Processing
+cryptography==42.0.2     # For digital signatures (aligned with TALENT_LAG's python-jose)
+
+# Web Scraping
+requests==2.31.0        # Aligned with TALENT_LAG
+beautifulsoup4==4.12.3  # For legal database updates
+
+# Data Processing
+pandas==2.2.0          # Aligned with TALENT_LAG
+pillow==10.2.0        # Aligned with TALENT_LAG
+python-slugify==8.0.1  # Aligned with TALENT_LAG
+tqdm==4.66.1          # Aligned with TALENT_LAG 

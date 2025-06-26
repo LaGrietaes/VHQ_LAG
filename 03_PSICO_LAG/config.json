@@ -1,0 +1,113 @@
+{
+    "agent_version": "3.5.8",
+    "agent_name": "PSICO_LAG",
+    "supported_languages": ["es-MX", "es-ES", "en-US"],
+    "supported_platforms": {
+        "x": {
+            "api_version": "2.0",
+            "data_collection_frequency": 3600
+        },
+        "instagram": {
+            "api_version": "v12.0",
+            "data_collection_frequency": 3600
+        },
+        "tiktok": {
+            "api_version": "v2.0",
+            "data_collection_frequency": 3600
+        },
+        "youtube": {
+            "api_version": "v3",
+            "data_collection_frequency": 7200
+        }
+    },
+    "emotion_analyzer": {
+        "version": "3.4",
+        "model": "BERT-Sentiment-v4",
+        "emotion_granularity": 7,
+        "emotions": [
+            "alegría",
+            "tristeza",
+            "ira",
+            "miedo",
+            "sorpresa",
+            "asco",
+            "neutral"
+        ],
+        "update_frequency": 21600,
+        "escalation_threshold": {
+            "low": 0.1,
+            "high": 0.9
+        },
+        "escalation_timeout": 900
+    },
+    "behavior_tracker": {
+        "version": "2.8",
+        "pattern_update_frequency": 86400,
+        "behavior_threshold": 0.85,
+        "metrics": [
+            "clicks",
+            "time_spent",
+            "comment_frequency",
+            "sharing_pattern",
+            "content_preference"
+        ],
+        "min_data_points": 100
+    },
+    "personalization_engine": {
+        "version": "2.6",
+        "personalization_level": "medium",
+        "response_time_max": 3,
+        "cache_duration": 3600,
+        "high_impact_threshold": 10000
+    },
+    "ethical_filter": {
+        "version": "3.1",
+        "compliance_threshold": 0.98,
+        "review_frequency": 43200,
+        "guidelines_path": "psycho_guidelines.txt",
+        "escalation_timeout": 600
+    },
+    "trend_forecaster": {
+        "version": "2.7",
+        "forecast_horizon": 604800,
+        "accuracy_target": 0.90,
+        "min_confidence": 0.85,
+        "update_frequency": 86400
+    },
+    "performance_metrics": {
+        "emotional_analysis": {
+            "excellent": 0.95,
+            "good": 0.92,
+            "poor": 0.85
+        },
+        "personalization": {
+            "excellent": 0.90,
+            "good": 0.85,
+            "poor": 0.75
+        },
+        "ethical_compliance": {
+            "excellent": 0.99,
+            "good": 0.98,
+            "poor": 0.95
+        }
+    },
+    "integrations": {
+        "donna": {
+            "notification_endpoint": "/api/notify",
+            "approval_threshold": 10000
+        },
+        "ceo": {
+            "escalation_endpoint": "/api/escalate"
+        },
+        "core_vision": {
+            "db_path": "Core_Vision_LAG.db"
+        }
+    },
+    "logging": {
+        "emotion_metrics_path": "emotion_metrics.csv",
+        "user_feedback_path": "user_feedback.log",
+        "behavior_patterns_path": "behavior_patterns.json",
+        "retention_days": 90,
+        "daily_summary_time": "20:00"
+    }
+} 

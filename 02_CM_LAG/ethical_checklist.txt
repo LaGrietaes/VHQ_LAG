@@ -1,0 +1,48 @@
+# Ethical Content Checklist for La Grieta
+
+## Content Authenticity (weight: 0.3)
+- [ ] Content is original or properly credited
+- [ ] Claims are factually accurate and verifiable
+- [ ] Sources are reliable and cited when necessary
+- [ ] Images and media are authentic or clearly labeled if modified
+- [ ] No misleading or deceptive information
+
+## Community Impact (weight: 0.25)
+- [ ] Content promotes constructive dialogue
+- [ ] Avoids harmful stereotypes or biases
+- [ ] Respects cultural sensitivities
+- [ ] Considers potential psychological impact
+- [ ] Promotes inclusivity and diversity
+
+## Brand Values (weight: 0.2)
+- [ ] Aligns with La Grieta's core mission
+- [ ] Maintains professional integrity
+- [ ] Supports community growth
+- [ ] Promotes educational value
+- [ ] Upholds transparency
+
+## Legal Compliance (weight: 0.15)
+- [ ] Respects intellectual property rights
+- [ ] Complies with platform guidelines
+- [ ] Adheres to privacy regulations
+- [ ] Follows advertising standards
+- [ ] Maintains data protection standards
+
+## Crisis Prevention (weight: 0.1)
+- [ ] Avoids controversial topics without proper context
+- [ ] Considers current social climate
+- [ ] Has crisis management plan if needed
+- [ ] Includes necessary disclaimers
+- [ ] Can be modified or removed if issues arise
+
+## Scoring System
+- Each item is scored 0-1 (0: Not met, 0.5: Partially met, 1: Fully met)
+- Section score = Average of item scores × section weight
+- Final score = Sum of all section scores
+- Minimum acceptable score: 0.97
+
+## Automatic Escalation Triggers
+1. Any individual item scoring 0
+2. Section score < 0.8
+3. Final score < 0.97
+4. Multiple items in Crisis Prevention scoring < 1 

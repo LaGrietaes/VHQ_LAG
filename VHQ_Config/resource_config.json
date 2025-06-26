@@ -1,0 +1,207 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2024-03-19",
+  "resource_requirements": {
+    "12_DEV_LAG": {
+      "priority": "high",
+      "cpu": {
+        "min_cores": 2,
+        "max_cores": 6,
+        "preferred": 4
+      },
+      "ram": {
+        "min_gb": 4,
+        "max_gb": 12,
+        "preferred": 8
+      },
+      "gpu": {
+        "required": true,
+        "vram_gb": 6,
+        "shareable": true
+      },
+      "disk": {
+        "min_gb": 10,
+        "preferred_gb": 20
+      }
+    },
+    "04_CLIP_LAG": {
+      "priority": "high",
+      "cpu": {
+        "min_cores": 2,
+        "max_cores": 6,
+        "preferred": 4
+      },
+      "ram": {
+        "min_gb": 4,
+        "max_gb": 12,
+        "preferred": 8
+      },
+      "gpu": {
+        "required": true,
+        "vram_gb": 8,
+        "shareable": true
+      },
+      "disk": {
+        "min_gb": 50,
+        "preferred_gb": 100
+      }
+    },
+    "03_PSICO_LAG": {
+      "priority": "medium",
+      "cpu": {
+        "min_cores": 2,
+        "max_cores": 4,
+        "preferred": 2
+      },
+      "ram": {
+        "min_gb": 2,
+        "max_gb": 6,
+        "preferred": 4
+      },
+      "gpu": {
+        "required": true,
+        "vram_gb": 4,
+        "shareable": true
+      },
+      "disk": {
+        "min_gb": 5,
+        "preferred_gb": 10
+      }
+    },
+    "13_ADS_LAG": {
+      "priority": "medium",
+      "cpu": {
+        "min_cores": 1,
+        "max_cores": 4,
+        "preferred": 2
+      },
+      "ram": {
+        "min_gb": 2,
+        "max_gb": 6,
+        "preferred": 4
+      },
+      "gpu": {
+        "required": false
+      },
+      "disk": {
+        "min_gb": 2,
+        "preferred_gb": 5
+      }
+    },
+    "01_SEO_LAG": {
+      "priority": "medium",
+      "cpu": {
+        "min_cores": 1,
+        "max_cores": 4,
+        "preferred": 2
+      },
+      "ram": {
+        "min_gb": 2,
+        "max_gb": 6,
+        "preferred": 4
+      },
+      "gpu": {
+        "required": false
+      },
+      "disk": {
+        "min_gb": 1,
+        "preferred_gb": 2
+      }
+    },
+    "02_CM_LAG": {
+      "priority": "low",
+      "cpu": {
+        "min_cores": 1,
+        "max_cores": 2,
+        "preferred": 1
+      },
+      "ram": {
+        "min_gb": 1,
+        "max_gb": 4,
+        "preferred": 2
+      },
+      "gpu": {
+        "required": false
+      },
+      "disk": {
+        "min_gb": 1,
+        "preferred_gb": 2
+      }
+    },
+    "05_MEDIA_LAG": {
+      "priority": "low",
+      "cpu": {
+        "min_cores": 1,
+        "max_cores": 2,
+        "preferred": 1
+      },
+      "ram": {
+        "min_gb": 2,
+        "max_gb": 4,
+        "preferred": 2
+      },
+      "gpu": {
+        "required": false
+      },
+      "disk": {
+        "min_gb": 100,
+        "preferred_gb": 200
+      }
+    },
+    "default": {
+      "priority": "low",
+      "cpu": {
+        "min_cores": 1,
+        "max_cores": 2,
+        "preferred": 1
+      },
+      "ram": {
+        "min_gb": 1,
+        "max_gb": 4,
+        "preferred": 2
+      },
+      "gpu": {
+        "required": false
+      },
+      "disk": {
+        "min_gb": 1,
+        "preferred_gb": 2
+      }
+    }
+  },
+  "optimization_rules": {
+    "cache": {
+      "enabled": true,
+      "memory_cache_size_mb": 1024,
+      "disk_cache_size_gb": 10,
+      "ttl_seconds": 3600
+    },
+    "lazy_loading": {
+      "enabled": true,
+      "load_threshold_percent": 80,
+      "unload_timeout_seconds": 1800
+    },
+    "gpu_sharing": {
+      "enabled": true,
+      "max_concurrent_users": 3,
+      "time_slice_ms": 100
+    },
+    "scheduling": {
+      "peak_hours": {
+        "start": "09:00",
+        "end": "18:00",
+        "max_intensive_tasks": 2
+      },
+      "off_peak_hours": {
+        "start": "18:00",
+        "end": "09:00",
+        "max_intensive_tasks": 4
+      }
+    }
+  },
+  "monitoring": {
+    "metrics_collection_interval_seconds": 60,
+    "resource_threshold_percent": 80,
+    "alert_cooldown_minutes": 15
+  }
+} 

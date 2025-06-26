@@ -1,0 +1,22 @@
+{
+    "agent_name": "DJ_LAG",
+    "version": "1.0.0",
+    "music_library_path": "./music_library",
+    "effects_library_path": "./effects_library",
+    "supported_formats": ["mp3", "wav", "ogg"],
+    "api_keys": {
+        "free_music_archive": "",
+        "sound_effects_db": ""
+    },
+    "max_file_size_mb": 50,
+    "default_output_format": "mp3",
+    "logging": {
+        "level": "INFO",
+        "file": "dj_agent.log"
+    },
+    "integrations": {
+        "04_CLIP_LAG": true,
+        "03_PSICO_LAG": true,
+        "00_CEO_LAG": true
+    }
+} 

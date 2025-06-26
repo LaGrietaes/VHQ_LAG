@@ -1,0 +1,41 @@
+{
+    "database": {
+        "path": "data/collaborators.db"
+    },
+    "email": {
+        "templates_dir": "data/email_templates",
+        "from_address": "talent@lagrieta.es"
+    },
+    "social": {
+        "instagram": {
+            "enabled": true,
+            "min_boost": 5.0,
+            "api_credentials": {
+                "app_id": "",
+                "app_secret": ""
+            }
+        },
+        "youtube": {
+            "enabled": true,
+            "min_boost": 5.0,
+            "api_credentials": {
+                "client_id": "",
+                "client_secret": ""
+            }
+        }
+    },
+    "scoring": {
+        "min_total": 20,
+        "weights": {
+            "views": 1.0,
+            "creativity": 1.0,
+            "altruism": 1.0,
+            "message": 1.0
+        }
+    },
+    "boost": {
+        "min_amount": 10.0,
+        "brand_min_amount": 50.0,
+        "external_content_limit": 0.2
+    }
+} 

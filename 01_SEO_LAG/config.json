@@ -1,0 +1,102 @@
+{
+    "agent_name": "SEO_LAG",
+    "version": "1.0.0",
+    "seo_settings": {
+        "min_keyword_score": 30,
+        "max_keyword_density": 2.5,
+        "min_content_length": {
+            "article": 1000,
+            "video_description": 300,
+            "social_post": 100
+        }
+    },
+    "keyword_tools": {
+        "google_trends": {
+            "enabled": true,
+            "region": "ES",
+            "language": "es"
+        },
+        "semrush": {
+            "enabled": false,
+            "api_key": ""
+        }
+    },
+    "content_optimization": {
+        "video": {
+            "title_length": {
+                "min": 40,
+                "max": 70
+            },
+            "description_length": {
+                "min": 250,
+                "max": 5000
+            },
+            "tags_count": {
+                "min": 10,
+                "max": 15
+            }
+        },
+        "article": {
+            "title_length": {
+                "min": 40,
+                "max": 60
+            },
+            "meta_description_length": {
+                "min": 120,
+                "max": 160
+            },
+            "heading_distribution": {
+                "h1": 1,
+                "h2": "2-5",
+                "h3": "3-7"
+            }
+        }
+    },
+    "integrations": {
+        "11_WPM_LAG": {
+            "enabled": true,
+            "optimize_posts": true,
+            "optimize_pages": true
+        },
+        "13_ADS_LAG": {
+            "enabled": true,
+            "share_analytics": true,
+            "coordinate_keywords": true
+        },
+        "02_CM_LAG": {
+            "enabled": true,
+            "optimize_social": true
+        },
+        "03_PSICO_LAG": {
+            "enabled": true,
+            "share_insights": true
+        },
+        "04_CLIP_LAG": {
+            "enabled": true,
+            "optimize_metadata": true
+        }
+    },
+    "analytics": {
+        "google_analytics": {
+            "enabled": true,
+            "property_id": "",
+            "metrics": [
+                "pageviews",
+                "avgTimeOnPage",
+                "bounceRate"
+            ]
+        },
+        "youtube_analytics": {
+            "enabled": true,
+            "metrics": [
+                "views",
+                "watchTime",
+                "averageViewDuration"
+            ]
+        }
+    },
+    "logging": {
+        "level": "INFO",
+        "file": "seo_agent.log"
+    }
+} 

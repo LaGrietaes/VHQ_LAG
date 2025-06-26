@@ -1,0 +1,5 @@
+timestamp,platform,post_id,content_type,engagement_rate,reach,impressions,likes,comments,shares,saves,sentiment_score,response_time,escalations,ethical_score,tone_score
+2025-06-05T00:00:00Z,x,example_post_1,educational,0.045,5000,7500,250,45,30,0,0.85,1200,0,0.98,0.96
+2025-06-05T01:00:00Z,instagram,example_post_2,community_update,0.038,3000,4500,180,25,15,10,0.92,900,0,0.99,0.97
+2025-06-05T02:00:00Z,youtube,example_post_3,educational,0.052,8000,10000,400,75,50,0,0.88,1500,0,0.97,0.95
+2025-06-05T03:00:00Z,tiktok,example_post_4,promotional,0.065,12000,15000,800,120,200,0,0.90,600,0,0.98,0.98 

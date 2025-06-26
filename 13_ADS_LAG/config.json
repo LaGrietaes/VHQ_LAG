@@ -1,0 +1,41 @@
+{
+    "agent_name": "ADS_LAG",
+    "version": "1.0.0",
+    "google_analytics": {
+        "property_id": "",
+        "credentials_path": ""
+    },
+    "content_strategy": {
+        "posts_per_week": 3,
+        "min_word_count": 1000,
+        "content_types": ["article", "tutorial", "review", "news"],
+        "platforms": ["website", "youtube", "social"]
+    },
+    "advertising": {
+        "monthly_budget": {
+            "august": 200,
+            "september": 400
+        },
+        "platforms": {
+            "google_ads": true,
+            "facebook_ads": true,
+            "twitter_ads": false
+        },
+        "targeting": {
+            "locations": ["ES"],
+            "languages": ["es"],
+            "interests": ["technology", "programming", "web development"]
+        }
+    },
+    "integrations": {
+        "11_WPM_LAG": true,
+        "01_SEO_LAG": true,
+        "03_PSICO_LAG": true,
+        "02_CM_LAG": true,
+        "00_CEO_LAG": true
+    },
+    "logging": {
+        "level": "INFO",
+        "file": "ads_agent.log"
+    }
+} 

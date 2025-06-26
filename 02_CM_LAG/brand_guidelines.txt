@@ -1,0 +1,136 @@
+# Brand Guidelines for La Grieta
+
+## Voice & Tone
+### Core Characteristics
+- Authentic: Genuine, transparent, and honest
+- Professional: Knowledgeable but approachable
+- Empowering: Encouraging and supportive
+- Innovative: Forward-thinking and creative
+- Community-focused: Collaborative and inclusive
+
+### Tone Spectrum (1-5 scale)
+1. Formal vs. Casual: 3 (Balanced professional)
+2. Serious vs. Playful: 2.5 (Mostly serious, occasional levity)
+3. Technical vs. Simple: 2 (Accessible expertise)
+4. Direct vs. Nuanced: 4 (Usually direct)
+5. Reserved vs. Enthusiastic: 3.5 (Measured enthusiasm)
+
+## Language Guidelines
+### General Rules
+- Use active voice
+- Keep sentences concise (15-20 words average)
+- Avoid jargon unless necessary
+- Use inclusive language
+- Maintain consistent terminology
+
+### Platform-Specific Adjustments
+1. X (Twitter):
+   - Concise, direct language
+   - Professional but conversational
+   - Use relevant hashtags (2-3 max)
+
+2. Instagram:
+   - Visual-first storytelling
+   - Emotional connection
+   - Longer, narrative captions
+   - Strategic emoji use
+
+3. YouTube:
+   - Educational tone
+   - Clear explanations
+   - Engaging introductions
+   - Call-to-action focused
+
+4. TikTok:
+   - Authentic, relatable voice
+   - Trend-aware but professional
+   - Quick, impactful messaging
+   - Community-focused language
+
+## Content Types & Tone Mapping
+1. Educational Content:
+   - Authoritative but accessible
+   - Step-by-step clarity
+   - Examples and analogies
+   - Encouraging tone
+
+2. Community Updates:
+   - Warm and inclusive
+   - Clear and direct
+   - Celebration-focused
+   - Action-oriented
+
+3. Crisis Communication:
+   - Direct and transparent
+   - Empathetic but professional
+   - Solution-focused
+   - Regular updates
+
+4. Promotional Content:
+   - Value-focused
+   - Authentic enthusiasm
+   - Clear benefits
+   - Community context
+
+## Engagement Guidelines
+1. Comments & Replies:
+   - Personalized responses
+   - Professional warmth
+   - Solution-oriented
+   - Timely engagement
+
+2. Direct Messages:
+   - Professional but friendly
+   - Clear and concise
+   - Action-focused
+   - Follow-up oriented
+
+## Brand Terms & Usage
+### Always Capitalize
+- La Grieta
+- [Product Names]
+- [Service Names]
+
+### Never Capitalize
+- common terms
+- general descriptions
+- technical terms unless proper nouns
+
+## Prohibited Language
+- Discriminatory terms
+- Political stance
+- Religious references
+- Excessive slang
+- Unprofessional abbreviations
+
+## Measurement Criteria
+1. Tone Consistency:
+   - Deviation threshold: 0.05
+   - Regular tone audits
+   - Platform-specific checks
+   - Community feedback integration
+
+2. Engagement Quality:
+   - Response appropriateness
+   - Community sentiment
+   - Resolution effectiveness
+   - Follow-up consistency
+
+## Review Process
+1. Initial Content Check:
+   - Tone alignment
+   - Brand consistency
+   - Platform appropriateness
+   - Value delivery
+
+2. Engagement Review:
+   - Response tone
+   - Solution effectiveness
+   - Follow-up quality
+   - Community impact
+
+## Version Control
+- Document Version: 2.5
+- Last Updated: 05/06/2025
+- Review Frequency: Monthly
+- Change Log: Maintained in version_history.txt 

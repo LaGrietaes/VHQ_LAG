@@ -1,0 +1,205 @@
+{
+    "agent_version": "3.6.4",
+    "agent_name": "CM_LAG",
+    "supported_languages": ["es-MX", "es-ES", "en-US"],
+    "supported_platforms": {
+        "x": {
+            "api_version": "2.0",
+            "post_frequency": 5,
+            "max_posts_per_day": 10
+        },
+        "instagram": {
+            "api_version": "v12.0",
+            "post_frequency": 3,
+            "max_posts_per_day": 5
+        },
+        "tiktok": {
+            "api_version": "v2.0",
+            "post_frequency": 2,
+            "max_posts_per_day": 4
+        },
+        "youtube": {
+            "api_version": "v3",
+            "post_frequency": 1,
+            "max_posts_per_day": 2
+        }
+    },
+    "content_planner": {
+        "version": "3.2",
+        "trend_refresh_rate": 12,
+        "min_posts_per_day": 3,
+        "max_posts_per_day": 5,
+        "calendar_path": "content_calendar.json"
+    },
+    "engagement_analyzer": {
+        "version": "2.7",
+        "metrics_path": "engagement_metrics.csv",
+        "engagement_target": 0.03,
+        "sentiment_model": "BERT-Sentiment-v4",
+        "metrics_retention_days": 90
+    },
+    "tone_checker": {
+        "version": "2.5",
+        "guidelines_path": "brand_guidelines.txt",
+        "deviation_threshold": 0.05,
+        "review_frequency": "per_post"
+    },
+    "community_responder": {
+        "version": "3.0",
+        "feedback_path": "community_feedback.log",
+        "max_response_time": 1800,
+        "escalation_threshold": 0.2
+    },
+    "ethical_filter": {
+        "version": "2.9",
+        "checklist_path": "ethical_checklist.txt",
+        "compliance_threshold": 0.97,
+        "review_frequency": 6
+    },
+    "performance_metrics": {
+        "engagement_rate": {
+            "excellent": 0.05,
+            "good": 0.03,
+            "poor": 0.01
+        },
+        "response_time": {
+            "excellent": 900,
+            "good": 1800,
+            "poor": 3600
+        },
+        "ethical_compliance": {
+            "excellent": 0.99,
+            "good": 0.97,
+            "poor": 0.95
+        }
+    },
+    "integrations": {
+        "donna": {
+            "notification_endpoint": "/api/notify",
+            "approval_threshold": 50000
+        },
+        "ceo": {
+            "escalation_endpoint": "/api/escalate"
+        },
+        "core_vision": {
+            "db_path": "Core_Vision_LAG.db"
+        }
+    },
+    "platforms": {
+        "youtube": {
+            "enabled": true,
+            "api_key": "",
+            "channel_id": "",
+            "auto_respond": true,
+            "response_delay": {
+                "min_seconds": 60,
+                "max_seconds": 300
+            },
+            "comment_filters": {
+                "spam_keywords": [],
+                "blocked_phrases": [],
+                "priority_keywords": []
+            }
+        },
+        "twitter": {
+            "enabled": true,
+            "api_key": "",
+            "api_secret": "",
+            "access_token": "",
+            "access_token_secret": "",
+            "auto_engage": true,
+            "engagement_rules": {
+                "like_mentions": true,
+                "retweet_threshold": 0.8,
+                "reply_threshold": 0.7
+            }
+        },
+        "instagram": {
+            "enabled": true,
+            "username": "",
+            "password": "",
+            "business_account": true,
+            "auto_engage": true,
+            "engagement_limits": {
+                "likes_per_hour": 30,
+                "comments_per_hour": 10,
+                "follows_per_day": 50
+            }
+        },
+        "facebook": {
+            "enabled": true,
+            "page_id": "",
+            "access_token": "",
+            "auto_moderate": true,
+            "moderation_rules": {
+                "hide_spam": true,
+                "delete_offensive": true,
+                "auto_like": true
+            }
+        }
+    },
+    "response_templates": {
+        "youtube": {
+            "positive_feedback": [
+                "¡Gracias por tu comentario! 🙌",
+                "¡Nos alegra que te haya gustado! 💪",
+                "¡Apreciamos tu apoyo! 🙏"
+            ],
+            "questions": [
+                "¡Buena pregunta! Déjanos investigar y te respondemos pronto 🔍",
+                "¡Interesante pregunta! Vamos a consultarlo con el equipo 🤔"
+            ],
+            "negative_feedback": [
+                "Lamentamos que no haya sido de tu agrado. ¿Podrías decirnos más? 🤝",
+                "Gracias por tu feedback. ¿Cómo podríamos mejorar? 📝"
+            ]
+        }
+    },
+    "crisis_management": {
+        "severity_levels": {
+            "low": {
+                "threshold": 3,
+                "response_time_minutes": 120
+            },
+            "medium": {
+                "threshold": 6,
+                "response_time_minutes": 60
+            },
+            "high": {
+                "threshold": 8,
+                "response_time_minutes": 30
+            },
+            "critical": {
+                "threshold": 9,
+                "response_time_minutes": 15
+            }
+        },
+        "notification_channels": [
+            "email",
+            "slack",
+            "ceo_direct"
+        ]
+    },
+    "posting_schedule": {
+        "optimal_times": {
+            "youtube": {
+                "weekday": ["14:00", "18:00", "21:00"],
+                "weekend": ["12:00", "16:00", "20:00"]
+            },
+            "twitter": {
+                "weekday": ["09:00", "13:00", "17:00"],
+                "weekend": ["11:00", "15:00", "19:00"]
+            }
+        },
+        "frequency_limits": {
+            "youtube_posts": 3,
+            "tweets": 5,
+            "instagram_posts": 2,
+            "facebook_posts": 3
+        }
+    },
+    "logging": {
+        "level": "INFO",
+        "file": "cm_agent.log"
+    }
+} 

@@ -1,0 +1,87 @@
+# Guías Psicológicas para La Grieta
+
+## Principios Fundamentales (peso: 0.35)
+- [ ] Respeta la autonomía del usuario
+- [ ] Promueve el bienestar psicológico
+- [ ] Mantiene la confidencialidad
+- [ ] No causa daño
+- [ ] Prioriza la salud mental
+
+## Prácticas de Intervención (peso: 0.25)
+- [ ] Usa técnicas basadas en evidencia
+- [ ] Adapta el contenido al contexto cultural
+- [ ] Considera el impacto emocional
+- [ ] Proporciona recursos de apoyo
+- [ ] Mantiene límites profesionales
+
+## Privacidad y Seguridad (peso: 0.20)
+- [ ] Protege datos sensibles
+- [ ] Anonimiza información personal
+- [ ] Implementa consentimiento informado
+- [ ] Mantiene registros seguros
+- [ ] Respeta preferencias de privacidad
+
+## Responsabilidad Social (peso: 0.15)
+- [ ] Promueve inclusión y diversidad
+- [ ] Evita sesgos y discriminación
+- [ ] Considera impacto comunitario
+- [ ] Fomenta diálogo constructivo
+- [ ] Apoya desarrollo social
+
+## Gestión de Crisis (peso: 0.05)
+- [ ] Identifica señales de crisis
+- [ ] Tiene protocolos de escalamiento
+- [ ] Ofrece recursos de emergencia
+- [ ] Mantiene canales de apoyo
+- [ ] Documenta intervenciones críticas
+
+## Sistema de Puntuación
+- Cada ítem: 0-1 (0: No cumple, 0.5: Cumple parcialmente, 1: Cumple totalmente)
+- Puntuación sección = Promedio ítems × peso sección
+- Puntuación final = Suma de puntuaciones secciones
+- Puntuación mínima aceptable: 0.98
+
+## Disparadores de Escalamiento
+1. Cualquier ítem con puntuación 0
+2. Puntuación sección < 0.9
+3. Puntuación final < 0.98
+4. Señales de crisis o riesgo psicológico
+5. Patrones de comportamiento extremos
+
+## Protocolos de Intervención
+1. Análisis Inicial
+   - Evaluar estado emocional
+   - Identificar factores de riesgo
+   - Determinar nivel de urgencia
+   - Verificar recursos disponibles
+
+2. Implementación
+   - Seleccionar técnicas apropiadas
+   - Adaptar al contexto individual
+   - Monitorear respuesta
+   - Documentar proceso
+
+3. Seguimiento
+   - Evaluar efectividad
+   - Ajustar según necesidad
+   - Mantener registros
+   - Proporcionar recursos adicionales
+
+## Métricas de Éxito
+1. Impacto Positivo
+   - Mejora en indicadores emocionales
+   - Aumento en engagement saludable
+   - Reducción de comportamientos negativos
+   - Feedback positivo de usuarios
+
+2. Cumplimiento Ético
+   - Adherencia a principios
+   - Protección de privacidad
+   - Manejo apropiado de crisis
+   - Documentación completa
+
+## Actualizaciones
+- Versión: 3.1
+- Última actualización: 04/06/2025
+- Revisión: Mensual
+- Registro de cambios en version_history.txt 

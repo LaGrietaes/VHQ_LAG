@@ -1,0 +1,321 @@
+🎭 DEFINICIÓN DE ROLES - SISTEMA VHQ_LAG
+================================================
+🎯 MISIÓN PRINCIPAL
+Automatizar y optimizar el flujo de trabajo de LaGrieta.es mediante coordinación inteligente de agentes IA especializados, maximizando la producción de contenido audiovisual, gestión de comunidad y monetización.
+
+👨‍💼 00_CEO_LAG - Agente Coordinador Principal
+Responsabilidades:
+Orquestación de todos los agentes del sistema
+Delegación inteligente de tareas según prioridades
+Supervisión de métricas y rendimiento general
+Coordinación de flujos de trabajo cross-agente
+Generación de reportes ejecutivos
+Gestión de calendario y deadlines
+Comunicación con stakeholders externos
+Capacidades Técnicas:
+Procesamiento de task_queue centralizada
+Análisis de métricas de rendimiento
+Integración con Google Calendar API
+Sistema de notificaciones (Twilio/WhatsApp)
+Dashboard de control ejecutivo
+Sistema de aprendizaje adaptativo
+🔍 01_SEO_LAG - Agente de Optimización SEO
+Responsabilidades:
+Análisis de palabras clave trending
+Optimización de títulos y descripciones YouTube
+Investigación de competencia
+Sugerencias de temas de alto impacto
+Análisis de performance SEO
+Entrada Típica: Tema de video, transcripción
+Salida Típica: Título optimizado, descripción, tags, sugerencias
+🌐 02_CM_LAG - Agente de Community Management
+Responsabilidades:
+Gestión de comentarios YouTube
+Engagement en redes sociales
+Respuestas automatizadas inteligentes
+Análisis de sentiment de audiencia
+Programación de posts en redes sociales
+Entrada Típica: Comentarios, menciones, posts programados
+Salida Típica: Respuestas, reportes de engagement, contenido social
+🧠 03_PSICO_LAG - Agente de Psicología y Engagement
+Responsabilidades:
+Análisis psicológico de audiencia
+Optimización de hooks y thumbnails
+Predicción de engagement based en psychology
+Análisis de retención de videos
+Sugerencias de storytelling
+Entrada Típica: Analytics YouTube, demographic data
+Salida Típica: Insights psicológicos, sugerencias de mejora
+🎬 04_CLIP_LAG - Agente de Edición de Video
+Responsabilidades:
+Automatización de edición básica
+Generación de clips cortos para YouTube Shorts
+Detección de momentos highlight
+Aplicación de templates de edición
+Optimización de audio y video
+Entrada Típica: Video RAW de 05_MEDIA_LAG
+Salida Típica: Video editado, clips cortos, highlights
+📚 05_MEDIA_LAG - Agente de Gestión de Media
+Responsabilidades Principales:
+Organización automática de archivos multimedia
+Detección y gestión de duplicados
+Ingesta post-filmación automatizada
+Mantenimiento de biblioteca de medios centralizada
+Provisión de media para otros agentes
+Gestión de versiones de contenido
+Optimización de calidad y formatos
+Distribución multi-plataforma
+Análisis de performance técnica
+Gestión de backups multimedia
+Capacidades Técnicas:
+Sistema de organización basado en metadatos
+Detección automática de duplicados mediante hashing
+Conversión y optimización de formatos
+Gestión de versiones y control de cambios
+Análisis de calidad técnica de media
+Distribución automatizada a múltiples plataformas
+Sistema de backup incremental
+API REST para interacción con otros agentes
+Entrada Típica:
+Archivos RAW de grabación
+Requests de otros agentes para media
+Solicitudes de conversión/optimización
+Solicitudes de distribución
+Salida Típica:
+Media organizada y optimizada
+Versiones específicas para plataformas
+Reportes de estado y uso
+Enlaces de distribución
+Métricas de performance técnica
+Estado: OPERACIONAL ✅
+Métricas Actuales: 9,257 archivos (439.75 GB)
+Integraciones:
+04_CLIP_LAG para edición
+02_CM_LAG para distribución social
+09_IT_LAG para backups
+00_CEO_LAG para reportes ejecutivos
+👥 06_TALENT_LAG - Agente de Gestión de Talento
+Responsabilidades:
+Gestión de colaboraciones
+Scheduling de grabaciones
+Coordinación con talentos externos
+Análisis de performance de colaboradores
+Gestión de contratos y pagos
+Entrada Típica: Calendarios, propuestas de colaboración
+Salida Típica: Schedules optimizados, reportes de talento
+💰 07_CASH_LAG - Agente de Finanzas y Monetización
+Responsabilidades:
+Gestión de ingresos por monetización de YouTube
+Implementación y seguimiento de programas de afiliados
+Coordinación de campañas de donaciones (ej. Patreon, PayPal)
+Análisis de ROI y reportes financieros
+Gestión de impuestos y contabilidad
+Optimización de revenue streams
+Análisis predictivo de ingresos
+Gestión de pagos a colaboradores
+Monitoreo de tendencias de monetización
+Integración con plataformas de pago
+Generación de propuestas, invoices y presupuestos para servicios web
+Capacidades Técnicas:
+Integración con APIs de monetización (YouTube, Patreon, etc.)
+Sistema de tracking de ingresos en tiempo real
+Análisis financiero automatizado
+Generación de reportes fiscales
+Dashboard de métricas monetarias
+Alertas de rendimiento financiero
+Sistema de predicción de ingresos
+Gestión automatizada de pagos
+Entrada Típica:
+Datos de YouTube Analytics
+Métricas de afiliados
+Registros de donaciones
+Facturas y gastos
+KPIs de contenido
+Solicitudes de servicios web (12_DEV_LAG)
+Salida Típica:
+Reportes financieros
+Estrategias de monetización
+Predicciones de ingresos
+Enlaces de afiliados optimizados
+Alertas de oportunidades monetarias
+Propuestas e invoices para clientes
+Estado: EN DESARROLLO 🚧
+Integraciones:
+00_CEO_LAG para aprobaciones y reportes
+08_LAW_LAG para compliance fiscal
+02_CM_LAG para campañas monetizadas
+06_TALENT_LAG para pagos de colaboradores
+📜 08_LAW_LAG - Agente de Asesoría Legal
+Responsabilidades:
+Redacción y revisión de contratos
+Gestión de derechos de imagen y copyrights
+Elaboración de cláusulas y términos y condiciones
+Prevención de riesgos legales
+Blindaje de contenido y marca
+Entrada Típica: Propuestas de colaboración, contenido generado
+Salida Típica: Contratos, términos legales, alertas de riesgo
+Capacidades Técnicas:
+Análisis de texto legal con NLP
+Generación de documentos legales básicos
+Integración con bases de datos legales (si disponibles)
+Notificaciones de cumplimiento
+💻 09_IT_LAG - Agente de Gestión Técnica
+Responsabilidades:
+Desarrollo y mantenimiento de sistemas (web, agentes)
+Control de hardware y software
+Gestión de backups (web, medios)
+Monitoreo de rendimiento técnico
+Solución de problemas técnicos
+Entrada Típica: Reportes de errores, requerimientos de desarrollo
+Salida Típica: Código optimizado, backups realizados, reportes técnicos
+Capacidades Técnicas:
+Scripting en Python/Shell
+Monitoreo con herramientas como Nagios
+Gestión de backups automatizados
+Diagnóstico de hardware/software
+🎵 10_DJ_LAG - Agente de Gestión Musical
+Responsabilidades:
+Búsqueda de música y efectos sin derechos (Creative Commons)
+Composición básica de pistas adaptadas
+Sincronización de música con video
+Curación de bibliotecas musicales
+Sugerencias de estilos según trends
+Entrada Típica: Requerimientos de video, datos del Psicólogo
+Salida Típica: Pistas musicales, efectos de sonido, bibliotecas actualizadas
+Capacidades Técnicas:
+Integración con bases de música libre (Free Music Archive)
+Edición básica de audio con Audacity/FFmpeg
+Análisis de trends musicales
+Generación de cortes sincronizados
+🖥️ 11_WPM_LAG - Agente de Gestión WordPress
+Responsabilidades:
+Gestionar y optimizar la web de WordPress de LaGrieta.es (la grieta.es)
+Desarrollar plugins propios (gamificación, login) usando Cursor Pro
+Mantener seguridad, actualizaciones y backups semanales
+Optimizar SEO con 01_SEO_LAG y aumentar tráfico con 03_PSICO_LAG
+Preparar blog para monetización básica, planificando APIs para migración
+Entrada Típica: Contenido para publicar, requerimientos de plugins
+Salida Típica: Web optimizada, plugins desarrollados, backups, planes de migración
+Capacidades Técnicas:
+Uso de herramientas como Plugin Check y Wordfence
+Cursor Pro para desarrollo de plugins
+WP REST API para APIs
+Estado: EN DESARROLLO 🚧
+Integraciones:
+01_SEO_LAG para SEO
+03_PSICO_LAG para tráfico
+09_IT_LAG para soporte técnico
+00_CEO_LAG para reportes
+💻 12_DEV_LAG - Agente de Desarrollo
+Responsabilidades:
+Desarrollar websites en React (plantillas: carta, landing, pro)
+Crear aplicaciones/tools en React Native para LaGrieta.es
+Generar apps para venta en Google Play Store como ingresos pasivos
+Ajustar visuales via formulario inteligente y coordinar con 07_CASH_LAG
+Entrada Típica: Requerimientos de webs/apps, datos de talentos/clientes
+Salida Típica: Plantillas React, apps publicadas, reportes de ingresos
+Capacidades Técnicas:
+Librerías React y React Native
+Cursor Pro para código
+Google Play Store Developer Console
+Formularios inteligentes
+Estado: EN DESARROLLO 🚧
+Integraciones:
+06_TALENT_LAG para necesidades de talentos
+07_CASH_LAG para ingresos
+08_LAW_LAG para legalidad
+11_WPM_LAG para APIs
+📈 13_ADS_LAG - Agente de Publicidad
+Responsabilidades:
+Impulsar contenido masivo (tres posts y medio/semana) con 11_WPM_LAG
+Usar IA para estrategias semanales (SEO, redes, emails) con métricas
+Preparar terreno para $200 (agosto) y $400 (septiembre) con ads
+Sugerir temas y pasos basados en Google Analytics
+Entrada Típica: Tráfico actual, datos de agentes
+Salida Típica: Planes de contenido, estrategias, métricas, preparativos para ads
+Capacidades Técnicas:
+Google Analytics para métricas
+IA (Cursor, ChatGPT) para estrategias
+Integración con todos los agentes
+Estado: EN DESARROLLO 🚧
+Integraciones:
+11_WPM_LAG para web
+01_SEO_LAG para SEO
+03_PSICO_LAG para psicología
+02_CM_LAG para redes
+07_CASH_LAG para ingresos
+👩‍💼 14_DONNA_LAG - Agente Asistente Ejecutiva Personal
+Responsabilidades:
+Supervisar calidad de contenido antes de publicación
+Controlar calendarios y deadlines de agentes
+Actuar como puente entre CEO y agentes
+Detectar errores lógicos, burnout o desvíos
+Velar por la ética y valores de La Grieta
+Entrada Típica: Contenido para auditar, tareas de agentes
+Salida Típica: Auditorías, reorganizaciones, alertas éticas
+Capacidades Técnicas:
+Acceso a Google Calendar, Trello, Obsidian
+Análisis de texto y tono con IA
+Alertas para burnout o sobrecarga
+Estado: EN DESARROLLO 🚧
+Integraciones:
+Todos los agentes (11_WPM_LAG, 12_DEV_LAG, 13_ADS_LAG, etc.)
+00_CEO_LAG para reportes y decisiones
+🔄 FLUJOS DE TRABAJO TIPO
+Workflow 1: Producción de Video Completa
+05_MEDIA_LAG → Organiza material de filmación
+04_CLIP_LAG → Edita video principal
+01_SEO_LAG → Optimiza título/descripción
+03_PSICO_LAG → Analiza psychological hooks
+02_CM_LAG → Prepara estrategia de lanzamiento
+00_CEO_LAG → Coordina timing y aprobaciones
+Workflow 2: Gestión de Comunidad Reactiva
+02_CM_LAG → Detecta comentarios/menciones
+03_PSICO_LAG → Analiza sentiment y contexto
+02_CM_LAG → Genera respuestas apropiadas
+00_CEO_LAG → Supervisa y escala si necesario
+Workflow 3: Optimización Continua
+Todos los agentes → Reportan métricas a 00_CEO_LAG
+00_CEO_LAG → Analiza performance general
+00_CEO_LAG → Identifica areas de mejora
+00_CEO_LAG → Redistribuye prioridades y recursos
+Workflow 4: Monetización y Legal
+07_CASH_LAG → Analiza ingresos y sugiere afiliados
+08_LAW_LAG → Revisa contratos y derechos
+00_CEO_LAG → Aprueba estrategias y firma documentos
+02_CM_LAG → Promociona campañas de donación
+Workflow 5: Mantenimiento Técnico
+09_IT_LAG → Monitorea sistemas y backups
+00_CEO_LAG → Recibe reportes técnicos
+09_IT_LAG → Resuelve incidencias o actualiza software
+Workflow 6: Producción Musical
+10_DJ_LAG → Curar música y efectos
+04_CLIP_LAG → Solicita pistas para clips
+03_PSICO_LAG → Sugiere estilos según audiencia
+00_CEO_LAG → Aprueba selección final
+Workflow 7: Gestión de Contenido Web
+11_WPM_LAG → Publica y optimiza posts
+13_ADS_LAG → Sugiere estrategias y temas
+01_SEO_LAG → Mejora SEO
+14_DONNA_LAG → Audita y aprueba contenido
+00_CEO_LAG → Supervisa y ajusta
+Workflow 8: Desarrollo de Proyectos
+12_DEV_LAG → Crea webs y apps
+07_CASH_LAG → Genera presupuestos
+08_LAW_LAG → Revisa legalidad
+14_DONNA_LAG → Coordina deadlines
+00_CEO_LAG → Aprueba lanzamiento
+📊 MÉTRICAS DE COORDINACIÓN
+KPIs Principales:
+Videos publicados por semana
+Engagement rate promedio
+Tiempo de producción por video
+ROI de monetización YouTube
+Eficiencia de respuesta en comunidad
+Posts web publicados por mes (meta: 15)
+Ingresos publicitarios mensuales (meta: $400 en septiembre)
+Métricas de Agentes:
+Tiempo de respuesta por agente
+Tasa de éxito en tareas delegadas
+Calidad de output (scoring automático)
+Utilización de recursos por agente

@@ -1,0 +1,24 @@
+{
+    "database": {
+        "path": "data/authorizations.db"
+    },
+    "ocr": {
+        "enabled": true,
+        "lang": ["spa", "eng", "ita"],
+        "confidence_threshold": 0.8
+    },
+    "fingerprint": {
+        "enabled": true,
+        "min_quality": 0.6,
+        "timeout": 30
+    },
+    "pdf": {
+        "export_dir": "data/pdf_exports",
+        "template_dir": "data/templates"
+    },
+    "legal": {
+        "update_interval": 2592000,
+        "countries": ["spain", "italy", "greece", "turkey"],
+        "default_language": "spa"
+    }
+} 

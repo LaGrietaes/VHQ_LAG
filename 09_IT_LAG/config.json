@@ -1,0 +1,82 @@
+{
+    "monitoring": {
+        "interval": 60,
+        "metrics_retention": 604800,
+        "alert_thresholds": {
+            "cpu_usage": 80,
+            "memory_usage": 80,
+            "disk_usage": 90
+        }
+    },
+    "backup": {
+        "default_retention": 30,
+        "compression_level": 9,
+        "encryption_algorithm": "AES-256",
+        "cloud_provider": "s3",
+        "local_backup_path": "data/backups",
+        "encryption_key": "CHANGE_THIS_KEY",
+        "bucket": "lagrieta-backups",
+        "local_path": "/path/to/backups",
+        "cloud_path": "s3://bucket-name/backups",
+        "schedule": "0 0 * * *",
+        "retention_days": 30
+    },
+    "development": {
+        "code_style": "black",
+        "test_coverage_min": 80,
+        "lint_config": "default"
+    },
+    "security": {
+        "scan_interval": 86400,
+        "allowed_ports": [80, 443, 22],
+        "ssl_check_interval": 604800
+    },
+    "subscriptions": {
+        "check_interval": 86400,
+        "default_notification_days": 30,
+        "notification_days": 14,
+        "providers": {
+            "noip": {
+                "api_endpoint": "https://api.noip.com/v1",
+                "api_key": "your-api-key",
+                "username": "your-noip-username",
+                "password": "your-noip-password",
+                "update_interval": 30,
+                "hostnames": ["your-hostname.ddns.net"],
+                "default_renewal_period": 30
+            },
+            "godaddy": {
+                "api_endpoint": "https://api.godaddy.com/v1",
+                "api_key": "your-api-key",
+                "api_secret": "your-api-secret"
+            },
+            "cloudflare": {
+                "api_endpoint": "https://api.cloudflare.com/client/v4",
+                "api_token": "your-api-token",
+                "zone_id": "your-zone-id"
+            }
+        },
+        "auto_renew_default": true,
+        "renewal_retry_attempts": 3,
+        "renewal_retry_delay": 3600
+    },
+    "system_monitor": {
+        "check_interval": 300,
+        "thresholds": {
+            "cpu_percent": 80,
+            "memory_percent": 85,
+            "disk_percent": 90
+        }
+    },
+    "nas": {
+        "host": "your-nas-ip",
+        "port": 22,
+        "username": "admin",
+        "password": "your-nas-password"
+    },
+    "email": {
+        "imap_server": "imap.gmail.com",
+        "username": "your-email@gmail.com",
+        "password": "your-app-specific-password"
+    }
+} 

@@ -1,0 +1,185 @@
+{
+    "agent_version": "3.7.3",
+    "agent_name": "MEDIA_LAG",
+    "agent_status": "OPERACIONAL",
+    "supported_languages": ["es-MX", "es-ES", "en-US"],
+    "supported_platforms": {
+        "youtube": {
+            "api_version": "v3",
+            "formats": ["mp4"],
+            "max_duration": 3600,
+            "min_quality": "1080p",
+            "max_file_size": 128000000
+        },
+        "tiktok": {
+            "api_version": "v2.0",
+            "formats": ["mp4"],
+            "max_duration": 180,
+            "aspect_ratio": "9:16",
+            "max_file_size": 512000000
+        },
+        "instagram": {
+            "api_version": "v12.0",
+            "formats": ["mp4", "jpg", "png"],
+            "max_duration": 60,
+            "aspect_ratios": ["1:1", "4:5", "9:16"],
+            "max_file_size": 100000000
+        },
+        "x": {
+            "api_version": "2.0",
+            "formats": ["mp4", "gif"],
+            "max_duration": 140,
+            "max_file_size": 512000000
+        }
+    },
+    "agent_integrations": {
+        "04_CLIP_LAG": {
+            "input_endpoint": "/api/media/raw",
+            "output_endpoint": "/api/media/processed",
+            "metrics_endpoint": "/api/metrics/technical"
+        },
+        "02_CM_LAG": {
+            "content_endpoint": "/api/social/content",
+            "metrics_endpoint": "/api/metrics/engagement",
+            "schedule_endpoint": "/api/schedule/social"
+        },
+        "09_IT_LAG": {
+            "backup_endpoint": "/api/backup/media",
+            "monitor_endpoint": "/api/monitor/performance",
+            "support_endpoint": "/api/support/technical"
+        },
+        "00_CEO_LAG": {
+            "report_endpoint": "/api/reports/executive",
+            "approval_endpoint": "/api/approvals/content",
+            "workflow_endpoint": "/api/workflow/coordination"
+        },
+        "14_DONNA_LAG": {
+            "audit_endpoint": "/api/audit/content",
+            "deadline_endpoint": "/api/deadlines/production",
+            "ethics_endpoint": "/api/compliance/ethics"
+        },
+        "10_DJ_LAG": {
+            "audio_endpoint": "/api/audio/library",
+            "sync_endpoint": "/api/audio/sync",
+            "effects_endpoint": "/api/audio/effects"
+        },
+        "03_PSICO_LAG": {
+            "insight_endpoint": "/api/insights/content",
+            "engagement_endpoint": "/api/analysis/engagement",
+            "format_endpoint": "/api/recommendations/format"
+        }
+    },
+    "media_producer": {
+        "version": "3.5",
+        "output_formats": ["mp4", "mp3", "png", "jpg", "gif"],
+        "production_frequency": {
+            "min_per_day": 2,
+            "max_per_day": 4
+        },
+        "quality_settings": {
+            "video": {
+                "codec": "h264",
+                "framerate": 30,
+                "bitrate": "8000k"
+            },
+            "audio": {
+                "codec": "aac",
+                "bitrate": "320k",
+                "sample_rate": 48000
+            },
+            "image": {
+                "format": "png",
+                "compression": 9,
+                "dpi": 300
+            }
+        }
+    },
+    "content_editor": {
+        "version": "2.9",
+        "max_duration": 60,
+        "quality_threshold": "1080p",
+        "aspect_ratios": ["16:9", "9:16", "1:1", "4:5"],
+        "compression_settings": {
+            "video": {
+                "codec": "h264",
+                "crf": 23
+            },
+            "audio": {
+                "codec": "aac",
+                "bitrate": "192k"
+            }
+        }
+    },
+    "distribution_manager": {
+        "version": "3.1",
+        "post_schedule": "dynamic",
+        "platform_optimization": true,
+        "retry_attempts": 3,
+        "retry_delay": 300,
+        "distribution_windows": {
+            "peak_hours": ["08:00-10:00", "12:00-14:00", "19:00-22:00"],
+            "off_peak": ["00:00-07:00", "15:00-18:00", "23:00-24:00"]
+        }
+    },
+    "performance_analyzer": {
+        "version": "2.8",
+        "engagement_target": 0.04,
+        "analysis_frequency": 86400,
+        "metrics": [
+            "views",
+            "likes",
+            "comments",
+            "shares",
+            "watch_time",
+            "retention_rate"
+        ],
+        "alert_thresholds": {
+            "low_engagement": 0.02,
+            "high_engagement": 0.08,
+            "viral_potential": 0.15
+        }
+    },
+    "ethical_filter": {
+        "version": "3.0",
+        "compliance_threshold": 0.97,
+        "review_frequency": "per_asset",
+        "checklist_path": "ethical_checklist.txt",
+        "escalation_timeout": 900
+    },
+    "performance_metrics": {
+        "engagement_rate": {
+            "excellent": 0.08,
+            "good": 0.04,
+            "poor": 0.02
+        },
+        "production_time": {
+            "excellent": 14400,
+            "good": 21600,
+            "poor": 28800
+        },
+        "ethical_compliance": {
+            "excellent": 0.99,
+            "good": 0.97,
+            "poor": 0.95
+        }
+    },
+    "storage": {
+        "media_library_path": "media_library.db",
+        "production_schedule_path": "production_schedule.json",
+        "style_guide_path": "brand_style_guide.txt",
+        "metrics_path": "performance_metrics.csv",
+        "retention_days": 120,
+        "current_stats": {
+            "total_files": 9257,
+            "total_size_gb": 439.75,
+            "processing_time_avg": 1800,
+            "duplicate_rate": 0.01,
+            "technical_quality": 0.95
+        }
+    },
+    "logging": {
+        "level": "INFO",
+        "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        "daily_summary_time": "22:30"
+    }
+} 

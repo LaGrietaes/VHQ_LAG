@@ -1,0 +1,117 @@
+{
+    "calendar_version": "1.0.0",
+    "last_updated": "2025-06-05T00:00:00Z",
+    "platforms": {
+        "x": {
+            "scheduled_posts": [],
+            "draft_posts": [],
+            "post_history": [],
+            "metrics": {
+                "engagement_rate": 0,
+                "follower_growth": 0,
+                "top_performing_hashtags": []
+            }
+        },
+        "instagram": {
+            "scheduled_posts": [],
+            "draft_posts": [],
+            "post_history": [],
+            "metrics": {
+                "engagement_rate": 0,
+                "follower_growth": 0,
+                "top_performing_hashtags": []
+            }
+        },
+        "youtube": {
+            "scheduled_posts": [],
+            "draft_posts": [],
+            "post_history": [],
+            "metrics": {
+                "engagement_rate": 0,
+                "subscriber_growth": 0,
+                "avg_watch_time": 0
+            }
+        },
+        "tiktok": {
+            "scheduled_posts": [],
+            "draft_posts": [],
+            "post_history": [],
+            "metrics": {
+                "engagement_rate": 0,
+                "follower_growth": 0,
+                "trending_sounds": []
+            }
+        }
+    },
+    "content_types": {
+        "educational": {
+            "frequency": "daily",
+            "platforms": ["youtube", "instagram"],
+            "tone_profile": "authoritative_accessible",
+            "required_approval": false
+        },
+        "community_updates": {
+            "frequency": "weekly",
+            "platforms": ["x", "instagram"],
+            "tone_profile": "warm_inclusive",
+            "required_approval": false
+        },
+        "promotional": {
+            "frequency": "weekly",
+            "platforms": ["all"],
+            "tone_profile": "value_focused",
+            "required_approval": true
+        },
+        "crisis_communication": {
+            "frequency": "as_needed",
+            "platforms": ["all"],
+            "tone_profile": "direct_transparent",
+            "required_approval": true
+        }
+    },
+    "post_template": {
+        "id": "",
+        "platform": "",
+        "content_type": "",
+        "scheduled_time": "",
+        "content": {
+            "text": "",
+            "media": [],
+            "hashtags": [],
+            "mentions": []
+        },
+        "metrics": {
+            "engagement_rate": 0,
+            "reach": 0,
+            "sentiment_score": 0
+        },
+        "approval": {
+            "required": false,
+            "status": "pending",
+            "approved_by": "",
+            "approval_date": ""
+        },
+        "ethical_check": {
+            "score": 0,
+            "issues": [],
+            "reviewed_by": ""
+        },
+        "tone_check": {
+            "score": 0,
+            "deviation": 0,
+            "issues": []
+        }
+    },
+    "trends": {
+        "last_updated": "",
+        "x": [],
+        "instagram": [],
+        "youtube": [],
+        "tiktok": []
+    },
+    "campaign_calendar": {
+        "ongoing": [],
+        "upcoming": [],
+        "completed": []
+    }
+} 

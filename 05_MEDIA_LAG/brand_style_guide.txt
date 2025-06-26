@@ -1,0 +1,133 @@
+# Guía de Estilo Visual y Auditivo para La Grieta
+
+## Identidad Visual
+### Logotipo
+- Versión principal: lagrieta-logo-full.png
+- Versión clara: lagrieta-logo-full-light.png
+- Versión oscura: lagrieta-logo-white.png
+- Área de protección: 20% del ancho del logo
+- Tamaño mínimo: 120px de ancho
+
+### Paleta de Colores
+- Principal: #2D2D2D (gris oscuro)
+- Secundario: #E63946 (rojo)
+- Acento: #457B9D (azul)
+- Fondo claro: #F1FAEE
+- Fondo oscuro: #1D3557
+
+### Tipografía
+- Títulos: Montserrat Bold
+- Subtítulos: Montserrat SemiBold
+- Cuerpo: Open Sans Regular
+- Destacados: Open Sans SemiBold
+- Tamaños mínimos: 16px para web, 24pt para video
+
+## Estilo Visual
+### Video
+1. Composición
+   - Relación de aspecto: 16:9 (horizontal), 9:16 (vertical)
+   - Resolución mínima: 1080p
+   - Framerate: 30fps
+   - Bitrate: 8000kbps
+
+2. Iluminación
+   - Estilo: Natural y limpio
+   - Ratio de contraste: 3:1 mínimo
+   - Temperatura: 5600K (día), 3200K (noche)
+
+3. Color
+   - Perfil: Rec.709
+   - Saturación: Moderada
+   - LUT: LaGrieta_Base.cube
+
+### Gráficos
+1. Elementos UI
+   - Bordes redondeados: 8px
+   - Sombras: 20% opacidad, 10px blur
+   - Iconos: Material Design, 2px stroke
+
+2. Animaciones
+   - Duración: 300ms
+   - Easing: cubic-bezier(0.4, 0, 0.2, 1)
+   - Fade in/out: 200ms
+
+3. Textos en Pantalla
+   - Posición: Tercios inferior
+   - Padding: 24px
+   - Duración mínima: 3 segundos
+
+## Estilo Auditivo
+### Voz
+1. Características
+   - Tono: Profesional pero cercano
+   - Ritmo: Natural, 150-170 palabras/minuto
+   - Ecualizador: Roll-off bajo 80Hz, boost 3-5kHz
+
+2. Procesamiento
+   - Compresión: 2:1 ratio
+   - De-esser: -3dB a 6kHz
+   - Reverb: Sala pequeña, 10% wet
+
+### Música
+1. Selección
+   - Estilo: Moderno, dinámico
+   - BPM: 90-120
+   - Tonalidad: Mayor para contenido positivo
+
+2. Mezcla
+   - Nivel: -18dB bajo voz
+   - Ducking: -6dB durante voz
+   - Transiciones: Cross-fade 2 segundos
+
+### Efectos Sonoros
+1. Características
+   - Biblioteca: LaGrieta_SFX
+   - Nivel: -12dB bajo voz
+   - Pan: 60% máximo
+
+2. Uso
+   - Transiciones: Whoosh suave
+   - Acentos: Impacto ligero
+   - UI: Clicks sutiles
+
+## Formatos por Plataforma
+### YouTube
+- Aspecto: 16:9
+- Resolución: 1080p/4K
+- Intro: 5 segundos máximo
+- Outro: Card screen 20 segundos
+
+### TikTok/Instagram Reels
+- Aspecto: 9:16
+- Resolución: 1080x1920
+- Duración: 15-60 segundos
+- Textos: 4 líneas máximo
+
+### Instagram Feed
+- Aspecto: 1:1 o 4:5
+- Resolución: 1080x1080/1350
+- Duración: 30-60 segundos
+- Textos: Centrados
+
+### X (Twitter)
+- Aspecto: 16:9
+- Resolución: 1080p
+- Duración: 2:20 máximo
+- Subtítulos: Siempre activos
+
+## Accesibilidad
+1. Textos
+   - Contraste: 4.5:1 mínimo
+   - Fuente: Sans-serif
+   - Tamaño mínimo: 16px/24pt
+
+2. Audio
+   - Subtítulos: Siempre incluidos
+   - Descripción: Cuando necesario
+   - Audio limpio: SNR >20dB
+
+## Actualizaciones
+- Versión: 2.5
+- Última actualización: 06/06/2025
+- Revisión: Mensual
+- Registro de cambios en version_history.txt 

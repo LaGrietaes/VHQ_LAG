@@ -1,0 +1,26 @@
+{
+    "n26": {
+        "enabled": true,
+        "api_url": "https://api.n26.com",
+        "refresh_interval": 300
+    },
+    "patreon": {
+        "enabled": true,
+        "campaign_id": "",
+        "refresh_interval": 3600
+    },
+    "crypto_addresses": {
+        "solana": "",
+        "ethereum": "",
+        "bitcoin": "",
+        "polygon": ""
+    },
+    "goals": {
+        "monthly_target": 1000,
+        "patron_target": 50
+    },
+    "reinvestment": {
+        "percentage": 20,
+        "threshold": 500
+    }
+} 

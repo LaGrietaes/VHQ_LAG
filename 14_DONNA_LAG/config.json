@@ -1,0 +1,63 @@
+{
+    "agent_name": "DONNA_LAG",
+    "version": "1.0.0",
+    "integrations": {
+        "calendar": {
+            "type": "google",
+            "credentials_path": "",
+            "calendar_id": ""
+        },
+        "task_management": {
+            "type": "trello",
+            "api_key": "",
+            "token": "",
+            "board_id": ""
+        },
+        "obsidian": {
+            "vault_path": "",
+            "templates_path": ""
+        }
+    },
+    "content_audit": {
+        "quality_metrics": {
+            "min_word_count": 500,
+            "readability_score": 60,
+            "plagiarism_threshold": 0.2
+        },
+        "ethical_guidelines": [
+            "respect_privacy",
+            "avoid_discrimination",
+            "promote_inclusivity",
+            "maintain_transparency"
+        ]
+    },
+    "agent_monitoring": {
+        "check_frequency": "hourly",
+        "metrics": [
+            "response_time",
+            "task_completion",
+            "error_rate",
+            "resource_usage"
+        ],
+        "alert_thresholds": {
+            "response_time_ms": 5000,
+            "error_rate": 0.1,
+            "resource_usage": 0.9
+        }
+    },
+    "deadline_management": {
+        "reminder_intervals": [
+            {"days": 7, "priority": "low"},
+            {"days": 3, "priority": "medium"},
+            {"days": 1, "priority": "high"}
+        ],
+        "escalation_policy": {
+            "overdue_days": 1,
+            "notify_ceo": true
+        }
+    },
+    "logging": {
+        "level": "INFO",
+        "file": "donna_agent.log"
+    }
+} 

@@ -1,0 +1,35 @@
+{
+    "agent_name": "WPM_LAG",
+    "version": "1.0.0",
+    "wordpress": {
+        "site_url": "https://lagrieta.es",
+        "api_url": "https://lagrieta.es/wp-json/wp/v2",
+        "username": "",
+        "password": "",
+        "backup": {
+            "frequency": "weekly",
+            "retention_days": 30,
+            "backup_path": "./backups"
+        }
+    },
+    "seo": {
+        "min_word_count": 300,
+        "max_keyword_density": 2.5,
+        "required_meta_fields": ["title", "description", "keywords"]
+    },
+    "security": {
+        "scan_frequency": "daily",
+        "allowed_file_types": ["jpg", "png", "pdf", "doc", "docx"],
+        "max_upload_size_mb": 10
+    },
+    "integrations": {
+        "01_SEO_LAG": true,
+        "03_PSICO_LAG": true,
+        "13_ADS_LAG": true,
+        "00_CEO_LAG": true
+    },
+    "logging": {
+        "level": "INFO",
+        "file": "wpm_agent.log"
+    }
+} 

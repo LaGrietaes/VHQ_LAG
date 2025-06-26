@@ -1,0 +1,87 @@
+# Lista de Verificación Ética para Contenido Multimedia
+
+## Autenticidad del Contenido (peso: 0.30)
+- [ ] Contenido original o correctamente licenciado
+- [ ] Sin manipulación engañosa
+- [ ] Fuentes citadas cuando sea necesario
+- [ ] Contexto preservado
+- [ ] Transparencia en ediciones
+
+## Impacto Social (peso: 0.25)
+- [ ] Promueve valores positivos
+- [ ] Evita estereotipos negativos
+- [ ] Respeta diversidad cultural
+- [ ] Considera sensibilidades sociales
+- [ ] Fomenta diálogo constructivo
+
+## Calidad Técnica (peso: 0.20)
+- [ ] Cumple estándares de calidad
+- [ ] Audio claro y balanceado
+- [ ] Subtítulos cuando necesario
+- [ ] Accesibilidad considerada
+- [ ] Optimizado para plataforma
+
+## Cumplimiento Legal (peso: 0.15)
+- [ ] Derechos de autor respetados
+- [ ] Permisos obtenidos
+- [ ] Cumple normativas de plataforma
+- [ ] Privacidad protegida
+- [ ] Disclaimers incluidos
+
+## Gestión de Crisis (peso: 0.10)
+- [ ] Plan de contingencia
+- [ ] Versiones alternativas
+- [ ] Capacidad de retirada rápida
+- [ ] Respuesta preparada
+- [ ] Escalamiento definido
+
+## Sistema de Puntuación
+- Cada ítem: 0-1 (0: No cumple, 0.5: Cumple parcialmente, 1: Cumple totalmente)
+- Puntuación sección = Promedio ítems × peso sección
+- Puntuación final = Suma de puntuaciones secciones
+- Puntuación mínima aceptable: 0.97
+
+## Disparadores de Escalamiento
+1. Cualquier ítem con puntuación 0
+2. Puntuación sección < 0.8
+3. Puntuación final < 0.97
+4. Contenido potencialmente viral (>100K alcance estimado)
+5. Temas sensibles o controversiales
+
+## Protocolos de Revisión
+1. Pre-Producción
+   - Verificar derechos y permisos
+   - Evaluar sensibilidad del contenido
+   - Confirmar alineación con marca
+   - Validar recursos técnicos
+
+2. Producción
+   - Monitorear calidad técnica
+   - Documentar fuentes y licencias
+   - Mantener copias de seguridad
+   - Verificar accesibilidad
+
+3. Post-Producción
+   - Revisar edición final
+   - Validar subtítulos/textos
+   - Confirmar optimización
+   - Preparar documentación
+
+## Métricas de Éxito
+1. Calidad
+   - Resolución apropiada
+   - Audio balanceado
+   - Edición profesional
+   - Formatos optimizados
+
+2. Impacto
+   - Engagement positivo
+   - Feedback constructivo
+   - Alcance efectivo
+   - Retención de audiencia
+
+## Actualizaciones
+- Versión: 3.0
+- Última actualización: 06/06/2025
+- Revisión: Mensual
+- Registro de cambios en version_history.txt 

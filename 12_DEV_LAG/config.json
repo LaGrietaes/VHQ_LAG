@@ -1,0 +1,43 @@
+{
+    "agent_name": "DEV_LAG",
+    "version": "1.0.0",
+    "templates_path": "./templates",
+    "project_defaults": {
+        "react": {
+            "typescript": true,
+            "eslint": true,
+            "prettier": true,
+            "testing_library": true
+        },
+        "react_native": {
+            "typescript": true,
+            "navigation": true,
+            "state_management": "redux-toolkit"
+        }
+    },
+    "build": {
+        "web": {
+            "optimization_level": "production",
+            "source_maps": false
+        },
+        "android": {
+            "min_sdk": 21,
+            "target_sdk": 33,
+            "keystore_path": ""
+        }
+    },
+    "play_store": {
+        "credentials_path": "",
+        "package_name_prefix": "es.lagrieta"
+    },
+    "integrations": {
+        "07_CASH_LAG": true,
+        "08_LAW_LAG": true,
+        "11_WPM_LAG": true,
+        "00_CEO_LAG": true
+    },
+    "logging": {
+        "level": "INFO",
+        "file": "dev_agent.log"
+    }
+} 

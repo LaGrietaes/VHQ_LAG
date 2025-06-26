@@ -1,0 +1,29 @@
+{
+    "output_dirs": {
+        "short": "output/short",
+        "music": "output/music",
+        "effects": "output/effects",
+        "previews": "output/previews"
+    },
+    "video_settings": {
+        "target_resolution": [1080, 1920],
+        "fps": 30,
+        "min_duration": 15,
+        "max_duration": 60
+    },
+    "reframe_options": {
+        "default_mode": "center",
+        "default_speed": "medium",
+        "pan_smoothing": 0.5,
+        "zoom_range": [1.0, 1.5]
+    },
+    "audio_settings": {
+        "sample_rate": 44100,
+        "channels": 2,
+        "format": "wav"
+    },
+    "integration": {
+        "psico_lag_hooks": "03_PSICO_LAG/datos/ganchos/ganchos_virales.txt",
+        "dj_lag_library": "10_DJ_LAG/music_library.txt"
+    }
+} 

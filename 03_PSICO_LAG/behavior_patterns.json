@@ -1,0 +1,111 @@
+{
+    "version": "2.8",
+    "last_updated": "2025-06-04T00:00:00Z",
+    "patterns": {
+        "engagement": {
+            "active_hours": {
+                "weekday": {
+                    "peak_start": "18:00",
+                    "peak_end": "22:00",
+                    "timezone": "Europe/Madrid"
+                },
+                "weekend": {
+                    "peak_start": "11:00",
+                    "peak_end": "23:00",
+                    "timezone": "Europe/Madrid"
+                }
+            },
+            "interaction_types": {
+                "likes": {"frequency": 0, "pattern": "random"},
+                "comments": {"frequency": 0, "pattern": "random"},
+                "shares": {"frequency": 0, "pattern": "random"},
+                "saves": {"frequency": 0, "pattern": "random"}
+            },
+            "content_preferences": {
+                "topics": {},
+                "formats": {},
+                "duration": {}
+            }
+        },
+        "emotional": {
+            "baseline": {
+                "joy": 0,
+                "sadness": 0,
+                "anger": 0,
+                "fear": 0,
+                "surprise": 0,
+                "disgust": 0,
+                "neutral": 0
+            },
+            "triggers": {
+                "positive": [],
+                "negative": []
+            },
+            "response_patterns": {
+                "to_positive": {},
+                "to_negative": {},
+                "to_neutral": {}
+            }
+        },
+        "behavioral": {
+            "session_metrics": {
+                "avg_duration": 0,
+                "bounce_rate": 0,
+                "return_rate": 0,
+                "depth_of_interaction": 0
+            },
+            "content_consumption": {
+                "read_patterns": {},
+                "watch_patterns": {},
+                "listen_patterns": {}
+            },
+            "social_dynamics": {
+                "influencer_interaction": 0,
+                "community_participation": 0,
+                "content_creation": 0
+            }
+        },
+        "cognitive": {
+            "attention_span": {
+                "short_form": 0,
+                "medium_form": 0,
+                "long_form": 0
+            },
+            "learning_patterns": {
+                "preferred_formats": [],
+                "comprehension_rate": 0,
+                "retention_indicators": {}
+            },
+            "decision_making": {
+                "click_through_rate": 0,
+                "conversion_patterns": {},
+                "abandonment_triggers": []
+            }
+        }
+    },
+    "segments": {
+        "by_engagement": {},
+        "by_emotion": {},
+        "by_behavior": {},
+        "by_cognition": {}
+    },
+    "trends": {
+        "short_term": {
+            "timeframe": "7d",
+            "patterns": {}
+        },
+        "medium_term": {
+            "timeframe": "30d",
+            "patterns": {}
+        },
+        "long_term": {
+            "timeframe": "90d",
+            "patterns": {}
+        }
+    },
+    "metrics": {
+        "pattern_confidence": 0,
+        "data_quality": 0,
+        "prediction_accuracy": 0
+    }
+} 

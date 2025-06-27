@@ -1,0 +1,139 @@
+{
+    "agent_version": "1.0.0",
+    "agent_name": "GHOST_LAG",
+    "supported_languages": ["es-MX", "es-ES", "en-US"],
+    "supported_formats": ["markdown", "plain_text", "html"],
+    "writing_engine": {
+        "version": "1.0",
+        "model": "GPT-4-Turbo",
+        "max_tokens": 4000,
+        "temperature": 0.7,
+        "style_guide": "GHOST_Reglas.md"
+    },
+    "project_management": {
+        "version": "1.0",
+        "workspace_path": "GHOST_Proyectos/",
+        "backup_frequency": "daily",
+        "auto_save": true,
+        "version_control": true
+    },
+    "content_types": {
+        "libros": {
+            "min_chapters": 8,
+            "max_chapters": 25,
+            "words_per_chapter": 3000,
+            "format": "markdown"
+        },
+        "scripts": {
+            "min_scenes": 10,
+            "max_scenes": 50,
+            "format": "fountain",
+            "export_format": "pdf"
+        },
+        "blog_posts": {
+            "min_words": 800,
+            "max_words": 3000,
+            "seo_optimization": true,
+            "format": "markdown"
+        },
+        "ebooks": {
+            "min_pages": 20,
+            "max_pages": 200,
+            "include_toc": true,
+            "format": "epub"
+        }
+    },
+    "integrations": {
+        "psico_lag": {
+            "endpoint": "/api/psico/analyze",
+            "consultation_phases": ["inicio", "climax", "cierre"],
+            "metrics": ["engagement", "emotional_impact", "retention"]
+        },
+        "seo_lag": {
+            "endpoint": "/api/seo/optimize",
+            "optimization_targets": ["titles", "subtitles", "meta_descriptions"],
+            "keyword_density": 0.02
+        },
+        "ceo_lag": {
+            "reporting_endpoint": "/api/ceo/report",
+            "approval_required": true,
+            "progress_updates": "weekly"
+        },
+        "obsidian": {
+            "sync_enabled": true,
+            "vault_path": "VHQ_Resources/obsidian_vault/",
+            "auto_sync": true,
+            "conflict_resolution": "manual"
+        }
+    },
+    "quality_controls": {
+        "grammar_check": {
+            "enabled": true,
+            "language": "es-MX",
+            "severity": "high"
+        },
+        "plagiarism_check": {
+            "enabled": true,
+            "threshold": 0.15
+        },
+        "readability": {
+            "target_level": "intermediate",
+            "flesch_score_min": 60
+        },
+        "word_count": {
+            "track_progress": true,
+            "daily_target": 2000,
+            "weekly_target": 12000
+        }
+    },
+    "workflow_automation": {
+        "auto_structure": true,
+        "chapter_numbering": true,
+        "toc_generation": true,
+        "cross_references": true,
+        "footnote_management": true
+    },
+    "performance_metrics": {
+        "words_per_day": {
+            "excellent": 3000,
+            "good": 2000,
+            "poor": 1000
+        },
+        "quality_score": {
+            "excellent": 0.9,
+            "good": 0.8,
+            "poor": 0.6
+        },
+        "completion_rate": {
+            "excellent": 0.95,
+            "good": 0.85,
+            "poor": 0.7
+        }
+    },
+    "content_templates": {
+        "book_structure": {
+            "sections": ["introduccion", "desarrollo", "climax", "resolucion", "conclusion"],
+            "chapter_template": "VHQ_Resources/templates/chapter_template.md"
+        },
+        "blog_post": {
+            "sections": ["hook", "problema", "solucion", "beneficios", "cta"],
+            "template": "VHQ_Resources/templates/blog_template.md"
+        },
+        "script": {
+            "sections": ["setup", "confrontation", "resolution"],
+            "template": "VHQ_Resources/templates/script_template.fountain"
+        }
+    },
+    "collaboration": {
+        "review_enabled": true,
+        "comment_system": true,
+        "version_tracking": true,
+        "approval_workflow": true
+    },
+    "output_settings": {
+        "default_format": "markdown",
+        "export_formats": ["pdf", "epub", "docx", "html"],
+        "include_metadata": true,
+        "watermark": false
+    }
+} 

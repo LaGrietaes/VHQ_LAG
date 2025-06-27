@@ -261,6 +261,33 @@ Estado: EN DESARROLLO 🚧
 Integraciones:
 Todos los agentes (11_WPM_LAG, 12_DEV_LAG, 13_ADS_LAG, etc.)
 00_CEO_LAG para reportes y decisiones
+👻 15_GHOST_LAG - Agente Escritor Fantasma
+Responsabilidades:
+Generación y edición asistida de textos largos (libros, guiones, eBooks)
+Transformación de ideas crudas en contenido estructurado y coherente
+Escritura por bloques con planificación modular
+Coordinación con PSICO_LAG para impacto emocional y storytelling
+Coordinación con SEO_LAG para optimización de títulos y visibilidad
+Gestión de proyectos de escritura con seguimiento de progreso
+Exportación a múltiples formatos (PDF, ePub, DOCX, Markdown)
+Sincronización con Obsidian para edición colaborativa
+Entrada Típica: Ideas centrales, índices, fragmentos de texto, briefings de proyectos
+Salida Típica: Capítulos completos, libros estructurados, guiones, eBooks, reportes de progreso
+Capacidades Técnicas:
+Integración con modelos de IA (GPT-4, local models)
+Gestión de base de datos de proyectos con SQLite
+Control de calidad con verificación gramatical y legibilidad
+Sistema de versionado y backups automáticos
+Generación de múltiples formatos de exportación
+Análisis de métricas de escritura (palabras/día, calidad)
+Workflow de colaboración inter-agente
+Estado: OPERACIONAL ✅
+Integraciones:
+03_PSICO_LAG para análisis emocional y engagement
+01_SEO_LAG para optimización y posicionamiento
+00_CEO_LAG para aprobaciones y reportes ejecutivos
+14_DONNA_LAG para revisión de calidad y deadlines
+Obsidian para sincronización y edición colaborativa
 🔄 FLUJOS DE TRABAJO TIPO
 Workflow 1: Producción de Video Completa
 05_MEDIA_LAG → Organiza material de filmación
@@ -305,6 +332,16 @@ Workflow 8: Desarrollo de Proyectos
 08_LAW_LAG → Revisa legalidad
 14_DONNA_LAG → Coordina deadlines
 00_CEO_LAG → Aprueba lanzamiento
+Workflow 9: Producción de Contenido Escrito
+00_CEO_LAG → Define proyecto de escritura y objetivos
+15_GHOST_LAG → Crea estructura y planifica capítulos
+15_GHOST_LAG → Genera borradores iterativos por bloques
+03_PSICO_LAG → Analiza impacto emocional en fases clave
+01_SEO_LAG → Optimiza títulos y estructura para visibilidad
+15_GHOST_LAG → Integra feedback y finaliza contenido
+14_DONNA_LAG → Revisa calidad y coherencia final
+15_GHOST_LAG → Exporta en formatos requeridos
+00_CEO_LAG → Aprueba publicación y distribución
 📊 MÉTRICAS DE COORDINACIÓN
 KPIs Principales:
 Videos publicados por semana
@@ -314,6 +351,9 @@ ROI de monetización YouTube
 Eficiencia de respuesta en comunidad
 Posts web publicados por mes (meta: 15)
 Ingresos publicitarios mensuales (meta: $400 en septiembre)
+Palabras escritas por día por GHOST_LAG (meta: 2000)
+Proyectos de escritura completados por trimestre (meta: 1 libro)
+Calidad promedio de contenido generado (meta: 0.8/1.0)
 Métricas de Agentes:
 Tiempo de respuesta por agente
 Tasa de éxito en tareas delegadas

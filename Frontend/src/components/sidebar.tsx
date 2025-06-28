@@ -32,9 +32,17 @@ export function Sidebar() {
             <Link key={agent.id} href={`/agent/${agent.id}`} passHref>
               <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
-                  <div className="flex items-center space-x-4 p-2 rounded-lg hover:bg-muted cursor-pointer">
+                  <div
+                    className={`flex items-center p-2 rounded-lg hover:bg-muted cursor-pointer ${
+                      isCollapsed ? "justify-center" : "space-x-4"
+                    } ${
+                      agent.status === "OPERATIONAL" && agent.currentTasks > 0
+                        ? "text-red-500"
+                        : ""
+                    }`}
+                  >
                     {agent.icon}
-                    {!isCollapsed && <span className="font-medium">{agent.name}</span>}
+                    {!isCollapsed && <span className="font-medium text-foreground">{agent.name}</span>}
                   </div>
                 </TooltipTrigger>
                 <TooltipContent side="right" className="ml-2">

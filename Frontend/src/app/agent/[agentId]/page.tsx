@@ -46,7 +46,9 @@ export default function AgentDetailPage() {
             <h1 className="text-xl font-bold tracking-widest text-primary uppercase flex-1 text-center">{agent.name.replace("_AGENT", "")}</h1>
             <div className="flex-1 flex justify-end items-center gap-4">
                 <SystemMonitor onlineAgents={onlineAgents} totalAgents={totalAgents} />
-                <ChatNotification onDrawerStateChange={setIsChatOpen} />
+                <div className="flex-shrink-0">
+                  <ChatNotification onDrawerStateChange={setIsChatOpen} />
+                </div>
             </div>
         </header>
         <main className="flex-1 overflow-y-auto p-8">

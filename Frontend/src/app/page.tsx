@@ -42,10 +42,12 @@ export default function VHQDashboard() {
               <ThemeAwareLogo />
             </Link>
           </div>
-          <h1 className="text-xl font-bold tracking-widest text-primary uppercase flex-1 text-center">VHQ_LAG // Dashboard</h1>
-          <div className="flex-1 flex justify-end items-center gap-4">
+          <h1 className="text-xl font-bold tracking-widest text-primary uppercase flex-1 text-center">Dashboard</h1>
+          <div className="flex-1 flex justify-end items-center gap-8">
             <SystemMonitor onlineAgents={onlineAgents} totalAgents={totalAgents} />
-            <ChatNotification onDrawerStateChange={setIsChatOpen} />
+            <div className="flex-shrink-0">
+              <ChatNotification onDrawerStateChange={setIsChatOpen} />
+            </div>
           </div>
         </header>
 

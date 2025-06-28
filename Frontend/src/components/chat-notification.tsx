@@ -19,8 +19,8 @@ interface Message {
 
 const tacticalAgents = agentsData.map(agent => ({
   ...agent,
-  code: agent.id.split('_')[0].padStart(2, '0')
-})).sort((a, b) => a.code.localeCompare(b.code))
+  code: agent.id.split('_')[0]
+}))
 
 const MOCK_NOTIFICATIONS = [
   { agentId: 'SEO_AGENT' },
@@ -49,10 +49,8 @@ export function ChatNotification({ onDrawerStateChange }: ChatNotificationProps)
   const [agentView, setAgentView] = useState<'chat' | 'history'>('chat');
   const [stagedFiles, setStagedFiles] = useState<File[]>([]);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
-  const [isAttachmentMenuOpen, setIsAttachmentMenuOpen] = useState(false);
   const messageInputRef = useRef<HTMLInputElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const attachmentMenuTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // --- Effects ---
    useEffect(() => {
@@ -177,24 +175,6 @@ export function ChatNotification({ onDrawerStateChange }: ChatNotificationProps)
     }
   };
 
-  const handleAttachmentMenuEnter = () => {
-    if (attachmentMenuTimeoutRef.current) {
-      clearTimeout(attachmentMenuTimeoutRef.current);
-    }
-    attachmentMenuTimeoutRef.current = setTimeout(() => {
-      setIsAttachmentMenuOpen(true);
-    }, 1000);
-  };
-
-  const handleAttachmentMenuLeave = () => {
-    if (attachmentMenuTimeoutRef.current) {
-      clearTimeout(attachmentMenuTimeoutRef.current);
-    }
-    attachmentMenuTimeoutRef.current = setTimeout(() => {
-      setIsAttachmentMenuOpen(false);
-    }, 300);
-  };
-
   const removeStagedFile = (fileToRemove: File) => {
     setStagedFiles(prev => prev.filter(file => file !== fileToRemove));
   };
@@ -215,18 +195,6 @@ export function ChatNotification({ onDrawerStateChange }: ChatNotificationProps)
 
   const renderAgentRoster = () => (
     <>
-      <div className="p-3 border-b border-primary/50">
-        <div className="relative">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/50" />
-          <input
-            type="text"
-            placeholder="Search callsign or name..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-8 pr-3 py-1.5 bg-black/50 text-primary placeholder:text-muted-foreground border border-primary/50 focus:border-primary focus:outline-none font-mono text-sm"
-          />
-        </div>
-      </div>
       <div className="flex-1 overflow-y-auto">
         <div className="p-1 flex flex-col h-full justify-around">
           {filteredAgents.map(agent => (
@@ -241,8 +209,7 @@ export function ChatNotification({ onDrawerStateChange }: ChatNotificationProps)
               <div className="w-5 h-5 flex items-center justify-center text-primary">{agent.icon}</div>
               <div className="flex-1">
                 <p className="font-mono text-sm text-white">
-                  <span className="text-white/60 mr-2">{agent.code}</span>
-                  {agent.name.replace('_AGENT', '')}
+                  {agent.name}
                 </p>
               </div>
             </button>
@@ -385,44 +352,23 @@ export function ChatNotification({ onDrawerStateChange }: ChatNotificationProps)
           <div className="relative">
             <input
               ref={messageInputRef}
-              type="text"
               placeholder={`Message ${chatTitle}...`}
               onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-              className="w-full pr-12 pl-3 py-2 bg-black/50 text-white placeholder:text-white/40 border border-primary/50 focus:border-primary focus:outline-none font-mono text-sm"
+              className="w-full pr-20 pl-3 py-2 bg-black/50 text-white placeholder:text-white/40 border border-primary/50 focus:border-primary focus:outline-none font-mono text-sm"
             />
-             <div 
-              className="absolute right-1 top-1/2 -translate-y-1/2 flex items-end"
-              onMouseLeave={handleAttachmentMenuLeave}
-             >
-                {/* Attachment Menu */}
-                <div className={cn(
-                  "flex flex-col-reverse items-center transition-all duration-300 ease-in-out",
-                  isAttachmentMenuOpen ? "w-auto opacity-100" : "w-0 opacity-0"
-                )}>
-                    <Button
-                        onClick={() => { /* TODO: Google Drive Logic */ }}
-                        variant="ghost" size="icon" className="h-8 w-8 text-primary" title="Attach from Google Drive"
-                    >
-                        <Link2 className="w-5 h-5" />
-                    </Button>
-                     <Button
-                        onClick={() => fileInputRef.current?.click()}
-                        variant="ghost" size="icon" className="h-8 w-8 text-primary" title="Attach file"
-                    >
-                        <Paperclip className="w-5 h-5" />
-                    </Button>
-                </div>
-                {/* Send Button */}
-                <Button
-                    onMouseEnter={handleAttachmentMenuEnter}
-                    onClick={handleSendMessage}
-                    variant="ghost" size="icon" className="h-8 w-8 text-primary hover:text-primary hover:bg-primary/20"
-                >
-                    <Send className="w-5 h-5" />
-                </Button>
-                 <input
-                    type="file" multiple ref={fileInputRef} onChange={handleFileSelect} className="hidden"
-                />
+            <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center">
+              <Button
+                onClick={() => fileInputRef.current?.click()}
+                variant="ghost" size="icon" className="h-8 w-8 text-primary" title="Attach file"
+              >
+                <Paperclip className="w-5 h-5" />
+              </Button>
+              <Button onClick={handleSendMessage} size="icon" className="bg-primary hover:bg-primary/90 text-black flex items-center justify-center w-8 h-8">
+                <Send size={16} />
+              </Button>
+              <input
+                  type="file" multiple ref={fileInputRef} onChange={handleFileSelect} className="hidden"
+              />
             </div>
           </div>
         </div>
@@ -436,24 +382,32 @@ export function ChatNotification({ onDrawerStateChange }: ChatNotificationProps)
       onClick={(e) => e.stopPropagation()}
     >
       {/* Drawer Header */}
-      <div className="p-4 border-b border-primary/50 flex items-center justify-between">
-        <h2 className="text-lg font-bold text-white tracking-widest">COMMS_TERMINAL</h2>
+      <div className="p-4 border-b border-primary/50 flex items-center justify-between gap-4">
+        <h2 className="text-lg font-bold text-white tracking-widest flex-shrink-0">COMMS_TERMINAL</h2>
+        <div className="relative flex-grow">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/50" />
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-8 pr-3 py-1.5 bg-black/50 text-primary placeholder:text-muted-foreground border border-primary/50 focus:border-primary focus:outline-none font-mono text-sm"
+          />
+        </div>
         <Button onClick={toggleDrawer} variant="ghost" size="icon" className="text-primary/60 hover:text-primary">
           <X className="w-6 h-6" />
         </Button>
       </div>
       {/* Drawer Content */}
       <div className="flex-1 flex overflow-hidden">
-        <div className="w-[200px] border-r border-primary/50 flex flex-col">
+        <div className="w-44 border-r border-primary/50 flex flex-col">
           {renderAgentRoster()}
         </div>
         <div className="flex-1 flex flex-col">
           {selectedAgents.length > 0 ? renderChatView() : (
-             <div className="flex-1 flex items-center justify-center">
-                <p className="text-primary/40 font-mono text-center">
-                  SELECT CALLSIGN TO INITIATE<br/>COMM-LINK.
-                </p>
-             </div>
+            <div className="flex-1 flex items-center justify-center">
+              <p className="text-primary/50">Select an agent to begin communication.</p>
+            </div>
           )}
         </div>
       </div>
@@ -461,30 +415,32 @@ export function ChatNotification({ onDrawerStateChange }: ChatNotificationProps)
     document.body
   ) : null;
 
-
   return (
     <>
-      <button onClick={toggleDrawer} className="relative w-12 h-12 flex items-center justify-center">
-        {/* Base icon for shape and size */}
-        <MessageSquare size={36} strokeWidth={1.5} className="scale-x-[-1] text-foreground" />
-  
-        {/* Agent Icon with Glitch Effect */}
-        {notifications.length > 0 && currentAgentForNotification && (
-          <div className={cn(
-            "absolute w-6 h-6 flex items-center justify-center",
-            isGlitching && "animate-glitch-in"
-          )}>
-             {React.isValidElement(currentAgentForNotification.icon) ? React.cloneElement(currentAgentForNotification.icon, { size: 18, className: 'text-foreground' }) : null}
-          </div>
-        )}
-        
-        {/* Notification Count Badge */}
-        {notifications.length > 0 && (
-          <div className="absolute top-0 right-0 w-5 h-5 bg-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center border-2 border-background">
-            {notifications.length}
-          </div>
-        )}
-      </button>
+      {!isDrawerOpen && (
+          <button
+            onClick={toggleDrawer}
+            className="fixed bottom-6 right-6 z-50 w-12 h-12 flex items-center justify-center"
+            aria-label="Toggle chat"
+          >
+            <MessageSquare size={36} strokeWidth={1.5} className="scale-x-[-1] text-foreground" />
+            
+            {notifications.length > 0 && currentAgentForNotification && (
+              <div className={cn(
+                "absolute w-6 h-6 flex items-center justify-center",
+                isGlitching && "animate-glitch-in"
+              )}>
+                {React.isValidElement(currentAgentForNotification.icon) ? React.cloneElement(currentAgentForNotification.icon, { size: 18, className: 'text-foreground' }) : null}
+              </div>
+            )}
+            
+            {notifications.length > 0 && (
+              <div className="absolute top-0 right-0 w-5 h-5 bg-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center border-2 border-background">
+                {notifications.length}
+              </div>
+            )}
+        </button>
+      )}
 
       {drawerComponent}
     </>

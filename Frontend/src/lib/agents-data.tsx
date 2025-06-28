@@ -15,7 +15,6 @@ import {
   Megaphone,
   UserCheck,
   Ghost,
-  LucideIcon,
 } from "lucide-react";
 import { ReactNode } from "react";
 
@@ -45,9 +44,10 @@ export interface Agent {
 }
 
 export const agentsData: Agent[] = [
+  // 00_CEO_LAG
   {
     id: "CEO_AGENT",
-    name: "CEO Agent",
+    name: "CEO",
     role: "Chief Executive Officer",
     status: "OPERATIONAL",
     performance: 98,
@@ -59,9 +59,10 @@ export const agentsData: Agent[] = [
     capabilities: ["strategic_planning", "decision_making", "coordination"],
     uptime: "24h 15m"
   },
+  // 01_SEO_LAG
   {
     id: "SEO_AGENT", 
-    name: "SEO Agent",
+    name: "SEO",
     role: "Search Engine Optimization",
     status: "OPERATIONAL",
     performance: 95,
@@ -73,9 +74,10 @@ export const agentsData: Agent[] = [
     capabilities: ["keyword_analysis", "content_optimization", "ranking_improvement"],
     uptime: "18h 42m"
   },
+  // 02_CM_LAG
   {
     id: "CM_AGENT",
-    name: "Community Manager",
+    name: "CM RRSS",
     role: "Social Media Management", 
     status: "WARNING",
     performance: 88,
@@ -87,9 +89,10 @@ export const agentsData: Agent[] = [
     capabilities: ["social_media", "community_engagement", "content_creation"],
     uptime: "12h 30m"
   },
+  // 03_PSICO_LAG
   {
     id: "PSICO_AGENT",
-    name: "Psychology Expert",
+    name: "Psychology",
     role: "Audience Analysis",
     status: "OPERATIONAL",
     performance: 94,
@@ -101,9 +104,10 @@ export const agentsData: Agent[] = [
     capabilities: ["behavior_analysis", "user_insights", "psychological_profiling"],
     uptime: "20h 15m"
   },
+  // 04_CLIP_LAG
   {
     id: "CLIP_AGENT",
-    name: "Clip Agent",
+    name: "Clip",
     role: "Video Clip Generation",
     status: "OPERATIONAL",
     performance: 96,
@@ -115,9 +119,10 @@ export const agentsData: Agent[] = [
     capabilities: ["video_processing", "clip_generation", "content_sourcing"],
     uptime: "22h 5m"
   },
+  // 05_MEDIA_LAG
   {
     id: "MEDIA_AGENT",
-    name: "Media Agent",
+    name: "Media",
     role: "Media Management",
     status: "OPERATIONAL",
     performance: 93,
@@ -129,9 +134,10 @@ export const agentsData: Agent[] = [
     capabilities: ["asset_management", "metadata_tagging", "storage_optimization"],
     uptime: "23h 10m"
   },
+  // 06_TALENT_LAG
   {
     id: "TALENT_AGENT",
-    name: "Talent Agent",
+    name: "Talent",
     role: "Talent Acquisition",
     status: "INACTIVE",
     performance: 0,
@@ -143,9 +149,10 @@ export const agentsData: Agent[] = [
     capabilities: ["scouting", "negotiation", "contract_management"],
     uptime: "0h 0m"
   },
+  // 07_CASH_LAG
   {
     id: "CASH_AGENT",
-    name: "Cash Agent",
+    name: "Cash",
     role: "Financial Management",
     status: "OPERATIONAL",
     performance: 99,
@@ -157,9 +164,10 @@ export const agentsData: Agent[] = [
     capabilities: ["transaction_processing", "budgeting", "financial_reporting"],
     uptime: "24h 0m"
   },
+  // 08_LAW_LAG
   {
     id: "LAW_AGENT",
-    name: "Law Agent",
+    name: "Law",
     role: "Legal Compliance",
     status: "OPERATIONAL",
     performance: 97,
@@ -171,9 +179,10 @@ export const agentsData: Agent[] = [
     capabilities: ["compliance_checking", "contract_review", "risk_assessment"],
     uptime: "24h 5m"
   },
+  // 09_IT_LAG
   {
     id: "IT_AGENT",
-    name: "IT Agent",
+    name: "IT",
     role: "Infrastructure & Security",
     status: "OPERATIONAL",
     performance: 95,
@@ -185,9 +194,10 @@ export const agentsData: Agent[] = [
     capabilities: ["system_monitoring", "security_audits", "network_management"],
     uptime: "23h 50m"
   },
+  // 10_DJ_LAG
   {
     id: "DJ_AGENT",
-    name: "DJ Agent",
+    name: "DJ",
     role: "Music & Audio Management",
     status: "OPERATIONAL",
     performance: 91,
@@ -199,9 +209,10 @@ export const agentsData: Agent[] = [
     capabilities: ["audio_mixing", "music_curation", "sound_design"],
     uptime: "19h 22m"
   },
+  // 11_WPM_LAG
   {
     id: "WPM_AGENT",
-    name: "WPM Agent",
+    name: "WP Manager",
     role: "Project Management",
     status: "WARNING",
     performance: 85,
@@ -213,9 +224,10 @@ export const agentsData: Agent[] = [
     capabilities: ["task_scheduling", "resource_allocation", "progress_tracking"],
     uptime: "15h 45m"
   },
+  // 12_DEV_LAG
   {
     id: "DEV_AGENT",
-    name: "Dev Agent",
+    name: "Dev",
     role: "Software Development",
     status: "OPERATIONAL",
     performance: 94,
@@ -227,9 +239,10 @@ export const agentsData: Agent[] = [
     capabilities: ["coding", "debugging", "version_control"],
     uptime: "21h 30m"
   },
+  // 13_ADS_LAG
   {
     id: "ADS_AGENT",
-    name: "Ads Agent",
+    name: "Ads",
     role: "Advertising Campaigns",
     status: "OPERATIONAL",
     performance: 92,
@@ -241,32 +254,34 @@ export const agentsData: Agent[] = [
     capabilities: ["campaign_management", "ad_optimization", "analytics"],
     uptime: "20h 55m"
   },
+  // 14_DONNA_LAG
   {
     id: "DONNA_AGENT",
-    name: "Donna Agent",
+    name: "Donna",
     role: "Executive Assistant",
     status: "OPERATIONAL",
     performance: 99,
     tasksCompleted: 250,
     currentTasks: 2,
-    description: "Assists with scheduling and administrative tasks.",
+    description: "Personal assistant for scheduling and communication.",
     icon: <UserCheck />,
     priority: 1,
     capabilities: ["scheduling", "communication", "task_management"],
-    uptime: "24h 10m"
+    uptime: "24h 0m"
   },
+  // 15_GHOST_LAG
   {
     id: "GHOST_AGENT",
-    name: "Ghost Agent",
-    role: "Content Ghostwriting",
-    status: "OPERATIONAL",
+    name: "Ghost",
+    role: "Stealth Operations",
+    status: "INACTIVE",
     performance: 96,
     tasksCompleted: 130,
-    currentTasks: 4,
-    description: "Writes content on behalf of others.",
+    currentTasks: 0,
+    description: "Handles sensitive and confidential tasks.",
     icon: <Ghost />,
-    priority: 3,
-    capabilities: ["writing", "research", "tone_adaptation"],
-    uptime: "22h 40m"
+    priority: 1,
+    capabilities: ["secure_communication", "data_anonymization", "stealth_operations"],
+    uptime: "N/A"
   }
-]
+];

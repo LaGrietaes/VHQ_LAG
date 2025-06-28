@@ -85,7 +85,7 @@ export function SystemMonitor({ onlineAgents, totalAgents }: SystemMonitorProps)
   }
 
   return (
-    <div className="flex items-center space-x-4 text-xs font-mono h-9">
+    <div className="flex items-center gap-6 text-xs font-mono h-9">
       {/* Agent Monitor */}
       <div className="flex items-center space-x-1">
         <Users className="h-3 w-3 text-white" />

@@ -1,74 +1,81 @@
 "use client"
 
-import * as React from "react"
-import { cn } from "@/lib/utils"
-import Image from "next/image"
+import { useTheme } from 'next-themes';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
-interface ThemeAwareLogoProps extends React.HTMLAttributes<HTMLDivElement> {
-  size?: "small" | "medium" | "large"
-  variant?: "full" | "compact"
-  theme?: "dark" | "light" | "auto"
+interface ThemeAwareLogoProps {
+  variant?: 'full' | 'small';
+  className?: string;
 }
 
-export function ThemeAwareLogo({ 
-  className, 
-  size = "medium", 
-  variant = "full",
-  theme = "auto",
-  ...props 
+export function ThemeAwareLogo({
+  variant = 'full',
+  className = '',
 }: ThemeAwareLogoProps) {
-  const [isDark, setIsDark] = React.useState(false)
+  const { theme, systemTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const [isPortrait, setIsPortrait] = useState(false);
 
-  React.useEffect(() => {
-    if (theme === "auto") {
-      // Check if we're in a dark background context
-      const checkDarkMode = () => {
-        const body = document.body
-        const computedStyle = window.getComputedStyle(body)
-        const bgColor = computedStyle.backgroundColor
-        // Simple heuristic: if background is dark, use dark logo
-        setIsDark(bgColor === 'rgb(0, 0, 0)' || body.classList.contains('dark'))
-      }
-      checkDarkMode()
-    } else {
-      setIsDark(theme === "dark")
-    }
-  }, [theme])
+  useEffect(() => {
+    setMounted(true);
 
-  const getDimensions = () => {
-    if (variant === "compact") {
-      switch (size) {
-        case "small": return { width: 40, height: 40 }
-        case "medium": return { width: 60, height: 60 }
-        case "large": return { width: 80, height: 80 }
-      }
-    } else {
-      switch (size) {
-        case "small": return { width: 120, height: 30 }
-        case "medium": return { width: 160, height: 40 }
-        case "large": return { width: 200, height: 50 }
-      }
-    }
+    // Set up portrait mode detection
+    const mediaQuery = window.matchMedia("(orientation: portrait)");
+    setIsPortrait(mediaQuery.matches);
+
+    const handleOrientationChange = (e: MediaQueryListEvent) => {
+      setIsPortrait(e.matches);
+    };
+
+    mediaQuery.addEventListener('change', handleOrientationChange);
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleOrientationChange);
+    };
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className={`h-12 w-auto ${className}`} />
+    );
   }
 
-  const getLogoPath = () => {
-    const themePrefix = isDark ? "dark" : "light"
-    const sizePrefix = variant === "compact" ? "small" : "full"
-    return `/lagrieta-logo-${themePrefix}-${sizePrefix}.svg`
-  }
+  const currentTheme = theme === 'system' ? systemTheme : theme;
+  const isDark = currentTheme === 'dark';
 
-  const dimensions = getDimensions()
+  // Use LA_VHQ for portrait mode on tablets/phones, otherwise use full VHQ_LAG
+  const useCompactLogo = isPortrait || variant === 'small';
+  
+  const logoPath = useCompactLogo
+    ? isDark ? '/LA_VHQ_W.svg' : '/LA_VHQ_B.svg'
+    : isDark ? '/VHQ_LAG_White.svg' : '/VHQ_LAG_Black.svg';
+
+  // Calculate dimensions based on logo type
+  const dimensions = useCompactLogo
+    ? { width: 120, height: 57 } // LA_VHQ (312.1:149.05 aspect ratio, scaled down)
+    : { width: 244, height: 60 }; // VHQ_LAG (keeping the same dimensions)
 
   return (
-    <div className={cn("relative flex items-center", className)} {...props}>
-      <Image
-        src={getLogoPath()}
-        alt="LA GRIETA"
-        width={dimensions.width}
-        height={dimensions.height}
-        className="object-contain"
-        priority
-      />
+    <div className={`relative flex items-center ${className}`}>
+      <div 
+        className="relative"
+        style={{
+          width: dimensions.width,
+          height: dimensions.height,
+          maxWidth: '100%'
+        }}
+      >
+        <Image
+          src={logoPath}
+          alt="VHQ Logo"
+          fill
+          className="object-contain object-center"
+          priority
+          sizes={`${dimensions.width}px`}
+          quality={100}
+        />
+      </div>
     </div>
-  )
+  );
 } 

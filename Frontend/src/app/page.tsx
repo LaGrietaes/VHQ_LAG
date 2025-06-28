@@ -1,3 +1,5 @@
+"use client"
+
 import { ThemeAwareLogo } from "@/components/theme-aware-logo"
 import { SystemMonitor } from "@/components/system-monitor"
 import { AgentCard } from "@/components/agent-card"
@@ -9,95 +11,81 @@ import { ProjectTimeline } from "@/components/project-timeline"
 import { TrendAnalysis } from "@/components/trend-analysis"
 import { ProcessingQueue } from "@/components/processing-queue"
 import { agentsData } from "@/lib/agents-data"
+import { Sidebar } from "@/components/sidebar"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import Link from "next/link"
+import { ChatNotification } from '@/components/chat-notification'
+import { useState } from 'react'
+import { cn } from "@/lib/utils"
+
+const SectionTitle = ({ children }: { children: React.ReactNode }) => (
+  <h2 className="text-lg font-bold text-primary mb-4 border-b border-primary/20 pb-2">
+    {children}
+  </h2>
+);
 
 export default function VHQDashboard() {
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const onlineAgents = agentsData.filter(agent => agent.status === "OPERATIONAL").length;
+  const totalAgents = agentsData.length;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black text-white">
-      {/* Header */}
-      <header className="bg-gradient-to-r from-black to-gray-900 border-b border-red-600/30 p-4 shadow-lg shadow-red-600/10">
-        <div className="container mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            {/* Full logo for larger screens */}
-            <div className="hidden md:block">
-              <ThemeAwareLogo 
-                className="h-8 w-auto" 
-                size="medium" 
-                theme="dark"
-                variant="full"
-              />
-            </div>
-            {/* Compact logo for mobile */}
-            <div className="block md:hidden">
-              <ThemeAwareLogo 
-                className="h-8 w-auto" 
-                size="small" 
-                theme="dark"
-                variant="compact"
-              />
-            </div>
-            <div className="hidden sm:block">
-              <div className="text-xs text-gray-400 font-mono">Virtual Head Quarters</div>
-            </div>
+    <div className="flex min-h-screen bg-background text-foreground font-mono">
+      <Sidebar />
+      <div className={cn(
+        "flex-1 flex flex-col transition-all duration-300 ease-in-out",
+        isChatOpen ? "mr-[500px]" : "mr-0"
+      )}>
+        <header className="sticky top-0 z-30 flex items-center justify-between p-6 pr-10 border-b border-border bg-background/80 backdrop-blur-md h-24">
+          <div className="flex-1">
+            <Link href="/">
+              <ThemeAwareLogo />
+            </Link>
           </div>
-          <SystemMonitor />
-        </div>
-      </header>
-
-      {/* Main Dashboard */}
-      <main className="container mx-auto p-6 space-y-6">
-        {/* Dashboard Overview */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2 text-red-400 font-mono">LA GRIETA COMMAND CENTER</h1>
-          <p className="text-gray-400 font-mono">Real-time agent monitoring and system control</p>
-        </div>
-
-        {/* Agent Grid */}
-        <section className="mb-8">
-          <h2 className="text-xl font-bold mb-4 text-white font-mono border-l-4 border-red-600 pl-3">AGENT STATUS</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {agentsData.map((agent) => (
-              <AgentCard key={agent.id} agent={agent} />
-            ))}
+          <h1 className="text-xl font-bold tracking-widest text-primary uppercase flex-1 text-center">VHQ_LAG // Dashboard</h1>
+          <div className="flex-1 flex justify-end items-center gap-4">
+            <SystemMonitor onlineAgents={onlineAgents} totalAgents={totalAgents} />
+            <ChatNotification onDrawerStateChange={setIsChatOpen} />
           </div>
-        </section>
+        </header>
 
-        {/* Metrics Dashboard */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-          <div className="lg:col-span-2">
-            <SEOMetrics />
-          </div>
-          <div>
-            <CalendarWidget />
-          </div>
-        </section>
-
-        {/* Analytics Section */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <EngagementOptimization />
-          <TrendAnalysis />
-        </section>
-
-        {/* Task Management */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-          <TodoList />
-          <ProjectTimeline />
-          <ProcessingQueue />
-        </section>
-
-        {/* Status Bar */}
-        <footer className="mt-12 pt-6 border-t border-gray-800">
-          <div className="flex items-center justify-between text-xs font-mono text-gray-500">
-            <div className="flex items-center space-x-4">
-              <span>SYSTEM STATUS: <span className="text-green-400">OPERATIONAL</span></span>
-              <span>AGENTS: <span className="text-red-400">{agentsData.length}</span></span>
-              <span>UPTIME: <span className="text-blue-400">24h 15m</span></span>
-            </div>
-            <div className="text-gray-600">
-              © 2024 LA GRIETA - Virtual Head Quarters
-            </div>
-          </div>
-        </footer>
-      </main>
+        <main className="flex-1 overflow-y-auto p-8">
+          <Tabs defaultValue="tasks">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="tasks">Schedule & Tasks</TabsTrigger>
+              <TabsTrigger value="analytics">Analytics</TabsTrigger>
+              <TabsTrigger value="system">System Queue</TabsTrigger>
+            </TabsList>
+            <TabsContent value="tasks">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+                    <div className="lg:col-span-1">
+                        <CalendarWidget />
+                    </div>
+                    <div className="lg:col-span-1">
+                        <TodoList />
+                    </div>
+                    <div className="lg:col-span-2">
+                        <ProjectTimeline />
+                    </div>
+                </div>
+            </TabsContent>
+            <TabsContent value="analytics">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+                    <div className="lg:col-span-2">
+                      <SEOMetrics />
+                    </div>
+                    <EngagementOptimization />
+                    <TrendAnalysis />
+                </div>
+            </TabsContent>
+            <TabsContent value="system">
+                <div className="mt-4">
+                    <ProcessingQueue />
+                </div>
+            </TabsContent>
+          </Tabs>
+        </main>
+      </div>
     </div>
   )
 }

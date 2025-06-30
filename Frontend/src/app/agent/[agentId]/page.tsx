@@ -9,6 +9,7 @@ import Link from 'next/link'
 import { ChatNotification } from '@/components/chat-notification'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
+import GhostWriterView from '@/components/ghost'
 
 export default function AgentDetailPage() {
   const [isChatOpen, setIsChatOpen] = useState(false)
@@ -31,7 +32,7 @@ export default function AgentDetailPage() {
   const totalAgents = agentsData.length;
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground font-mono">
+    <div className="flex h-screen bg-background text-foreground font-mono">
       <Sidebar />
       <div className={cn(
         "flex-1 flex flex-col transition-all duration-300 ease-in-out",
@@ -51,8 +52,12 @@ export default function AgentDetailPage() {
                 </div>
             </div>
         </header>
-        <main className="flex-1 overflow-y-auto p-8">
-          <p>Test Content</p>
+        <main className="flex-1 overflow-hidden">
+          {agent.id === 'GHOST_AGENT' ? <GhostWriterView /> : (
+            <div className="h-full overflow-y-auto p-8">
+              <p>Test Content</p>
+            </div>
+          )}
         </main>
       </div>
     </div>

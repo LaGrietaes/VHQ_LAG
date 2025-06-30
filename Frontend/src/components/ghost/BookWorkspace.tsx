@@ -1,6 +1,6 @@
 import { Project } from "@/lib/ghost-agent-data";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, BrainCircuit, Globe, Settings2, FileSignature, BookText, Share2, Save, ChevronsUp, FilePlus, Upload, Link } from "lucide-react";
+import { ArrowLeft, BrainCircuit, Globe, Settings2, FileSignature, BookText, Share2, Save, ChevronsUp, FilePlus, Upload, Link, FolderPlus, FilePlus as FilePlusIcon } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +16,8 @@ import { LinkProjectDialog } from "./LinkProjectDialog";
 import { v4 as uuidv4 } from 'uuid';
 import { ImportDialog, StagedFile } from "./ImportDialog";
 import { OutlineItemView, TreeOutlineItem } from "./OutlineItemView";
+import { DragDropContext, Droppable, DropResult } from "@hello-pangea/dnd";
+import { Input } from "@/components/ui/input";
 
 type OutlineItem = {
     id: string;
@@ -23,6 +25,8 @@ type OutlineItem = {
     type: 'chapter' | 'section';
     content: string;
 };
+
+type RenderableItem = TreeOutlineItem & { level: number };
 
 const bookTemplates = [
      { 
@@ -52,6 +56,8 @@ export const BookWorkspace = ({ project, onBack, onUpdateProject, allProjects }:
   const [editingItemTitle, setEditingItemTitle] = useState("");
   const [activeItemId, setActiveItemId] = useState<string | null>(null);
   const [outlineKey, setOutlineKey] = useState(Date.now());
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  const [searchTerm, setSearchTerm] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const folderInputRef = useRef<HTMLInputElement>(null);
 
@@ -336,6 +342,100 @@ export const BookWorkspace = ({ project, onBack, onUpdateProject, allProjects }:
     }
   };
 
+  const handleToggleExpand = (itemId: string) => {
+    setExpandedItems(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(itemId)) {
+        newSet.delete(itemId);
+      } else {
+        newSet.add(itemId);
+      }
+      return newSet;
+    });
+  };
+
+  const onDragEnd = (result: DropResult) => {
+    const { source, destination } = result;
+    if (!destination) return;
+
+    const findItemAndParent = (nodes: TreeOutlineItem[], id: string, parent: TreeOutlineItem | null = null): {item: TreeOutlineItem, parent: TreeOutlineItem | null} | null => {
+        for(const item of nodes) {
+            if (item.id === id) return { item, parent };
+            if (item.children) {
+                const found = findItemAndParent(item.children, id, item);
+                if (found) return found;
+            }
+        }
+        return null;
+    }
+
+    const reorderChildren = (parent: TreeOutlineItem | { structure: TreeOutlineItem[] }, startIndex: number, endIndex: number) => {
+        const childList = 'structure' in parent ? parent.structure : parent.children || [];
+        const [removed] = childList.splice(startIndex, 1);
+        childList.splice(endIndex, 0, removed);
+        return childList;
+    }
+
+    const newStructure = JSON.parse(JSON.stringify(project.structure || []));
+
+    const flatItems = flattenTree(newStructure);
+    const sourceItemInfo = findItemAndParent(newStructure, flatItems[source.index].id);
+    const destItemInfo = findItemAndParent(newStructure, flatItems[destination.index].id);
+
+    if (sourceItemInfo && destItemInfo && sourceItemInfo.parent?.id === destItemInfo.parent?.id) {
+        const parent = sourceItemInfo.parent;
+        const parentChildren = parent ? parent.children : newStructure;
+        if (!parentChildren) return;
+
+        const sourceListIndex = parentChildren.findIndex(i => i.id === sourceItemInfo.item.id);
+        const destListIndex = parentChildren.findIndex(i => i.id === destItemInfo.item.id);
+
+        reorderChildren(parent || { structure: newStructure }, sourceListIndex, destListIndex);
+        onUpdateProject({ ...project, structure: newStructure });
+    }
+  };
+  
+  const flattenTree = (tree: TreeOutlineItem[]): RenderableItem[] => {
+    const flatList: RenderableItem[] = [];
+    
+    function recurse(nodes: TreeOutlineItem[], level: number) {
+        for (const node of nodes) {
+            flatList.push({ ...node, level });
+            if (expandedItems.has(node.id) && node.children) {
+                recurse(node.children, level + 1);
+            }
+        }
+    }
+    
+    recurse(tree, 0);
+    return flatList;
+  };
+
+  const visibleItems = project.structure ? flattenTree(project.structure) : [];
+
+  const filteredItems = visibleItems.filter(item => 
+    item.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleAddItem = (type: 'chapter' | 'folder') => {
+    const newItem: TreeOutlineItem = {
+      id: uuidv4(),
+      title: type === 'folder' ? "New Folder" : "New Chapter",
+      type: type,
+      children: type === 'folder' ? [] : undefined,
+      content: ""
+    };
+
+    const newStructure = [...(project.structure || []), newItem];
+    onUpdateProject({ ...project, structure: newStructure });
+    
+    setEditingItemId(newItem.id);
+    setEditingItemTitle(newItem.title);
+    if(type === 'folder') {
+        setExpandedItems(prev => new Set(prev).add(newItem.id));
+    }
+  };
+
   return (
     <div className="h-full flex flex-col bg-black text-gray-300 font-mono">
       <input 
@@ -409,12 +509,61 @@ export const BookWorkspace = ({ project, onBack, onUpdateProject, allProjects }:
       </header>
       <div className="flex-1 flex min-h-0">
         <aside className="w-1/3 lg:w-1/4 p-4 border-r border-gray-800 bg-gradient-to-r from-gray-900 to-black flex flex-col">
-            <div className="flex justify-between items-center mb-4 flex-shrink-0">
-                <h3 className="text-lg font-semibold text-red-600">OUTLINE</h3>
+            <div className="flex items-center gap-2 mb-4 flex-shrink-0">
+                <Input 
+                    type="text"
+                    placeholder="Search outline..."
+                    className="bg-gray-800 border-gray-700 text-white h-8 flex-grow"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <Button variant="ghost" size="icon" onClick={() => handleAddItem('folder')} className="text-gray-400 hover:text-red-400">
+                    <FolderPlus className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={() => handleAddItem('chapter')} className="text-gray-400 hover:text-red-400">
+                    <FilePlusIcon className="h-4 w-4" />
+                </Button>
+            </div>
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable droppableId="outline">
+                {(provided) => (
+                  <div 
+                    className="flex-grow overflow-y-auto -mr-4 pr-4" 
+                    key={outlineKey}
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                  >
+                      <ul className="space-y-1">
+                          {filteredItems.map((item, index) => (
+                              <OutlineItemView
+                                  key={item.id}
+                                  item={item}
+                                  index={index}
+                                  level={item.level}
+                                  activeItemId={activeItemId}
+                                  editingItemId={editingItemId}
+                                  editingItemTitle={editingItemTitle}
+                                  onItemClick={setActiveItemId}
+                                  onItemDoubleClick={handleTitleDoubleClick}
+                                  onTitleChange={handleTitleChange}
+                                  onTitleBlur={handleTitleBlur}
+                                  onTitleKeyDown={handleTitleKeyDown}
+                                  expandedItems={expandedItems}
+                                  onToggleExpand={handleToggleExpand}
+                              />
+                          ))}
+                          {provided.placeholder}
+                      </ul>
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
+
+            <div className="mt-auto pt-4 flex-shrink-0 flex items-center gap-2">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="text-gray-400 hover:text-red-400">
-                            <Upload className="h-4 w-4 mr-2" />
+                        <Button variant="outline" className="flex-1 flex justify-center items-center gap-2 border-gray-700 hover:border-red-600 hover:bg-gray-900 hover:text-red-400">
+                            <Upload className="h-4 w-4" />
                             Importar
                         </Button>
                     </DropdownMenuTrigger>
@@ -427,43 +576,16 @@ export const BookWorkspace = ({ project, onBack, onUpdateProject, allProjects }:
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
-            </div>
-            <div className="flex-grow overflow-y-auto -mr-4 pr-4" key={outlineKey}>
-                <ul className="space-y-1">
-                    {project.structure && project.structure.length > 0 ? (
-                        project.structure.map(item => (
-                            <OutlineItemView
-                                key={item.id}
-                                item={item}
-                                level={0}
-                                activeItemId={activeItemId}
-                                editingItemId={editingItemId}
-                                editingItemTitle={editingItemTitle}
-                                onItemClick={setActiveItemId}
-                                onItemDoubleClick={handleTitleDoubleClick}
-                                onTitleChange={handleTitleChange}
-                                onTitleBlur={handleTitleBlur}
-                                onTitleKeyDown={handleTitleKeyDown}
-                            />
-                        ))
-                    ) : (
-                        <p className="text-gray-500 text-sm">El outline está vacío.</p>
-                    )}
-                </ul>
-            </div>
-
-            <div className="mt-auto pt-4 flex-shrink-0">
                  <DropdownMenu>
                     <DropdownMenuTrigger asChild disabled={editingMode === 'template'}>
-                        <Button variant="outline" className="w-full border-gray-700 hover:border-red-600 hover:bg-gray-900 hover:text-red-400 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <Button variant="outline" className="flex-1 border-gray-700 hover:border-red-600 hover:bg-gray-900 hover:text-red-400 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                             <FilePlus className="h-4 w-4" />
                             <span>PLANTILLAS</span>
-                            <ChevronsUp className="h-4 w-4" />
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)] bg-gray-900 border-gray-700 text-gray-300" side="top">
                         <DropdownMenuLabel className="flex items-center gap-2 text-red-500">
-                          <FilePlus className="h-4 w-4" /> PLANTILLAS DE LIBRO
+                           <FilePlus className="h-4 w-4" /> PLANTILLAS DE LIBRO
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator className="bg-gray-700"/>
                         {templates.map(template => (

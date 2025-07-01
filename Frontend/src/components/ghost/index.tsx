@@ -3,15 +3,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Book, FileText, Rss, Share2, ListChecks, Clock, Bot } from "lucide-react";
-import { mockProjects as initialMockProjects, Project, initialBlogCategories } from "@/lib/ghost-agent-data";
-import { useState } from "react";
-import { ProjectWorkspace } from "./Workspace";
+import { Project, ScriptProject, BlogPostProject, BookProject } from "@/lib/ghost-agent-data";
+import { useState, useEffect, useCallback } from "react";
 import { BookWorkspace } from "./BookWorkspace";
 import { ScriptWorkspace } from "./ScriptWorkspace";
 import { BlogWorkspace } from "./BlogWorkspace";
-import { SocialWorkspace } from "./SocialWorkspace";
 import { cn } from "@/lib/utils";
 import { ProjectCard } from "./ProjectCard";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 
 const UpcomingTasks = () => (
   <Card className="bg-gray-900/50 border-gray-800">
@@ -60,6 +63,67 @@ const AgentLogs = () => (
   </Card>
 )
 
+interface NewProjectDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onProjectCreated: () => void;
+}
+
+const NewProjectDialog = ({ isOpen, onClose, onProjectCreated }: NewProjectDialogProps) => {
+    const [projectName, setProjectName] = useState("");
+    const [projectType, setProjectType] = useState<'book' | 'blog' | 'script'>('book');
+
+    const handleCreate = async () => {
+        if (!projectName) return;
+        try {
+            const response = await fetch('/api/projects/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: projectName, type: projectType }),
+            });
+            if (response.ok) {
+                onProjectCreated();
+                onClose();
+            } else {
+                const err = await response.json();
+                console.error("Failed to create project", err.error);
+            }
+        } catch (error) {
+            console.error("Error creating project", error);
+        }
+    };
+
+    return (
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Create New Project</DialogTitle>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                    <Input
+                        placeholder="Project Name"
+                        value={projectName}
+                        onChange={(e) => setProjectName(e.target.value)}
+                    />
+                    <Select onValueChange={(value) => setProjectType(value as 'book' | 'blog' | 'script')} defaultValue={projectType}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="book">Book</SelectItem>
+                            <SelectItem value="blog">Blog Post</SelectItem>
+                            <SelectItem value="script">Script</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <DialogFooter>
+                    <Button onClick={handleCreate}>Create Project</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+};
+
 const ProjectList = ({ projects, onProjectSelect, onUpdateProject }: { 
   projects: Project[], 
   onProjectSelect: (project: Project) => void,
@@ -107,7 +171,7 @@ const ScriptCategoryFilters = ({ activeCategory, setCategory }: { activeCategory
 }
 
 const BlogCategoryFilters = ({ activeCategory, setCategory }: { activeCategory: string, setCategory: (category: string) => void }) => {
-  const categories = ["all", ...initialBlogCategories];
+    const categories = ["all", "Street Art", "Cultura", "Deporte", "Musica", "Comida", "Viajes", "Fotografia", "Diseño"];
   return (
     <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-2">
       {categories.map(cat => (
@@ -129,143 +193,159 @@ const BlogCategoryFilters = ({ activeCategory, setCategory }: { activeCategory: 
 }
 
 export const GhostWriterView = () => {
-  const [projectsData, setProjectsData] = useState(initialMockProjects);
+  const [projectsData, setProjectsData] = useState<{
+    scripts: ScriptProject[];
+    blogs: BlogPostProject[];
+    books: BookProject[];
+  }>({ scripts: [], blogs: [], books: [] });
+
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [scriptCategory, setScriptCategory] = useState<ScriptCategory>("all");
   const [blogCategory, setBlogCategory] = useState<string>("all");
-  const [activeTab, setActiveTab] = useState<'scripts' | 'blogs' | 'books' | 'socials'>('scripts');
+  const [activeTab, setActiveTab] = useState<'scripts' | 'blogs' | 'books'>('scripts');
+  const [isNewProjectDialogOpen, setIsNewProjectDialogOpen] = useState(false);
 
-  const handleProjectSelect = (project: Project, type: 'scripts' | 'blogs' | 'books' | 'socials') => {
-    setActiveTab(type);
+  const fetchProjects = async () => {
+    try {
+        const response = await fetch('/api/projects');
+        if (!response.ok) throw new Error("Failed to fetch projects");
+        const data = await response.json();
+        setProjectsData(data);
+    } catch (error) {
+        console.error("Failed to fetch projects:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const handleProjectSelect = (project: Project) => {
+    const projectType = projectsData.scripts.some(p => p.id === project.id) ? 'scripts'
+                      : projectsData.blogs.some(p => p.id === project.id) ? 'blogs'
+                      : 'books';
+    setActiveTab(projectType);
     setSelectedProject(project);
   };
 
-  const handleUpdateProject = (updatedProject: Project) => {
-    let categoryKey: "scripts" | "blogs" | "books" | "socials" | null = null;
-    if (projectsData.scripts.some(p => p.id === updatedProject.id)) categoryKey = "scripts";
-    else if (projectsData.blogs.some(p => p.id === updatedProject.id)) categoryKey = "blogs";
-    else if (projectsData.books.some(p => p.id === updatedProject.id)) categoryKey = "books";
-    else if (projectsData.socials.some(p => p.id === updatedProject.id)) categoryKey = "socials";
-
-    if (categoryKey) {
-        setProjectsData(prevData => ({
-            ...prevData,
-            [categoryKey]: prevData[categoryKey]!.map(p =>
-                p.id === updatedProject.id ? updatedProject : p
-            )
-        }));
+  const handleUpdateProject = useCallback((updatedProject: Project) => {
+    if (!updatedProject) {
+        console.warn("handleUpdateProject called with undefined project");
+        return;
     }
-  };
+
+    setProjectsData(prevData => {
+        let categoryKey: "scripts" | "blogs" | "books" | null = null;
+        if (updatedProject.type === 'script' && prevData.scripts.some(p => p?.id === updatedProject.id)) categoryKey = "scripts";
+        else if (updatedProject.type === 'blog' && prevData.blogs.some(p => p?.id === updatedProject.id)) categoryKey = "blogs";
+        else if (updatedProject.type === 'book' && prevData.books.some(p => p?.id === updatedProject.id)) categoryKey = "books";
+
+        if (categoryKey) {
+            return {
+                ...prevData,
+                [categoryKey]: prevData[categoryKey]!.map(p =>
+                    p.id === updatedProject.id ? updatedProject : p
+                )
+            };
+        }
+        return prevData;
+    });
+    
+    setSelectedProject(currentSelected => 
+        (currentSelected && currentSelected.id === updatedProject.id) ? updatedProject : currentSelected
+    );
+  }, []);
 
   const handleBack = () => {
     setSelectedProject(null);
+    fetchProjects();
   };
-
-  const filteredScripts = projectsData.scripts.filter(script => {
-    if (scriptCategory === "all") return true;
-    return script.category === scriptCategory;
-  });
-
-  const filteredBlogs = projectsData.blogs.filter(blog => {
-    if (blogCategory === "all") return true;
-    return blog.blogCategory === blogCategory;
-  });
-
-  if (selectedProject) {
-    const allProjects = [...projectsData.scripts, ...projectsData.blogs, ...projectsData.books, ...projectsData.socials];
-    const currentProjectData = allProjects.find(p => p.id === selectedProject.id) || selectedProject;
-    
-    if (activeTab === 'scripts') {
-        return <ScriptWorkspace
-            project={currentProjectData}
-            onBack={handleBack}
-            onUpdateProject={handleUpdateProject}
-            allProjects={allProjects}
-        />;
-    }
-    if (activeTab === 'blogs') {
-        return <BlogWorkspace
-            project={currentProjectData}
-            onBack={handleBack}
-            onUpdateProject={handleUpdateProject}
-            allProjects={allProjects}
-        />;
-    }
-    if (activeTab === 'books') {
-        return <BookWorkspace
-            project={currentProjectData}
-            onBack={handleBack}
-            onUpdateProject={handleUpdateProject}
-            allProjects={allProjects}
-        />;
-    }
-    if (activeTab === 'socials') {
-        return <SocialWorkspace
-            project={currentProjectData}
-            onBack={handleBack}
-            onUpdateProject={handleUpdateProject}
-            allProjects={allProjects}
-        />;
-    }
-    
-    // Fallback in case something goes wrong, though it shouldn't be reached.
-    return <div>Error: Workspace not found for the selected project.</div>;
-  }
+  
+  const allProjects = [...projectsData.scripts, ...projectsData.blogs, ...projectsData.books];
 
   return (
-    <div className="h-full w-full bg-transparent text-foreground">
-      <div className="h-full w-full flex flex-col">
-        <header className="flex-shrink-0 flex items-center justify-between p-4 border-b border-gray-800">
-          <h2 className="text-xl font-bold text-white font-mono flex items-center gap-2">
-            <FileText className="h-5 w-5 text-red-600" />
-            GHOST WRITER DASHBOARD
-          </h2>
-        </header>
+    <div className="flex flex-col h-full w-full">
+      {selectedProject ? (
+        <>
+          {selectedProject.type === 'book' && (
+            <BookWorkspace
+              project={selectedProject as BookProject}
+              onBack={handleBack}
+              onUpdateProject={handleUpdateProject}
+              allProjects={allProjects}
+            />
+          )}
+          {selectedProject.type === 'script' && (
+            <ScriptWorkspace 
+              project={selectedProject as ScriptProject} 
+              onBack={handleBack} 
+              onUpdateProject={handleUpdateProject}
+              allProjects={allProjects}
+            />
+          )}
+          {selectedProject.type === 'blog' && (
+            <BlogWorkspace 
+              project={selectedProject as BlogPostProject} 
+              onBack={handleBack} 
+              onUpdateProject={handleUpdateProject}
+              allProjects={allProjects}
+            />
+          )}
+        </>
+      ) : (
+        <div className="p-8 h-full overflow-y-auto">
+            <header className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-white">Proyectos de GHOST</h2>
+              <Button onClick={() => setIsNewProjectDialogOpen(true)}>Nuevo Proyecto</Button>
+            </header>
 
-        <div className="flex-1 p-6 grid grid-cols-12 gap-6 overflow-hidden">
-          {/* Main Content Area */}
-          <div className="col-span-12 lg:col-span-9 flex flex-col h-full">
-            <Tabs 
-              value={activeTab} 
-              onValueChange={(value) => setActiveTab(value as 'scripts' | 'blogs' | 'books' | 'socials')}
-              className="flex flex-col flex-1"
-            >
-              <TabsList className="grid w-full grid-cols-4 bg-gray-900 border border-gray-800">
-                <TabsTrigger value="scripts" className="data-[state=active]:bg-red-600 data-[state=active]:text-white text-gray-400">Scripts</TabsTrigger>
-                <TabsTrigger value="blogs" className="data-[state=active]:bg-red-600 data-[state=active]:text-white text-gray-400">Blog Posts</TabsTrigger>
-                <TabsTrigger value="books" className="data-[state=active]:bg-red-600 data-[state=active]:text-white text-gray-400">Books</TabsTrigger>
-                <TabsTrigger value="socials" className="data-[state=active]:bg-red-600 data-[state=active]:text-white text-gray-400">Social Media</TabsTrigger>
-              </TabsList>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <UpcomingTasks />
+                <Deadlines />
+                <AgentLogs />
+            </div>
 
-              <div className="mt-4 flex-1 overflow-y-auto">
-                <TabsContent value="scripts">
-                  <ScriptCategoryFilters activeCategory={scriptCategory} setCategory={setScriptCategory} />
-                  <ProjectList projects={filteredScripts} onProjectSelect={(p) => handleProjectSelect(p, 'scripts')} onUpdateProject={handleUpdateProject} />
-                </TabsContent>
-                <TabsContent value="blogs">
-                  <BlogCategoryFilters activeCategory={blogCategory} setCategory={setBlogCategory} />
-                  <ProjectList projects={filteredBlogs} onProjectSelect={(p) => handleProjectSelect(p, 'blogs')} onUpdateProject={handleUpdateProject} />
-                </TabsContent>
-                <TabsContent value="books">
-                  <ProjectList projects={projectsData.books} onProjectSelect={(p) => handleProjectSelect(p, 'books')} onUpdateProject={handleUpdateProject} />
-                </TabsContent>
-                <TabsContent value="socials">
-                  <ProjectList projects={projectsData.socials} onProjectSelect={(p) => handleProjectSelect(p, 'socials')} onUpdateProject={handleUpdateProject} />
-                </TabsContent>
-              </div>
-            </Tabs>
-          </div>
+            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)} className="w-full">
+            <TabsList className="grid w-full grid-cols-3 bg-gray-900/80">
+              <TabsTrigger value="scripts"><FileText className="w-4 h-4 mr-2" />Guiones</TabsTrigger>
+              <TabsTrigger value="blogs"><Rss className="w-4 h-4 mr-2" />Blogs</TabsTrigger>
+              <TabsTrigger value="books"><Book className="w-4 h-4 mr-2" />Libros</TabsTrigger>
+            </TabsList>
+            <TabsContent value="scripts" className="mt-6">
+              <ScriptCategoryFilters activeCategory={scriptCategory} setCategory={setScriptCategory} />
+              <ProjectList 
+                projects={projectsData.scripts.filter(p => scriptCategory === 'all' || p.category === scriptCategory)} 
+                onProjectSelect={handleProjectSelect}
+                onUpdateProject={handleUpdateProject}
+              />
+            </TabsContent>
+            <TabsContent value="blogs" className="mt-6">
+              <BlogCategoryFilters activeCategory={blogCategory} setCategory={setBlogCategory} />
+               <ProjectList 
+                projects={projectsData.blogs.filter(p => blogCategory === 'all' || p.blogCategory === blogCategory)} 
+                onProjectSelect={handleProjectSelect}
+                onUpdateProject={handleUpdateProject}
+              />
+            </TabsContent>
+            <TabsContent value="books" className="mt-6">
+              <ProjectList 
+                projects={projectsData.books} 
+                onProjectSelect={handleProjectSelect} 
+                onUpdateProject={handleUpdateProject}
+              />
+            </TabsContent>
+          </Tabs>
 
-          {/* Sidebar */}
-          <aside className="col-span-12 lg:col-span-3 flex flex-col gap-6 overflow-y-auto">
-            <UpcomingTasks />
-            <Deadlines />
-            <AgentLogs />
-          </aside>
+          <NewProjectDialog 
+            isOpen={isNewProjectDialogOpen}
+            onClose={() => setIsNewProjectDialogOpen(false)}
+            onProjectCreated={() => {
+              fetchProjects();
+              // Optionally switch to the tab of the new project type
+            }}
+          />
         </div>
-      </div>
+      )}
     </div>
   );
 };
-
-export default GhostWriterView; 

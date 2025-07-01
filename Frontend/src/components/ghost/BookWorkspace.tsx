@@ -1,6 +1,6 @@
-import { Project } from "@/lib/ghost-agent-data";
+import { Project, OutlineItem, BookProject } from "@/lib/ghost-agent-data";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, BrainCircuit, Globe, Settings2, FileSignature, BookText, Share2, Save, ChevronsUp, FilePlus, Upload, Link, FolderPlus, FilePlus as FilePlusIcon } from "lucide-react";
+import { ArrowLeft, BrainCircuit, Globe, Settings2, FileSignature, BookText, Share2, Save, ChevronsUp, FilePlus as FilePlusIcon, Upload, Link, FolderPlus, FileUp, FolderUp, LayoutPanelLeft } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,647 +15,777 @@ import { ConfirmationDialog } from "../ui/ConfirmationDialog";
 import { LinkProjectDialog } from "./LinkProjectDialog";
 import { v4 as uuidv4 } from 'uuid';
 import { ImportDialog, StagedFile } from "./ImportDialog";
-import { OutlineItemView, TreeOutlineItem } from "./OutlineItemView";
-import { DragDropContext, Droppable, DropResult } from "@hello-pangea/dnd";
+import { OutlineItemView } from "./OutlineItemView";
+import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 import { Input } from "@/components/ui/input";
+import * as path from 'path';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
-type OutlineItem = {
-    id: string;
-    title: string;
-    type: 'chapter' | 'section';
-    content: string;
-};
-
-type RenderableItem = TreeOutlineItem & { level: number };
+type RenderableItem = OutlineItem & { level: number };
 
 const bookTemplates = [
-     { 
-        title: "Capítulo de Libro", 
-        content: "# Capítulo X: Título del Capítulo\n\n## Apertura\n\n*   Anécdota o cita para empezar.\n\n## Desarrollo de la Tesis\n\n*   Argumento principal del capítulo.\n\n## Subsección 1\n\n*   Detalles y evidencias.\n\n## Subsección 2\n\n*   Más detalles y contraargumentos.\n\n## Cierre del Capítulo\n\n*   Resumen de lo aprendido.\n*   Transición al siguiente capítulo." 
+     {
+        title: "Capítulo de Libro",
+        content: "# Capítulo X: Título del Capítulo\n\n## Apertura\n\n*   Anécdota o cita para empezar.\n\n## Desarrollo de la Tesis\n\n*   Argumento principal del capítulo.\n\n## Subsección 1\n\n*   Detalles y evidencias.\n\n## Subsección 2\n\n*   Más detalles y contraargumentos.\n\n## Cierre del Capítulo\n\n*   Resumen de lo aprendido.\n*   Transición al siguiente capítulo."
     },
 ];
 
 type BookWorkspaceProps = {
-  project: Project;
+  project: BookProject;
   onBack: () => void;
   onUpdateProject: (project: Project) => void;
   allProjects: Project[];
 };
 
-export const BookWorkspace = ({ project, onBack, onUpdateProject, allProjects }: BookWorkspaceProps) => {
-  const [content, setContent] = useState(project.content || "");
-  const [isDirty, setIsDirty] = useState(false);
-  const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
-  const [editingMode, setEditingMode] = useState<'project' | 'template'>('project');
-  const [newTemplateContent, setNewTemplateContent] = useState("");
-  const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
-  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
-  const [stagedFiles, setStagedFiles] = useState<StagedFile[]>([]);
-  const [templates, setTemplates] = useState(bookTemplates);
-  const [editingItemId, setEditingItemId] = useState<string | null>(null);
-  const [editingItemTitle, setEditingItemTitle] = useState("");
-  const [activeItemId, setActiveItemId] = useState<string | null>(null);
-  const [outlineKey, setOutlineKey] = useState(Date.now());
-  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
-  const [searchTerm, setSearchTerm] = useState("");
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const folderInputRef = useRef<HTMLInputElement>(null);
+export const BookWorkspace = ({ project: initialProject, onBack, onUpdateProject, allProjects }: BookWorkspaceProps) => {
+    const [project, setProject] = useState<BookProject | null>(null);
+    const [content, setContent] = useState("");
+    const [isDirty, setIsDirty] = useState(false);
+    const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
+    const [editingMode, setEditingMode] = useState<'project' | 'template'>('project');
+    const [newTemplateContent, setNewTemplateContent] = useState("");
+    const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
+    const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+    const [stagedFiles, setStagedFiles] = useState<StagedFile[]>([]);
+    const [templates, setTemplates] = useState(bookTemplates);
+    const [editingItemId, setEditingItemId] = useState<string | null>(null);
+    const [editingItemTitle, setEditingItemTitle] = useState("");
+    const [activeItemId, setActiveItemId] = useState<string | null>(null);
+    const [outlineKey, setOutlineKey] = useState(Date.now());
+    const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+    const [searchTerm, setSearchTerm] = useState("");
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const folderInputRef = useRef<HTMLInputElement>(null);
+    const [isContextPanelOpen, setIsContextPanelOpen] = useState(false);
 
-  useEffect(() => {
-    if (editingMode === 'project') {
-      const activeItem = activeItemId ? findItemInTree(project.structure || [], activeItemId) : null;
-      setContent(activeItem?.content || "");
-    }
-  }, [project, editingMode, activeItemId]);
-
-  useEffect(() => {
-    if (editingMode === 'project') {
-      const activeItem = activeItemId ? findItemInTree(project.structure || [], activeItemId) : null;
-      setIsDirty(content !== (activeItem?.content || ""));
-    }
-  }, [content, project, editingMode, activeItemId]);
-
-  const handleBack = () => {
-    if (isDirty) {
-      setConfirmModalOpen(true);
-    } else {
-      onBack();
-    }
-  };
-
-  const handleConfirmLeave = () => {
-    onBack();
-    setConfirmModalOpen(false);
-  };
-
-  const handleSave = () => {
-    if(activeItemId) {
-        const newStructure = updateItemContentInTree(project.structure || [], activeItemId, content);
-        onUpdateProject({ ...project, structure: newStructure });
-    }
-    setIsDirty(false);
-  };
-
-  const handleSaveAndExit = () => {
-    handleSave();
-    onBack();
-    setNewTemplateContent("");
-  };
-
-  const handleCreateNewTemplate = () => {
-    setNewTemplateContent("## Nuevo Título de Plantilla\n\nEscribe tu contenido aquí...");
-    setEditingMode('template');
-  };
-
-  const handleImportFile = (isFolder: boolean) => {
-    if (isFolder) {
-        folderInputRef.current?.click();
-    } else {
-        fileInputRef.current?.click();
-    }
-  };
-
-  const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      const filePromises = Array.from(files).map(file => {
-        return new Promise<StagedFile>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const text = e.target?.result as string;
-            let parsedStructure: TreeOutlineItem[] = [];
-
-            if (file.type === "text/plain" || file.type === "text/markdown" || file.name.endsWith('.md')) {
-                const lines = text.split('\n');
-                const tempTree: TreeOutlineItem[] = [];
-                const parentStack: TreeOutlineItem[] = [];
-
-                lines.forEach(line => {
-                    const match = line.match(/^(#+)\s(.*)/);
-                    if (match) {
-                        const level = match[1].length;
-                        const title = match[2].trim();
-                        const newItem: TreeOutlineItem = {
-                            id: uuidv4(),
-                            title,
-                            type: 'chapter', // Default type, can be refined
-                            content: text,
-                            children: []
-                        };
-
-                        while (parentStack.length >= level) {
-                            parentStack.pop();
-                        }
-                        
-                        const parent = parentStack[parentStack.length - 1];
-                        if (parent) {
-                            parent.children = parent.children || [];
-                            parent.children.push(newItem);
-                        } else {
-                            tempTree.push(newItem);
-                        }
-                        parentStack.push(newItem);
-                    }
-                });
-                parsedStructure = tempTree;
-
-            } else {
-                parsedStructure = [{ id: uuidv4(), title: `Unsupported file type: ${file.name}`, type: 'section', content: `Content of ${file.name} could not be read.`, children: [] }];
+    useEffect(() => {
+        const fetchProjectDetails = async (id: string) => {
+            try {
+                const response = await fetch(`/api/projects/structure?id=${id}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setProject(data.project as BookProject);
+                } else {
+                    console.error("Failed to fetch project details for id:", id);
+                    setProject(initialProject as BookProject);
+                }
+            } catch (error) {
+                console.error("Error fetching project details:", error);
+                setProject(initialProject as BookProject);
             }
-            resolve({ file, parsedStructure });
-          };
-          reader.onerror = reject;
-          reader.readAsText(file);
-        });
-      });
+        };
 
-      Promise.all(filePromises).then(results => {
-        setStagedFiles(results);
-        setIsImportDialogOpen(true);
-      });
+        if (initialProject?.id) {
+             fetchProjectDetails(initialProject.id);
+        }
+    }, [initialProject?.id]);
+
+    useEffect(() => {
+        if (project) {
+            onUpdateProject(project);
+        }
+    }, [project]);
+
+    useEffect(() => {
+        if (project && editingMode === 'project') {
+            const activeItem = activeItemId ? findItemInTree(project.outline || [], activeItemId) : null;
+            setContent(activeItem?.content || "");
+        }
+    }, [project, editingMode, activeItemId]);
+
+    useEffect(() => {
+        if (project && editingMode === 'project') {
+            const activeItem = activeItemId ? findItemInTree(project.outline || [], activeItemId) : null;
+            setIsDirty(content !== (activeItem?.content || ""));
+        }
+    }, [content, project, editingMode, activeItemId]);
+
+    if (!project) {
+        return <div className="flex items-center justify-center h-full w-full bg-black text-white">Loading project...</div>;
     }
 
-    if (event.target) {
-      event.target.value = "";
-    }
-  };
+    const handleBack = () => {
+        if (isDirty) {
+            setConfirmModalOpen(true);
+        } else {
+            onBack();
+        }
+    };
 
-  const handleFolderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-        const fileReadPromises = Array.from(files).map(file => {
-            return new Promise<{ file: File, content: string }>((resolve, reject) => {
-                if (file.type.startsWith('text/') || file.name.endsWith('.md')) {
+    const handleConfirmLeave = () => {
+        onBack();
+        setConfirmModalOpen(false);
+    };
+
+    const handleSave = () => {
+        if(activeItemId) {
+            const newOutline = updateItemContentInTree(project.outline || [], activeItemId, content);
+            setProject({ ...project, outline: newOutline });
+        }
+        setIsDirty(false);
+    };
+
+    const handleSaveAndExit = () => {
+        handleSave();
+        onBack();
+        setNewTemplateContent("");
+    };
+
+    const handleCreateNewTemplate = () => {
+        setNewTemplateContent("## Nuevo Título de Plantilla\n\nEscribe tu contenido aquí...");
+        setEditingMode('template');
+    };
+
+    const handleImportFile = (isFolder: boolean) => {
+        if (isFolder) {
+            folderInputRef.current?.click();
+        } else {
+            fileInputRef.current?.click();
+        }
+    };
+
+    const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
+        if (files && files.length > 0) {
+            const filePromises = Array.from(files).map(file => {
+                return new Promise<StagedFile>((resolve, reject) => {
                     const reader = new FileReader();
-                    reader.onload = (e) => resolve({ file, content: e.target?.result as string });
+                    reader.onload = (e) => {
+                        const text = e.target?.result as string;
+                        let parsedStructure: OutlineItem[] = [];
+
+                        if (file.type === "text/plain" || file.type === "text/markdown" || file.name.endsWith('.md')) {
+                            const lines = text.split('\n');
+                            const tempTree: OutlineItem[] = [];
+                            const parentStack: OutlineItem[] = [];
+
+                            lines.forEach(line => {
+                                const match = line.match(/^(#+)\\s(.*)/);
+                                if (match) {
+                                    const level = match[1].length;
+                                    const title = match[2].trim();
+                                    const newItem: OutlineItem = {
+                                        id: uuidv4(),
+                                        title,
+                                        type: 'file',
+                                        content: text,
+                                        children: []
+                                    };
+
+                                    while (parentStack.length >= level) {
+                                        parentStack.pop();
+                                    }
+
+                                    const parent = parentStack[parentStack.length - 1];
+                                    if (parent) {
+                                        parent.children = parent.children || [];
+                                        parent.children.push(newItem);
+                                    } else {
+                                        tempTree.push(newItem);
+                                    }
+                                    parentStack.push(newItem);
+                                }
+                            });
+                            parsedStructure = tempTree;
+
+                        } else {
+                            parsedStructure = [{ id: uuidv4(), title: `Unsupported file type: ${file.name}`, type: 'file', content: `Content of ${file.name} could not be read.` }];
+                        }
+                        resolve({ file, parsedStructure });
+                    };
                     reader.onerror = reject;
                     reader.readAsText(file);
-                } else {
-                    resolve({ file, content: `Unsupported file type: ${file.name}` });
-                }
-            });
-        });
-
-        Promise.all(fileReadPromises).then(readFiles => {
-            const root: TreeOutlineItem = { id: uuidv4(), title: "Imported Folder", type: 'folder', children: [] };
-            const pathMap: { [key: string]: TreeOutlineItem } = { "": root };
-
-            readFiles.forEach(({ file, content }) => {
-                const pathParts = file.webkitRelativePath.split('/');
-                const fileName = pathParts.pop() || file.name;
-
-                let currentPath = "";
-                for (let i = 0; i < pathParts.length; i++) {
-                    const part = pathParts[i];
-                    const parentPath = currentPath;
-                    currentPath += (currentPath ? '/' : '') + part;
-
-                    if (!pathMap[currentPath]) {
-                        const newFolder: TreeOutlineItem = {
-                            id: uuidv4(),
-                            title: part,
-                            type: 'folder',
-                            children: []
-                        };
-                        pathMap[parentPath].children?.push(newFolder);
-                        pathMap[currentPath] = newFolder;
-                    }
-                }
-
-                const parentFolder = pathMap[pathParts.join('/')] || root;
-                parentFolder.children?.push({
-                    id: uuidv4(),
-                    title: fileName,
-                    type: 'chapter',
-                    content: content
                 });
             });
 
-            const newStructure = [...(project.structure || []), ...(root.children || [])];
-            onUpdateProject({ ...project, structure: newStructure });
-            setOutlineKey(Date.now());
+            Promise.all(filePromises).then(results => {
+                setStagedFiles(results);
+                setIsImportDialogOpen(true);
+            });
+        }
+
+        if (event.target) {
+            event.target.value = "";
+        }
+    };
+
+    const handleFolderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
+        if (files) {
+            const fileReadPromises = Array.from(files).map(file => {
+                return new Promise<{ file: File, content: string }>((resolve, reject) => {
+                    if (file.type.startsWith('text/') || file.name.endsWith('.md')) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => resolve({ file, content: e.target?.result as string });
+                        reader.onerror = reject;
+                        reader.readAsText(file);
+                    } else {
+                        resolve({ file, content: `Unsupported file type: ${file.name}` });
+                    }
+                });
+            });
+
+            Promise.all(fileReadPromises).then(readFiles => {
+                const root: OutlineItem = { id: uuidv4(), title: "Imported Folder", type: 'folder', children: [] };
+                const pathMap: { [key: string]: OutlineItem } = { "": root };
+
+                readFiles.forEach(({ file, content }) => {
+                    const pathParts = file.webkitRelativePath.split('/');
+                    const fileName = pathParts.pop() || file.name;
+
+                    let currentPath = "";
+                    for (let i = 0; i < pathParts.length; i++) {
+                        const part = pathParts[i];
+                        const parentPath = currentPath;
+                        currentPath += (currentPath ? '/' : '') + part;
+
+                        if (!pathMap[currentPath]) {
+                            const newFolder: OutlineItem = {
+                                id: uuidv4(),
+                                title: part,
+                                type: 'folder',
+                                children: []
+                            };
+                            pathMap[parentPath].children?.push(newFolder);
+                            pathMap[currentPath] = newFolder;
+                        }
+                    }
+
+                    pathMap[currentPath].children?.push({
+                        id: uuidv4(),
+                        title: fileName,
+                        type: 'file',
+                        content,
+                    });
+                });
+                setStagedFiles([{ file: new File([], "folder"), parsedStructure: root.children || [] }]);
+                setIsImportDialogOpen(true);
+            });
+        }
+        if (event.target) {
+            event.target.value = "";
+        }
+    };
+
+    const saveNewTemplate = () => {
+        const newTemplate = { title: "Custom Template", content: newTemplateContent };
+        setTemplates([...templates, newTemplate]);
+        setEditingMode('project');
+        setNewTemplateContent("");
+    };
+
+    const cancelTemplateCreation = () => {
+        setEditingMode('project');
+        setNewTemplateContent("");
+    };
+
+    const handleTemplateSelect = (templateContent: string) => {
+        if (!activeItemId) {
+            console.warn("No active item to apply template to.");
+            return;
+        }
+        const updatedOutline = addTemplateContentInTree(project.outline, activeItemId, templateContent);
+        setProject({ ...project, outline: updatedOutline });
+    };
+
+    const handleEditorChange = (value: string) => {
+        setContent(value || "");
+    };
+
+    const handleTitleDoubleClick = (item: OutlineItem) => {
+        setEditingItemId(item.id);
+        setEditingItemTitle(item.title);
+    };
+
+    const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setEditingItemTitle(e.target.value);
+    };
+
+    const updateItemInTree = (nodes: OutlineItem[], id: string, newTitle: string): OutlineItem[] => {
+        return nodes.map(node => {
+            if (node.id === id) {
+                return { ...node, title: newTitle };
+            }
+            if (node.children) {
+                return { ...node, children: updateItemInTree(node.children, id, newTitle) };
+            }
+            return node;
         });
-    }
-    if (event.target) {
-        event.target.value = "";
-    }
-  };
+    };
 
-  const saveNewTemplate = () => {
-    const title = newTemplateContent.split('\n')[0].replace('#', '').trim() || "Nueva Plantilla";
-    const newTemplate = { title, content: newTemplateContent };
-    setTemplates(prev => [...prev, newTemplate]);
-    setEditingMode('project');
-    setNewTemplateContent("");
-  };
-
-  const cancelTemplateCreation = () => {
-    setEditingMode('project');
-    setNewTemplateContent("");
-  };
-
-  const handleTemplateSelect = (templateContent: string) => {
-    if (editingMode === 'template') return;
-    
-    if(activeItemId) {
-        const newStructure = addTemplateContentInTree(project.structure || [], activeItemId, templateContent);
-        onUpdateProject({ ...project, structure: newStructure });
-    }
-  };
-
-  const editorContent = editingMode === 'project' ? content : newTemplateContent;
-  const handleEditorChange = (value: string) => {
-      if (editingMode === 'template') {
-          setNewTemplateContent(value);
-      } else {
-          setContent(value);
-      }
-  }
-
-  const handleTitleDoubleClick = (item: TreeOutlineItem) => {
-    setEditingItemId(item.id);
-    setEditingItemTitle(item.title);
-  };
-
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEditingItemTitle(e.target.value);
-  };
-
-  const updateItemInTree = (nodes: TreeOutlineItem[], id: string, newTitle: string): TreeOutlineItem[] => {
-    return nodes.map(node => {
-        if (node.id === id) {
-            return { ...node, title: newTitle };
-        }
-        if (node.children) {
-            return { ...node, children: updateItemInTree(node.children, id, newTitle) };
-        }
-        return node;
-    });
-  };
-
-  const findItemInTree = (nodes: TreeOutlineItem[], id: string): TreeOutlineItem | null => {
-    for (const node of nodes) {
-        if (node.id === id) return node;
-        if (node.children) {
-            const found = findItemInTree(node.children, id);
-            if (found) return found;
-        }
-    }
-    return null;
-  };
-
-  const updateItemContentInTree = (nodes: TreeOutlineItem[], id: string, newContent: string): TreeOutlineItem[] => {
-    return nodes.map(node => {
-        if (node.id === id) {
-            return { ...node, content: newContent };
-        }
-        if (node.children) {
-            return { ...node, children: updateItemContentInTree(node.children, id, newContent) };
-        }
-        return node;
-    });
-  };
-
-  const addTemplateContentInTree = (nodes: TreeOutlineItem[], id: string, templateContent: string): TreeOutlineItem[] => {
-      return nodes.map(node => {
-          if (node.id === id) {
-              return { ...node, content: (node.content || "") + templateContent };
-          }
-          if (node.children) {
-              return { ...node, children: addTemplateContentInTree(node.children, id, templateContent) };
-          }
-          return node;
-      });
-  };
-
-  const handleTitleBlur = () => {
-    if (editingItemId) {
-      const newStructure = updateItemInTree(project.structure || [], editingItemId, editingItemTitle)
-      onUpdateProject({ ...project, structure: newStructure });
-      setEditingItemId(null);
-    }
-  };
-
-  const handleTitleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleTitleBlur();
-    }
-  };
-
-  const handleToggleExpand = (itemId: string) => {
-    setExpandedItems(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(itemId)) {
-        newSet.delete(itemId);
-      } else {
-        newSet.add(itemId);
-      }
-      return newSet;
-    });
-  };
-
-  const onDragEnd = (result: DropResult) => {
-    const { source, destination } = result;
-    if (!destination) return;
-
-    const findItemAndParent = (nodes: TreeOutlineItem[], id: string, parent: TreeOutlineItem | null = null): {item: TreeOutlineItem, parent: TreeOutlineItem | null} | null => {
-        for(const item of nodes) {
-            if (item.id === id) return { item, parent };
-            if (item.children) {
-                const found = findItemAndParent(item.children, id, item);
+    const findItemInTree = (nodes: OutlineItem[], id: string): OutlineItem | null => {
+        for (const node of nodes) {
+            if (node.id === id) return node;
+            if (node.children) {
+                const found = findItemInTree(node.children, id);
                 if (found) return found;
             }
         }
         return null;
-    }
-
-    const reorderChildren = (parent: TreeOutlineItem | { structure: TreeOutlineItem[] }, startIndex: number, endIndex: number) => {
-        const childList = 'structure' in parent ? parent.structure : parent.children || [];
-        const [removed] = childList.splice(startIndex, 1);
-        childList.splice(endIndex, 0, removed);
-        return childList;
-    }
-
-    const newStructure = JSON.parse(JSON.stringify(project.structure || []));
-
-    const flatItems = flattenTree(newStructure);
-    const sourceItemInfo = findItemAndParent(newStructure, flatItems[source.index].id);
-    const destItemInfo = findItemAndParent(newStructure, flatItems[destination.index].id);
-
-    if (sourceItemInfo && destItemInfo && sourceItemInfo.parent?.id === destItemInfo.parent?.id) {
-        const parent = sourceItemInfo.parent;
-        const parentChildren = parent ? parent.children : newStructure;
-        if (!parentChildren) return;
-
-        const sourceListIndex = parentChildren.findIndex(i => i.id === sourceItemInfo.item.id);
-        const destListIndex = parentChildren.findIndex(i => i.id === destItemInfo.item.id);
-
-        reorderChildren(parent || { structure: newStructure }, sourceListIndex, destListIndex);
-        onUpdateProject({ ...project, structure: newStructure });
-    }
-  };
-  
-  const flattenTree = (tree: TreeOutlineItem[]): RenderableItem[] => {
-    const flatList: RenderableItem[] = [];
-    
-    function recurse(nodes: TreeOutlineItem[], level: number) {
-        for (const node of nodes) {
-            flatList.push({ ...node, level });
-            if (expandedItems.has(node.id) && node.children) {
-                recurse(node.children, level + 1);
-            }
-        }
-    }
-    
-    recurse(tree, 0);
-    return flatList;
-  };
-
-  const visibleItems = project.structure ? flattenTree(project.structure) : [];
-
-  const filteredItems = visibleItems.filter(item => 
-    item.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const handleAddItem = (type: 'chapter' | 'folder') => {
-    const newItem: TreeOutlineItem = {
-      id: uuidv4(),
-      title: type === 'folder' ? "New Folder" : "New Chapter",
-      type: type,
-      children: type === 'folder' ? [] : undefined,
-      content: ""
     };
 
-    const newStructure = [...(project.structure || []), newItem];
-    onUpdateProject({ ...project, structure: newStructure });
-    
-    setEditingItemId(newItem.id);
-    setEditingItemTitle(newItem.title);
-    if(type === 'folder') {
-        setExpandedItems(prev => new Set(prev).add(newItem.id));
-    }
-  };
+    const findParent = (nodes: OutlineItem[], id: string, parent: OutlineItem | null = null): OutlineItem | null => {
+        for (const node of nodes) {
+            if (node.id === id) return parent;
+            if (node.children) {
+                const found = findParent(node.children, id, node);
+                if (found) return found;
+            }
+        }
+        return null;
+    };
+
+    const updateItemContentInTree = (nodes: OutlineItem[], id: string, newContent: string): OutlineItem[] => {
+        return nodes.map(node => {
+            if (node.id === id) {
+                return { ...node, content: newContent };
+            }
+            if (node.children) {
+                return { ...node, children: updateItemContentInTree(node.children, id, newContent) };
+            }
+            return node;
+        });
+    };
+
+    const addTemplateContentInTree = (nodes: OutlineItem[], id: string, templateContent: string): OutlineItem[] => {
+        return nodes.map(node => {
+            if (node.id === id) {
+                return { ...node, content: (node.content || "") + "\n" + templateContent };
+            }
+            if (node.children) {
+                return { ...node, children: addTemplateContentInTree(node.children, id, templateContent) };
+            }
+            return node;
+        });
+    };
+
+    const findItemPath = (nodes: OutlineItem[], id: string, currentPath: string[] = []): string | null => {
+        for(const node of nodes) {
+            const nextPath = [...currentPath, node.title];
+            if (node.id === id) {
+                return path.join(...nextPath);
+            }
+            if (node.children) {
+                const foundPath = findItemPath(node.children, id, nextPath);
+                if (foundPath) return foundPath;
+            }
+        }
+        return null;
+    };
+
+    const handleTitleBlur = async () => {
+        if (!editingItemId) return;
+
+        const item = findItemInTree(project.outline, editingItemId);
+        if (!item) return;
+
+        if (editingItemTitle === item.title) {
+            setEditingItemId(null);
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/workspace/renameItem', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    projectRootPath: project.path,
+                    itemId: editingItemId,
+                    newTitle: editingItemTitle,
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Failed to rename item:', errorData.message || 'Unknown error');
+                setProject(prev => {
+                    if (!prev) return null;
+                    const newOutline = updateItemInTree(prev.outline, editingItemId!, item.title);
+                    return { ...prev, outline: newOutline };
+                });
+            } else {
+                const { updatedProject } = await response.json();
+                setProject(prev => prev ? { ...prev, outline: updatedProject.outline } : null);
+            }
+        } catch (error) {
+            console.error('Error renaming item:', error);
+            setProject(prev => {
+                if (!prev) return null;
+                const newOutline = updateItemInTree(prev.outline, editingItemId!, item.title);
+                return { ...prev, outline: newOutline };
+            });
+        } finally {
+            setEditingItemId(null);
+            setOutlineKey(Date.now());
+        }
+    };
+
+    const handleTitleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            handleTitleBlur();
+        } else if (e.key === 'Escape') {
+            setEditingItemId(null);
+        }
+    };
+
+    const handleToggleExpand = (itemId: string) => {
+        setExpandedItems(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(itemId)) {
+                newSet.delete(itemId);
+            } else {
+                newSet.add(itemId);
+            }
+            return newSet;
+        });
+    };
+
+    const onDragEnd = (result: DropResult) => {
+        const { source, destination, draggableId } = result;
+        if (!destination) return;
+
+        const newOutline = [...project.outline];
+
+        const findAndRemove = (nodes: OutlineItem[], id: string): OutlineItem | null => {
+            for (let i = 0; i < nodes.length; i++) {
+                if (nodes[i].id === id) {
+                    return nodes.splice(i, 1)[0];
+                }
+                if (nodes[i].children) {
+                    const found = findAndRemove(nodes[i].children!, id);
+                    if (found) return found;
+                }
+            }
+            return null;
+        };
+
+        const findParentAndIndex = (nodes: OutlineItem[], targetId: string, parent: OutlineItem | null = null): { parent: OutlineItem | null, index: number } | null => {
+            for (let i = 0; i < nodes.length; i++) {
+                if (nodes[i].id === targetId) {
+                    return { parent, index: i };
+                }
+                const children = nodes[i].children;
+                if (children) {
+                    const found = findParentAndIndex(children, targetId, nodes[i]);
+                    if (found) return found;
+                }
+            }
+            return null;
+        }
+
+        const findAndAdd = (nodes: OutlineItem[], targetId: string, itemToAdd: OutlineItem): boolean => {
+            for (let i = 0; i < nodes.length; i++) {
+                if (nodes[i].id === targetId && nodes[i].type === 'folder') {
+                    const targetNode = nodes[i];
+                    if (!targetNode.children) {
+                        targetNode.children = [];
+                    }
+                    targetNode.children.splice(destination.index, 0, itemToAdd);
+                    return true;
+                }
+                const children = nodes[i].children;
+                if (children) {
+                    if (findAndAdd(children, targetId, itemToAdd)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        };
+
+        const movedItem = findAndRemove(newOutline, draggableId);
+        if (!movedItem) return;
+
+        if (destination.droppableId === 'outline-root') {
+            newOutline.splice(destination.index, 0, movedItem);
+        } else {
+            const parentId = destination.droppableId.replace('droppable-', '');
+            if (!findAndAdd(newOutline, parentId, movedItem)) {
+                newOutline.splice(source.index, 0, movedItem);
+            }
+        }
+
+        setProject({ ...project, outline: newOutline });
+        setOutlineKey(Date.now());
+    };
+
+    const flattenTree = (tree: OutlineItem[]): RenderableItem[] => {
+        const result: RenderableItem[] = [];
+        function recurse(nodes: OutlineItem[], level: number) {
+            for (const node of nodes) {
+                result.push({ ...node, level });
+                if (node.children && expandedItems.has(node.id)) {
+                    recurse(node.children, level + 1);
+                }
+            }
+        }
+        recurse(tree, 0);
+        return result;
+    };
+
+    const handleAddItem = async (type: 'file' | 'folder') => {
+        const parentId = activeItemId || project.id;
+        const newItem: OutlineItem = {
+            id: uuidv4(),
+            title: type === 'file' ? 'New File' : 'New Folder',
+            type: type,
+            children: type === 'folder' ? [] : undefined,
+            content: type === 'file' ? '' : undefined,
+        };
+
+        try {
+            const response = await fetch('/api/workspace/addItem', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    projectRootPath: project.path,
+                    parentId: parentId === project.id ? null : parentId,
+                    item: newItem,
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to create item');
+            }
+
+            const { updatedProject } = await response.json();
+            setProject(prev => prev ? { ...prev, outline: updatedProject.outline } : null);
+            setOutlineKey(Date.now());
+            setActiveItemId(newItem.id);
+            setEditingItemId(newItem.id);
+
+        } catch (error) {
+            console.error('Failed to create item:', error);
+        }
+    };
+
+    const removeItemFromTree = (nodes: OutlineItem[], id: string): OutlineItem[] => {
+        return nodes.reduce((acc, node) => {
+            if (node.id === id) {
+                return acc;
+            }
+            if (node.children) {
+                node.children = removeItemFromTree(node.children, id);
+            }
+            acc.push(node);
+            return acc;
+        }, [] as OutlineItem[]);
+    };
+
+    const setItemPersisted = (nodes: OutlineItem[], id: string, newTitle: string): OutlineItem[] => {
+      return nodes.map(node => {
+        if (node.id === id) {
+          return { ...node, title: newTitle, isNew: false };
+        }
+        if (node.children) {
+          return { ...node, children: setItemPersisted(node.children, id, newTitle) };
+        }
+        return node;
+      });
+    };
+
+    const filteredAndFlattenedOutline = flattenTree(
+        project.outline.filter(item => item.title.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
 
   return (
-    <div className="h-full flex flex-col bg-black text-gray-300 font-mono">
-      <input 
-        type="file"
-        ref={fileInputRef}
-        onChange={onFileChange}
-        className="hidden"
-        accept=".md,.txt,.pdf,.docx"
-        multiple
-      />
-      <input 
-        type="file"
-        ref={folderInputRef}
-        onChange={handleFolderChange}
-        className="hidden"
-        webkitdirectory=""
-        directory=""
-      />
-      
-      <ImportDialog
-        isOpen={isImportDialogOpen}
-        onClose={() => setIsImportDialogOpen(false)}
-        stagedFiles={stagedFiles}
-        onConfirmImport={(selectedItems) => {
-            onUpdateProject({ ...project, structure: [...(project.structure || []), ...selectedItems] });
-            setIsImportDialogOpen(false);
-            setOutlineKey(Date.now());
-        }}
-      />
-      
-      <header className="flex-shrink-0 flex items-center justify-between p-4 border-b border-gray-800">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={editingMode === 'project' ? handleBack : cancelTemplateCreation} className="text-gray-400 hover:bg-gray-800 hover:text-red-400">
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <h2 className="text-xl font-bold text-white">
-            {editingMode === 'project' ? project.title : "Crear Nueva Plantilla de Libro"}
-          </h2>
-          {editingMode === 'project' && (
-            <>
-              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-red-400 flex items-center gap-2">
-                  <BrainCircuit className="h-4 w-4" />PSY
-              </Button>
-              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-red-400 flex items-center gap-2">
-                  <Globe className="h-4 w-4" />SEO
-              </Button>
-              <Button variant="ghost" size="icon" className="text-gray-400 hover:text-red-400">
-                  <Settings2 className="h-5 w-5" />
-              </Button>
-            </>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          {editingMode === 'project' && (
-            <>
-              <Button variant="outline" onClick={() => setIsLinkDialogOpen(true)} className="border-gray-700 hover:border-red-600 hover:bg-gray-900 hover:text-red-400 flex items-center gap-2">
-                <Link className="h-4 w-4" /> LINK CONTENT
-              </Button>
-              <Button variant="outline" className="border-gray-700 hover:border-red-600 hover:bg-gray-900 hover:text-red-400">
-                <FileSignature className="h-4 w-4 mr-2"/> GEN DRAFT
-              </Button>
-              <Button variant="outline" className="border-gray-700 hover:border-red-600 hover:bg-gray-900 hover:text-red-400">
-                <BookText className="h-4 w-4 mr-2"/> SUMMRZ
-              </Button>
-              <Button variant="outline" className="border-gray-700 hover:border-red-600 hover:bg-gray-900 hover:text-red-400">
-                <Share2 className="h-4 w-4 mr-2"/> XPND
-              </Button>
-            </>
-          )}
-        </div>
-      </header>
-      <div className="flex-1 flex min-h-0">
-        <aside className="w-1/3 lg:w-1/4 p-4 border-r border-gray-800 bg-gradient-to-r from-gray-900 to-black flex flex-col">
-            <div className="flex items-center gap-2 mb-4 flex-shrink-0">
-                <Input 
-                    type="text"
-                    placeholder="Search outline..."
-                    className="bg-gray-800 border-gray-700 text-white h-8 flex-grow"
+    <div className="flex flex-1 w-full bg-background text-foreground">
+      {/* Left Panel: Outline */}
+      <div className="w-1/4 min-w-[300px] border-r border-gray-800 flex flex-col bg-gray-900/50">
+            <div className="p-4 flex-shrink-0">
+                <Button variant="ghost" size="sm" onClick={handleBack} className="mb-4">
+                    <ArrowLeft className="mr-2 h-4 w-4" /> Volver a Proyectos
+                </Button>
+                <h2 className="text-2xl font-bold truncate text-primary">{project.name}</h2>
+                <Input
+                    type="search"
+                    placeholder="Buscar en el esquema..."
+                    className="mt-4"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <Button variant="ghost" size="icon" onClick={() => handleAddItem('folder')} className="text-gray-400 hover:text-red-400">
-                    <FolderPlus className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="icon" onClick={() => handleAddItem('chapter')} className="text-gray-400 hover:text-red-400">
-                    <FilePlusIcon className="h-4 w-4" />
-                </Button>
             </div>
-            <DragDropContext onDragEnd={onDragEnd}>
-              <Droppable droppableId="outline">
-                {(provided) => (
-                  <div 
-                    className="flex-grow overflow-y-auto -mr-4 pr-4" 
-                    key={outlineKey}
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                  >
-                      <ul className="space-y-1">
-                          {filteredItems.map((item, index) => (
-                              <OutlineItemView
-                                  key={item.id}
-                                  item={item}
-                                  index={index}
-                                  level={item.level}
-                                  activeItemId={activeItemId}
-                                  editingItemId={editingItemId}
-                                  editingItemTitle={editingItemTitle}
-                                  onItemClick={setActiveItemId}
-                                  onItemDoubleClick={handleTitleDoubleClick}
-                                  onTitleChange={handleTitleChange}
-                                  onTitleBlur={handleTitleBlur}
-                                  onTitleKeyDown={handleTitleKeyDown}
-                                  expandedItems={expandedItems}
-                                  onToggleExpand={handleToggleExpand}
-                              />
+
+            <div className="flex-shrink-0 px-4 pb-2 border-b border-gray-800 flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="icon" onClick={() => handleAddItem('file')} title="Nuevo Archivo">
+                        <FilePlusIcon className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => handleAddItem('folder')} title="Nueva Carpeta">
+                        <FolderPlus className="h-4 w-4" />
+                    </Button>
+                    <div className="w-px h-6 bg-gray-800 mx-1" />
+                    <Button variant="ghost" size="icon" onClick={() => handleImportFile(false)} title="Importar Archivo">
+                        <FileUp className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => handleImportFile(true)} title="Importar Carpeta">
+                        <FolderUp className="h-4 w-4" />
+                    </Button>
+                    <div className="w-px h-6 bg-gray-800 mx-1" />
+                    <Button variant="ghost" size="icon" onClick={() => setIsLinkDialogOpen(true)} title="Vincular Proyecto">
+                        <Link className="h-4 w-4" />
+                    </Button>
+                </div>
+            </div>
+
+            <div className="flex-grow overflow-y-auto">
+                 <DragDropContext onDragEnd={onDragEnd}>
+                    <Droppable droppableId="outline-root" type="DEFAULT">
+                      {(provided, snapshot) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.droppableProps}
+                          className={cn("p-4 space-y-1", snapshot.isDraggingOver ? "bg-primary/10" : "")}
+                        >
+                          {filteredAndFlattenedOutline.map((item, index) => (
+                            <Draggable key={item.id} draggableId={item.id} index={index}>
+                              {(provided, snapshot) => (
+                                <div
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                >
+                                    <OutlineItemView
+                                        item={item}
+                                        level={item.level}
+                                        onSelect={() => setActiveItemId(item.id)}
+                                        isSelected={activeItemId === item.id}
+                                        onDoubleClick={() => handleTitleDoubleClick(item)}
+                                        isEditing={editingItemId === item.id}
+                                        editingTitle={editingItemTitle}
+                                        onTitleChange={handleTitleChange}
+                                        onTitleBlur={handleTitleBlur}
+                                        onTitleKeyDown={handleTitleKeyDown}
+                                        isExpanded={expandedItems.has(item.id)}
+                                        onToggleExpand={() => handleToggleExpand(item.id)}
+                                    />
+                                </div>
+                              )}
+                            </Draggable>
                           ))}
                           {provided.placeholder}
-                      </ul>
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
-
-            <div className="mt-auto pt-4 flex-shrink-0 flex items-center gap-2">
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="flex-1 flex justify-center items-center gap-2 border-gray-700 hover:border-red-600 hover:bg-gray-900 hover:text-red-400">
-                            <Upload className="h-4 w-4" />
-                            Importar
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                        <DropdownMenuItem onSelect={() => handleImportFile(false)}>
-                            Importar Archivos
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => handleImportFile(true)}>
-                            Importar Carpeta
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-                 <DropdownMenu>
-                    <DropdownMenuTrigger asChild disabled={editingMode === 'template'}>
-                        <Button variant="outline" className="flex-1 border-gray-700 hover:border-red-600 hover:bg-gray-900 hover:text-red-400 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                            <FilePlus className="h-4 w-4" />
-                            <span>PLANTILLAS</span>
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)] bg-gray-900 border-gray-700 text-gray-300" side="top">
-                        <DropdownMenuLabel className="flex items-center gap-2 text-red-500">
-                           <FilePlus className="h-4 w-4" /> PLANTILLAS DE LIBRO
-                        </DropdownMenuLabel>
-                        <DropdownMenuSeparator className="bg-gray-700"/>
-                        {templates.map(template => (
-                             <DropdownMenuItem 
-                                key={template.title}
-                                onSelect={() => handleTemplateSelect(template.content)}
-                                className="hover:bg-gray-800 hover:text-white"
-                             >
-                                {template.title}
-                            </DropdownMenuItem>
-                        ))}
-                        <DropdownMenuSeparator className="bg-gray-700"/>
-                        <DropdownMenuItem onSelect={handleCreateNewTemplate} className="hover:bg-gray-800 hover:text-white flex items-center gap-2">
-                           <FilePlus className="h-4 w-4" /> Crear Nueva
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                        </div>
+                      )}
+                    </Droppable>
+                  </DragDropContext>
             </div>
-        </aside>
-
-        <main className="w-2/3 lg:w-3/4 flex flex-col bg-black">
-           <div className="p-4 flex-grow min-h-0">
-               <textarea 
-                  className="w-full h-full bg-transparent text-gray-300 font-mono text-base border-none resize-none focus:outline-none leading-relaxed"
-                  value={editorContent}
-                  onChange={(e) => handleEditorChange(e.target.value)}
-              />
-          </div>
-          <footer className="flex-shrink-0 p-4 border-t border-gray-800 flex justify-end items-center gap-4">
-            {editingMode === 'project' ? (
-              <div className="flex items-center">
-                  <Button onClick={handleSave} variant="outline" disabled={!isDirty} className="h-full border-gray-700 hover:border-green-600 hover:bg-gray-900 hover:text-green-400 disabled:opacity-50 disabled:hover:border-gray-700 disabled:hover:text-gray-500">
-                    <Save className="h-4 w-4 mr-2" /> SAVE
-                  </Button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-4">
-                 <Button onClick={cancelTemplateCreation} variant="destructive" className="bg-red-800 hover:bg-red-700 text-white">
-                    Cancelar
-                </Button>
-                <Button onClick={saveNewTemplate} variant="outline" className="border-green-600 text-green-400 hover:bg-green-900 hover:text-green-300">
-                  <Save className="h-4 w-4 mr-2" /> Guardar Plantilla
-                </Button>
-              </div>
-            )}
-          </footer>
-        </main>
       </div>
-      <ConfirmationDialog 
+
+      {/* Main Panel: Editor */}
+      <div className={cn("flex-grow flex flex-col transition-all duration-300 ease-in-out", isContextPanelOpen ? "w-1/2" : "w-3/4")}>
+         <div className="flex-shrink-0 p-4 border-b border-gray-800 flex justify-between items-center">
+                <div>
+                    <Button variant={editingMode === 'project' ? "secondary" : "ghost"} size="sm" onClick={() => setEditingMode('project')}>Editor</Button>
+                    <Button variant={editingMode === 'template' ? "secondary" : "ghost"} size="sm" onClick={handleCreateNewTemplate}>Plantillas</Button>
+                </div>
+                <div>
+                    <Button variant="ghost" size="icon" onClick={handleSave} disabled={!isDirty}>
+                        <Save className={cn("h-5 w-5", isDirty ? "text-primary" : "")} />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => setIsContextPanelOpen(!isContextPanelOpen)}>
+                        <LayoutPanelLeft className="h-5 w-5" />
+                    </Button>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon"><ChevronsUp className="h-5 w-5" /></Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuLabel>Opciones de IA</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem>Sugerir Mejoras</DropdownMenuItem>
+                            <DropdownMenuItem>Optimizar para SEO</DropdownMenuItem>
+                            <DropdownMenuItem>Cambiar Tono</DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+            </div>
+
+            <div className="flex-grow overflow-y-auto p-2">
+                 {editingMode === 'project' ? (
+                    <textarea
+                        className="w-full h-full p-4 bg-transparent resize-none focus:outline-none text-base leading-relaxed"
+                        value={content}
+                        onChange={(e) => handleEditorChange(e.target.value)}
+                        placeholder="Selecciona un archivo del esquema para empezar a escribir..."
+                    />
+                ) : (
+                    <div className="p-4">
+                        <h3 className="text-xl font-bold mb-4">Plantillas de Contenido</h3>
+                        <div className="grid grid-cols-2 gap-4">
+                            {templates.map((template, index) => (
+                                <Card key={index} className="cursor-pointer hover:border-primary p-0 gap-0 rounded-lg" onClick={() => handleTemplateSelect(template.content)}>
+                                    <CardHeader className="p-6 flex flex-col space-y-1.5">
+                                        <CardTitle className="text-2xl tracking-tight">{template.title}</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="p-6 pt-0">
+                                        <p className="text-sm text-muted-foreground line-clamp-3">{template.content}</p>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
+      </div>
+
+      {/* Right Panel: Context */}
+        {isContextPanelOpen && (
+            <div className="w-1/4 min-w-[300px] border-l border-gray-800 flex flex-col bg-gray-900/50 animate-in slide-in-from-right duration-300">
+                <div className="p-4 border-b border-gray-800">
+                <h3 className="text-lg font-semibold text-primary">Contexto del Proyecto</h3>
+                </div>
+                <div className="flex-grow p-4 overflow-y-auto">
+                    {/* Context widgets go here */}
+                </div>
+            </div>
+        )}
+
+      <ConfirmationDialog
         isOpen={isConfirmModalOpen}
-        onSave={handleSaveAndExit}
-        onDiscard={handleConfirmLeave}
         onCancel={() => setConfirmModalOpen(false)}
-        title="Cambios no guardados"
-        message="Tienes cambios sin guardar. ¿Qué te gustaría hacer?"
+        onDiscard={handleConfirmLeave}
+        title="¿Descartar cambios?"
+        message="Tienes cambios sin guardar. ¿Estás seguro de que quieres salir?"
       />
-      <LinkProjectDialog 
-        isOpen={isLinkDialogOpen}
-        onClose={() => setIsLinkDialogOpen(false)}
-        currentProject={project}
-        allProjects={allProjects}
-        onUpdateProject={onUpdateProject}
-      />
+
+       <LinkProjectDialog
+            isOpen={isLinkDialogOpen}
+            onClose={() => setIsLinkDialogOpen(false)}
+            allProjects={allProjects}
+            currentProject={project}
+            onUpdateProject={onUpdateProject}
+        />
+
+        <ImportDialog
+            isOpen={isImportDialogOpen}
+            onClose={() => setIsImportDialogOpen(false)}
+            stagedFiles={stagedFiles}
+            onImport={(itemsToImport: OutlineItem[]) => {
+                 setProject(prev => {
+                    if (!prev) return null;
+                    const newOutline = [...prev.outline, ...itemsToImport];
+                    return { ...prev, outline: newOutline };
+                });
+                setIsImportDialogOpen(false);
+            }}
+        />
+
+        <input
+            type="file"
+            ref={fileInputRef}
+            onChange={onFileChange}
+            style={{ display: 'none' }}
+        />
+        <input
+            type="file"
+            ref={folderInputRef}
+            onChange={handleFolderChange}
+            style={{ display: 'none' }}
+            // These attributes are non-standard but necessary for folder uploads
+            {...{ webkitdirectory: "true", mozdirectory: "true", directory: "true" }}
+        />
     </div>
   );
 };
-
-declare module 'react' {
-    interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
-      webkitdirectory?: string;
-      directory?: string;
-    }
-} 

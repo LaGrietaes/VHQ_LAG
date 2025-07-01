@@ -13,9 +13,14 @@ export async function GET() {
       si.currentLoad()
     ]);
 
-    const cpuTemp = await si.cpuTemperature();
+    let cpuTemp = { main: 0 };
+    try {
+      cpuTemp = await si.cpuTemperature();
+    } catch (e) {
+      // console.warn("Could not get CPU temperature:", e);
+    }
 
-    const mainDisk = fsSize[0];
+    const mainDisk = fsSize.find(d => d.mount === 'C:') || fsSize[0];
     const gpuController = gpu.controllers[0];
 
     const stats = {

@@ -30,19 +30,109 @@ export const mockProjects = {
   ]
 };
 
-export type Project = {
+export interface OutlineItem {
   id: string;
   title: string;
-  status: "Borrador" | "Revisión" | "Pausado" | "Finalizado" | "Escribiendo" | "Planificado";
+  content?: string;
+  type: 'folder' | 'file';
+  children?: OutlineItem[];
+  isNew?: boolean;
+}
+
+// Base Project Type
+interface BaseProject {
+  id: string;
+  title: string;
   lastEdit: string;
   progress: number;
-  category?: "Video" | "Short";
-  platforms?: Platform[];
-  socialPlatforms?: Platform[];
-  blogCategory?: string;
-  duration?: string;
-  readingTime?: string;
+  description?: string;
   relatedProjectIds?: string[];
-  content?: string;
-  platformOverrides?: { [key in Platform]?: string };
-}; 
+}
+
+export interface ScriptProject extends BaseProject {
+  type: 'script';
+  status: "Borrador" | "Revisión" | "Pausado" | "Finalizado";
+  category: "Video" | "Short";
+  platforms: Platform[];
+  duration: string;
+}
+
+export interface BlogPostProject extends BaseProject {
+  type: 'blog';
+  status: "Finalizado" | "Escribiendo";
+  blogCategory: string;
+  readingTime: string;
+}
+
+export interface BookProject extends BaseProject {
+  type: 'book';
+  status: "Escribiendo" | "Planificado";
+  name: string;
+  path: string;
+  outline: OutlineItem[];
+}
+
+export interface SocialPostProject extends BaseProject {
+    type: 'social';
+    status: "Borrador" | "Revisión";
+    socialPlatforms: Platform[];
+    content?: string;
+    platformOverrides?: { [key in Platform]?: string };
+}
+
+export type Project = ScriptProject | BlogPostProject | BookProject | SocialPostProject;
+
+// Let's fix the mock data
+mockProjects.scripts = [
+    { ...mockProjects.scripts[0], type: 'script' as const },
+    { ...mockProjects.scripts[1], type: 'script' as const },
+    { ...mockProjects.scripts[2], type: 'script' as const },
+    { ...mockProjects.scripts[3], type: 'script' as const },
+];
+
+mockProjects.blogs = [
+    { ...mockProjects.blogs[0], type: 'blog' as const },
+    { ...mockProjects.blogs[1], type: 'blog' as const },
+];
+
+mockProjects.socials = [
+    { ...mockProjects.socials[0], type: 'social' as const },
+    { ...mockProjects.socials[1], type: 'social' as const },
+];
+
+// The books data was fixed in a previous step, but let's ensure it conforms to the new structure.
+const books: BookProject[] = [
+    { 
+      id: "Test_Project", 
+      title: "Test Project", 
+      status: "Escribiendo", 
+      lastEdit: "4h ago", 
+      progress: 55, 
+      type: 'book',
+      name: 'Test_Project',
+      path: 'GHOST_Proyectos/libros/Test_Project',
+      description: 'A deep dive into the silicon revolution.',
+      outline: [
+        { id: '1', title: 'Chapter 1: The Beginning', type: 'file', children: [] },
+        { id: '2', title: 'Folder 1', type: 'folder', children: [
+            { id: '2-1', title: 'Chapter 2: The Middle', type: 'file', children: [] },
+            { id: '2-2', title: 'Chapter 3: The Other Middle', type: 'file', children: [] },
+        ] },
+        { id: '3', title: 'Chapter 4: The End', type: 'file', children: [] },
+      ]
+    },
+    { 
+      id: "bok-02", 
+      title: "Memorias de un Viajero", 
+      status: "Planificado", 
+      lastEdit: "1w ago", 
+      progress: 5, 
+      type: 'book',
+      name: 'Memorias de un Viajero',
+      path: 'GHOST_Proyectos/libros/Memorias de un Viajero',
+      description: 'Tales from a world traveler.',
+      outline: []
+    },
+];
+
+mockProjects.books = books; 

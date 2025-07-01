@@ -9,7 +9,8 @@ import Link from 'next/link'
 import { ChatNotification } from '@/components/chat-notification'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
-import GhostWriterView from '@/components/ghost'
+import { GhostWriterView } from '@/components/ghost'
+import { CMWorkspaceView } from '@/components/cm'
 
 export default function AgentDetailPage() {
   const [isChatOpen, setIsChatOpen] = useState(false)
@@ -53,9 +54,11 @@ export default function AgentDetailPage() {
             </div>
         </header>
         <main className="flex-1 overflow-hidden">
-          {agent.id === 'GHOST_AGENT' ? <GhostWriterView /> : (
+          {agent.id === 'GHOST_AGENT' && <GhostWriterView />}
+          {agent.id === 'CM_LAG' && <CMWorkspaceView />}
+          {!['GHOST_AGENT', 'CM_LAG'].includes(agent.id) && (
             <div className="h-full overflow-y-auto p-8">
-              <p>Test Content</p>
+              <p>Workspace not available for this agent yet.</p>
             </div>
           )}
         </main>

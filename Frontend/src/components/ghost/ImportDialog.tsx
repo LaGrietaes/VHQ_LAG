@@ -10,12 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useState, useEffect } from "react";
-
-type OutlineItem = {
-    id: string;
-    title: string;
-    type: 'chapter' | 'section';
-};
+import { OutlineItem } from "@/lib/ghost-agent-data";
 
 export type StagedFile = {
     file: File;
@@ -26,10 +21,10 @@ type ImportDialogProps = {
   isOpen: boolean;
   onClose: () => void;
   stagedFiles: StagedFile[];
-  onConfirmImport: (selectedItems: OutlineItem[]) => void;
+  onImport: (selectedItems: OutlineItem[]) => void;
 };
 
-export const ImportDialog = ({ isOpen, onClose, stagedFiles, onConfirmImport }: ImportDialogProps) => {
+export const ImportDialog = ({ isOpen, onClose, stagedFiles, onImport }: ImportDialogProps) => {
     const [selectedItems, setSelectedItems] = useState<{ [id: string]: boolean }>({});
 
     useEffect(() => {
@@ -53,7 +48,7 @@ export const ImportDialog = ({ isOpen, onClose, stagedFiles, onConfirmImport }: 
                 }
             });
         });
-        onConfirmImport(itemsToImport);
+        onImport(itemsToImport);
     };
     
     const handleItemSelect = (id: string, isSelected: boolean) => {

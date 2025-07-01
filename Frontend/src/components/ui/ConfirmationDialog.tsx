@@ -5,7 +5,7 @@ import { Button } from "./button";
 
 type ConfirmationDialogProps = {
   isOpen: boolean;
-  onSave: () => void;
+  onSave?: () => void;
   onDiscard: () => void;
   onCancel: () => void;
   title: string;
@@ -41,13 +41,15 @@ export const ConfirmationDialog = ({ isOpen, onSave, onDiscard, onCancel, title,
           >
             Cancelar
           </Button>
-          <Button 
-            onClick={onSave}
-            className="bg-slate-700 hover:bg-slate-600 text-white font-bold flex items-center gap-2 border border-slate-500"
-          >
-            <Save className="h-4 w-4" />
-            Guardar
-          </Button>
+          {onSave && (
+            <Button 
+              onClick={onSave}
+              className="bg-slate-700 hover:bg-slate-600 text-white font-bold flex items-center gap-2 border border-slate-500"
+            >
+              <Save className="h-4 w-4" />
+              Guardar
+            </Button>
+          )}
           <Button 
             variant="destructive" 
             onClick={onDiscard}

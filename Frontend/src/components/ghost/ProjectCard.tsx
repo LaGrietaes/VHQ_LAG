@@ -1,156 +1,163 @@
-import { Project, Platform, initialBlogCategories } from "@/lib/ghost-agent-data";
-import { useState, useRef, useEffect } from "react";
-import { Edit, Save, XCircle, Monitor, Smartphone, Youtube, Instagram, Clock, Timer, Link, Share2, Twitter, MessageSquare } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { socialPlatforms as socialPlatformOptions } from "@/lib/ghost-agent-data";
+import { Project } from "@/lib/ghost-agent-data";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Book, FileText, Rss, Share2, Twitter, Twitch, Youtube, Instagram, Facebook } from "lucide-react";
+import { useState, useRef } from "react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { ConfirmationDialog } from "../ui/ConfirmationDialog";
 
 // A simple component for the TikTok icon
 const TikTokIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12.528 8.004H16.18V4.348h-3.652v11.397a4.348 4.348 0 1 1-4.348-4.348" />
-  </svg>
-);
-
-const YoutubeShortsIcon = () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" strokeWidth="1.5" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-red-500">
-        <path d="M10 15.5V8.5L16 12L10 15.5Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" fill="currentColor" />
-        <path d="M2 12C2 16.9706 6.02944 21 11 21C15.9706 21 20 16.9706 20 12C20 7.02944 15.9706 3 11 3" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M22 12C22 16.9706 17.9706 21 13 21" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-2.43.03-4.83-.95-6.43-2.88-1.59-1.92-2.31-4.56-2.09-7.18.2-2.43 1.1-4.72 2.4-6.61l.01-.02c1.8-2.61 4.9-4.06 8.02-4.27.1-3.39.08-6.78.02-10.16z"></path>
     </svg>
 );
 
-const platformIcons: { [key in Platform]: React.ReactNode } = {
-  youtube: <Youtube size={16} className="text-red-600" />,
-  instagram: <Instagram size={16} className="text-pink-500" />,
+const socialIcons = {
+    Twitter: <Twitter />,
+    Twitch: <Twitch />,
+    YouTube: <Youtube />,
+    Instagram: <Instagram />,
+    Facebook: <Facebook />,
+    x: <Twitter />,
   tiktok: <TikTokIcon />,
-  youtube_shorts: <YoutubeShortsIcon />,
-  x: <Twitter size={14} className="text-sky-500" />,
-  threads: <MessageSquare size={14} className="text-gray-400" />,
+    youtube_shorts: <Youtube />
 };
-
-const scriptPlatforms: Platform[] = ["youtube", "instagram", "tiktok", "youtube_shorts"];
 
 type ProjectCardProps = {
   project: Project;
+    onSelectProject: (project: Project) => void;
   onUpdateProject: (project: Project) => void;
-  onSelectProject: (project: Project) => void;
 };
 
-export const ProjectCard = ({ project, onUpdateProject, onSelectProject }: ProjectCardProps) => {
+export const ProjectCard = ({ project, onSelectProject, onUpdateProject }: ProjectCardProps) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [title, setTitle] = useState(project.title);
-  const [category, setCategory] = useState(project.category);
-  const [platforms, setPlatforms] = useState(project.platforms || []);
-  const [blogCategory, setBlogCategory] = useState(project.blogCategory);
-  const [duration, setDuration] = useState(project.duration);
-  const [readingTime, setReadingTime] = useState(project.readingTime);
+    const [editedTitle, setEditedTitle] = useState(project.title);
+    const [editedDescription, setEditedDescription] = useState(project.description || "");
   const [socialPlatforms, setSocialPlatforms] = useState(project.socialPlatforms || []);
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const isDirty = () => {
-    return (
-      title !== project.title ||
-      category !== project.category ||
-      blogCategory !== project.blogCategory ||
-      duration !== project.duration ||
-      readingTime !== project.readingTime ||
-      JSON.stringify(platforms.sort()) !== JSON.stringify((project.platforms || []).sort()) ||
-      JSON.stringify(socialPlatforms.sort()) !== JSON.stringify((project.socialPlatforms || []).sort())
-    );
-  }
+        return editedTitle !== project.title || 
+               editedDescription !== (project.description || "") ||
+               JSON.stringify(socialPlatforms.sort()) !== JSON.stringify((project.socialPlatforms || []).sort());
+    };
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
+    const handleEdit = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setIsEditing(true);
+    };
+
+    const handleSave = (e?: React.MouseEvent) => {
+        if(e) e.stopPropagation();
         if (isDirty()) {
+            onUpdateProject({ ...project, title: editedTitle, description: editedDescription, socialPlatforms });
+        }
+        setIsEditing(false);
+    };
+
+    const handleCancel = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if(isDirty()){
           setShowSaveConfirm(true);
         } else {
           setIsEditing(false);
         }
-      }
     };
-
-    if (isEditing) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isEditing, title, category, blogCategory, duration, readingTime, platforms, socialPlatforms]);
-
-  const handlePlatformChange = (platform: Platform) => {
-    setPlatforms(prev =>
-      prev.includes(platform) ? prev.filter(p => p !== platform) : [...prev, platform]
-    );
-  };
-
-  const handleSave = (e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    onUpdateProject({ ...project, title, category, platforms, blogCategory, duration, readingTime, socialPlatforms });
-    setIsEditing(false);
-    setShowSaveConfirm(false);
-  };
-
-  const handleCancel = (e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    setTitle(project.title);
-    setCategory(project.category);
-    setPlatforms(project.platforms || []);
-    setBlogCategory(project.blogCategory);
-    setDuration(project.duration);
-    setReadingTime(project.readingTime);
+    
+    const handleConfirmLeave = () => {
+        setEditedTitle(project.title);
+        setEditedDescription(project.description || "");
     setSocialPlatforms(project.socialPlatforms || []);
     setIsEditing(false);
     setShowSaveConfirm(false);
   };
 
-  const handleEditClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsEditing(true);
-  };
+    const handleSocialPlatformChange = (platform: string) => {
+        setSocialPlatforms(prev => 
+            prev.includes(platform) ? prev.filter(p => p !== platform) : [...prev, platform]
+        );
+    };
 
-  if (isEditing) {
+    const progress = project.status === "Completed" ? 100 : (project.progress || 0);
+    const statusColor = project.status === "Completed" ? "bg-green-500" :
+                        project.status === "In Progress" ? "bg-blue-500" :
+                        project.status === "Planning" ? "bg-yellow-500" : "bg-gray-500";
+
+    const getIcon = () => {
+        switch(project.type) {
+            case 'book': return <Book className="h-6 w-6 text-gray-400" />;
+            case 'script': return <FileText className="h-6 w-6 text-gray-400" />;
+            case 'blog': return <Rss className="h-6 w-6 text-gray-400" />;
+            case 'social': return <Share2 className="h-6 w-6 text-gray-400" />;
+            default: return null;
+        }
+    };
+
     return (
-      <>
-        <div ref={cardRef} className="bg-gradient-to-b from-gray-800 to-gray-900 border border-red-600 p-4 flex flex-col justify-between group transition-all relative">
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="bg-black text-white font-mono text-lg font-bold mb-2 p-1 border border-gray-700 focus:outline-none focus:ring-1 focus:ring-red-500"
-            onClick={(e) => e.stopPropagation()}
-          />
-          {project.category && (
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value as "Video" | "Short")}
-              className="bg-black text-white text-xs p-1 border border-gray-700 w-full mb-4 font-mono focus:outline-none focus:ring-1 focus:ring-red-500"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <option value="Video">Video</option>
-              <option value="Short">Short</option>
-            </select>
-          )}
-          {project.blogCategory && (
-              <select
-                  value={blogCategory}
-                  onChange={(e) => setBlogCategory(e.target.value)}
-                  className="bg-black text-white text-xs p-1 border border-gray-700 w-full mb-4 font-mono focus:outline-none focus:ring-1 focus:ring-red-500"
-                  onClick={(e) => e.stopPropagation()}
-              >
-                  {initialBlogCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-              </select>
-          )}
-          {project.socialPlatforms && (
-            <div className="space-y-2 my-4">
-              <h4 className="text-xs text-gray-400 font-mono">Platforms</h4>
-              <div className="grid grid-cols-3 gap-2">
-                {socialPlatformOptions.map(platform => (
+        <Card ref={cardRef} onClick={() => onSelectProject(project)} className="bg-gray-900/50 border-gray-800 text-white font-mono flex flex-col justify-between hover:border-red-600 transition-colors cursor-pointer min-h-[280px] overflow-hidden">
+            <CardHeader>
+                <div className="flex justify-between items-start">
+                    <div className="flex-grow">
+                        <CardTitle className="text-lg font-bold text-red-500">{project.title}</CardTitle>
+                        <CardDescription className="text-gray-400 text-sm mt-1">{project.description || ""}</CardDescription>
+                    </div>
+                    {getIcon()}
+                </div>
+            </CardHeader>
+            <CardContent>
+                {project.type === 'social' && project.socialPlatforms && (
+                     <div className="flex flex-wrap gap-2">
+                        {project.socialPlatforms.map(platform => (
+                            <Badge key={platform} variant="secondary" className="gap-1.5 pl-2 pr-2.5 py-1 text-xs">
+                                {socialIcons[platform]}
+                                {platform}
+                            </Badge>
+                        ))}
+                    </div>
+                )}
+                {project.type !== 'social' && (
+                    <>
+                        <div className="text-sm text-gray-400 mb-2">Status: <span className={`font-bold ${
+                            project.status === "Completed" ? "text-green-400" :
+                            project.status === "In Progress" ? "text-blue-400" :
+                            "text-yellow-400"
+                        }`}>{project.status}</span></div>
+                        <Progress value={progress} className="w-full [&>div]:bg-red-600 h-2" />
+                    </>
+                )}
+            </CardContent>
+            <CardFooter className="mt-auto flex justify-end p-4">
+                 <Dialog open={isEditing} onOpenChange={(isOpen) => !isOpen && handleCancel(new MouseEvent('click') as any)}>
+                    <DialogTrigger asChild>
+                        <Button variant="ghost" size="sm" onClick={handleEdit} className="text-gray-400 hover:text-red-400">Edit</Button>
+                    </DialogTrigger>
+                    <DialogContent onClick={(e) => e.stopPropagation()} className="bg-gray-900 border-gray-700 text-white">
+                        <DialogHeader>
+                            <DialogTitle>Edit Project Details</DialogTitle>
+                            <DialogDescription>
+                                Make changes to your project here. Click save when you're done.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <label htmlFor="title" className="text-right">Title</label>
+                                <Input id="title" value={editedTitle} onChange={e => setEditedTitle(e.target.value)} className="col-span-3" />
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <label htmlFor="description" className="text-right">Description</label>
+                                <Textarea id="description" value={editedDescription} onChange={e => setEditedDescription(e.target.value)} className="col-span-3" />
+                            </div>
+                            {project.type === 'social' && (
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <label className="text-right">Platforms</label>
+                                    <div className="col-span-3 grid grid-cols-3 gap-2">
+                                        {Object.keys(socialIcons).map(platform => (
                   <label key={platform} className="flex items-center gap-2 text-sm cursor-pointer">
                     <input
                       type="checkbox"
@@ -165,115 +172,21 @@ export const ProjectCard = ({ project, onUpdateProject, onSelectProject }: Proje
               </div>
             </div>
           )}
-          {project.duration !== undefined && (
-               <div className="mt-2">
-                  <label className="text-xs text-gray-400 font-mono">Duration (mm:ss)</label>
-                  <input
-                      type="text" value={duration} onChange={(e) => setDuration(e.target.value)}
-                      className="bg-black text-white text-xs p-1 border border-gray-700 w-full mt-1 font-mono focus:outline-none focus:ring-1 focus:ring-red-500"
-                      onClick={(e) => e.stopPropagation()}
-                  />
               </div>
-          )}
-           {project.category && (
-            <div className="space-y-2 my-4">
-              <h4 className="text-xs text-gray-400 font-mono">Platforms</h4>
-              <div className="grid grid-cols-2 gap-2">
-                {scriptPlatforms.map(platform => (
-                  <label key={platform} className="flex items-center gap-2 text-sm cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={platforms.includes(platform)}
-                      onChange={() => handlePlatformChange(platform)}
-                      className="accent-red-500"
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                    {platform.replace('_', ' ')}
-                  </label>
-                ))}
-              </div>
-            </div>
-          )}
-          <div className="flex justify-end gap-2 mt-auto pt-4">
-            <button onClick={handleCancel} className="p-1 text-gray-500 hover:text-red-400" aria-label="Cancel"><XCircle size={20} /></button>
-            <button onClick={handleSave} className="p-1 text-gray-500 hover:text-green-400" aria-label="Save"><Save size={20} /></button>
-          </div>
-        </div>
+                        <DialogFooter>
+                            <Button variant="outline" onClick={handleCancel}>Cancel</Button>
+                            <Button onClick={handleSave}>Save Changes</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
         <ConfirmationDialog
             isOpen={showSaveConfirm}
-            onSave={() => handleSave()}
-            onDiscard={() => handleCancel()}
-            onCancel={() => setShowSaveConfirm(false)}
-            title="Guardar Cambios"
-            message="Tienes cambios sin guardar. ¿Quieres guardarlos?"
-        />
-      </>
-    );
-  }
-
-  return (
-    <div
-      onClick={() => onSelectProject(project)}
-      className="bg-gradient-to-b from-gray-900 to-black border border-gray-800 p-4 flex flex-col justify-between cursor-pointer group hover:border-red-600 transition-all relative"
-    >
-      <button onClick={handleEditClick} className="absolute top-2 right-2 p-1 text-gray-600 group-hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity" aria-label="Edit Project">
-        <Edit size={16} />
-      </button>
-
-      <div className="pr-6">
-        <div className="flex items-center gap-3 mb-2">
-           {project.category === 'Video' && <Monitor size={20} className="text-gray-600 flex-shrink-0" />}
-           {project.category === 'Short' && <Smartphone size={20} className="text-gray-600 flex-shrink-0" />}
-           <h3 className="text-lg font-bold text-white font-mono group-hover:text-red-400 transition-colors truncate">
-              {project.title}
-           </h3>
-        </div>
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex items-center gap-2">
-            <span className={`text-xs px-2 py-0.5 ${project.status === 'Finalizado' ? 'bg-green-600 text-white' : 'bg-gray-700 text-gray-300'}`}>{project.status}</span>
-            {project.blogCategory && (
-                <span className="text-xs px-2 py-0.5 bg-blue-800 text-white">{project.blogCategory}</span>
-            )}
-          </div>
-          <div className="flex items-center gap-3">
-            {project.duration && (
-                <div className="flex items-center gap-1 text-xs text-gray-500 font-mono">
-                    <Clock size={12} />
-                    <span>{project.duration}</span>
-                </div>
-            )}
-            {project.readingTime && (
-                 <div className="flex items-center gap-1 text-xs text-gray-500 font-mono">
-                    <Timer size={12} />
-                    <span>{project.readingTime}</span>
-                </div>
-            )}
-            {project.platforms?.map(p => <span key={p}>{platformIcons[p]}</span>)}
-          </div>
-        </div>
-      </div>
-      <div className="flex items-center mt-auto pt-4">
-        <div className="w-full bg-gray-800 h-2">
-          <div className="bg-red-600 h-2" style={{ width: `${project.progress}%` }}></div>
-        </div>
-        {project.relatedProjectIds && project.relatedProjectIds.length > 0 && (
-          <div className="ml-3 opacity-0 group-hover:opacity-100 transition-opacity">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <div className="flex items-center gap-1 text-gray-500">
-                    <Link size={14} />
-                    <span className="text-xs">{project.relatedProjectIds.length}</span>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent className="bg-gray-800 text-white border-gray-700">
-                  <p>Linked to {project.relatedProjectIds.length} other items</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-        )}
-      </div>
-    </div>
+                    onClose={() => setShowSaveConfirm(false)}
+                    onConfirm={handleConfirmLeave}
+                    title="Discard changes?"
+                    description="You have unsaved changes. Are you sure you want to discard them?"
+                />
+            </CardFooter>
+        </Card>
   );
 }; 

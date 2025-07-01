@@ -32,7 +32,10 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
         const { projectRootPath, itemId, newTitle } = body;
 
+        console.log('[API/renameItem] Request body:', { projectRootPath, itemId, newTitle });
+
         if (!projectRootPath || !itemId || !newTitle) {
+            console.log('[API/renameItem] Missing parameters:', { projectRootPath: !!projectRootPath, itemId: !!itemId, newTitle: !!newTitle });
             return NextResponse.json({ message: 'Missing required parameters' }, { status: 400 });
         }
 

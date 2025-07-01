@@ -423,6 +423,12 @@ export const BookWorkspace = ({ project: initialProject, onBack, onUpdateProject
         }
 
         try {
+            console.log('Attempting to rename item:', {
+                projectRootPath: project.path,
+                itemId: editingItemId,
+                newTitle: editingItemTitle,
+            });
+            
             const response = await fetch('/api/workspace/renameItem', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -432,6 +438,8 @@ export const BookWorkspace = ({ project: initialProject, onBack, onUpdateProject
                     newTitle: editingItemTitle,
                 }),
             });
+            
+            console.log('Rename response status:', response.status, response.statusText);
 
             if (!response.ok) {
                 const errorData = await response.json();

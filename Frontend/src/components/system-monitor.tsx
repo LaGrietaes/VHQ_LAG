@@ -5,25 +5,27 @@ import { Cpu, HardDrive, Thermometer, Zap, Gpu, Users } from "lucide-react"
 
 interface SystemStats {
   cpu: {
-    usage: number
-    temp: number
-    cores: number
-  }
-  gpu: {
-    usage: number
-    temp: number
-    memory: number
-  }
-  memory: {
-    used: number
-    total: number
-    percentage: number
-  }
-  disk: {
-    used: number
-    total: number
-    percentage: number
-  }
+    manufacturer?: string;
+    brand?: string;
+    speed?: number;
+    cores?: number;
+    physicalCores?: number;
+    error?: string;
+  };
+  mem: {
+    total?: number;
+    free?: number;
+    used?: number;
+    active?: number;
+    error?: string;
+  };
+  os: {
+    platform?: string;
+    distro?: string;
+    release?: string;
+    arch?: string;
+    error?: string;
+  };
 }
 
 interface SystemMonitorProps {
@@ -62,12 +64,6 @@ export function SystemMonitor({ onlineAgents, totalAgents }: SystemMonitorProps)
     return "text-gray-400"
   }
 
-  const getTempColor = (temp: number) => {
-    if (temp >= 75) return "text-red-400"
-    if (temp >= 65) return "text-yellow-400"
-    return "text-gray-400"
-  }
-
   const getAgentColor = (online: number, total: number) => {
     if (total === 0) return "text-gray-400";
     const percentage = (online / total) * 100;
@@ -84,6 +80,14 @@ export function SystemMonitor({ onlineAgents, totalAgents }: SystemMonitorProps)
     return <div className="text-xs text-gray-500">Loading system stats...</div>;
   }
 
+  // Calculate memory usage percentage
+  const memoryUsagePercentage = stats.mem?.total && stats.mem?.used 
+    ? Math.round((stats.mem.used / stats.mem.total) * 100)
+    : 0;
+
+  const memoryUsedGB = stats.mem?.used ? (stats.mem.used / (1024 * 1024 * 1024)).toFixed(1) : '0';
+  const memoryTotalGB = stats.mem?.total ? (stats.mem.total / (1024 * 1024 * 1024)).toFixed(1) : '0';
+
   return (
     <div className="flex items-center gap-6 text-xs font-mono h-9">
       {/* Agent Monitor */}
@@ -97,27 +101,14 @@ export function SystemMonitor({ onlineAgents, totalAgents }: SystemMonitorProps)
       <div className="flex items-center space-x-1">
         <Cpu className="h-3 w-3 text-white" />
         <span className="text-gray-400">CPU:</span>
-        <span className={getUsageColor(stats.cpu.usage)}>{stats.cpu.usage}%</span>
-        <span className="text-gray-500">|</span>
-        <Thermometer className="h-3 w-3 text-white" />
-        {stats.cpu.temp > 0 ? (
-          <span className={getTempColor(stats.cpu.temp)}>{stats.cpu.temp}°C</span>
+        {stats.cpu?.error ? (
+          <span className="text-red-400">N/A</span>
         ) : (
-          <span className="text-gray-500">N/A</span>
-        )}
-      </div>
-
-      {/* GPU Monitor */}
-      <div className="flex items-center space-x-1">
-        <Gpu className="h-3 w-3 text-white" />
-        <span className="text-gray-400">GPU:</span>
-        <span className={getUsageColor(stats.gpu.usage)}>{stats.gpu.usage}%</span>
-        <span className="text-gray-500">|</span>
-        <Thermometer className="h-3 w-3 text-white" />
-        {stats.gpu.temp > 0 ? (
-          <span className={getTempColor(stats.gpu.temp)}>{stats.gpu.temp}°C</span>
-        ) : (
-          <span className="text-gray-500">N/A</span>
+          <>
+            <span className="text-gray-400">{stats.cpu?.cores || 'N/A'} cores</span>
+            <span className="text-gray-500">|</span>
+            <span className="text-gray-400">{stats.cpu?.brand || 'Unknown'}</span>
+          </>
         )}
       </div>
 
@@ -125,18 +116,26 @@ export function SystemMonitor({ onlineAgents, totalAgents }: SystemMonitorProps)
       <div className="flex items-center space-x-1">
         <Zap className="h-3 w-3 text-white" />
         <span className="text-gray-400">RAM:</span>
-        <span className={getUsageColor(stats.memory.percentage)}>
-          {stats.memory.used.toFixed(1)}GB/{stats.memory.total.toFixed(1)}GB
-        </span>
+        {stats.mem?.error ? (
+          <span className="text-red-400">N/A</span>
+        ) : (
+          <span className={getUsageColor(memoryUsagePercentage)}>
+            {memoryUsedGB}GB/{memoryTotalGB}GB ({memoryUsagePercentage}%)
+          </span>
+        )}
       </div>
 
-      {/* Disk Monitor */}
+      {/* OS Monitor */}
       <div className="flex items-center space-x-1">
         <HardDrive className="h-3 w-3 text-white" />
-        <span className="text-gray-400">Disk:</span>
-        <span className={getUsageColor(stats.disk.percentage)}>
-          {stats.disk.used.toFixed(1)}GB/{stats.disk.total.toFixed(1)}GB
-        </span>
+        <span className="text-gray-400">OS:</span>
+        {stats.os?.error ? (
+          <span className="text-red-400">N/A</span>
+        ) : (
+          <span className="text-gray-400">
+            {stats.os?.platform || 'Unknown'} {stats.os?.arch || ''}
+          </span>
+        )}
       </div>
     </div>
   )

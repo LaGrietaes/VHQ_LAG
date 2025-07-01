@@ -62,7 +62,8 @@ export const BookWorkspace = ({ project: initialProject, onBack, onUpdateProject
     useEffect(() => {
         const fetchProjectDetails = async (id: string) => {
             try {
-                const response = await fetch(`/api/projects/structure?id=${id}`);
+                const timestamp = Date.now();
+                const response = await fetch(`/api/projects/structure?id=${id}&t=${timestamp}`);
                 if (response.ok) {
                     const data = await response.json();
                     setProject(data.project as BookProject);
@@ -80,6 +81,21 @@ export const BookWorkspace = ({ project: initialProject, onBack, onUpdateProject
              fetchProjectDetails(initialProject.id);
         }
     }, [initialProject?.id]);
+
+    const refreshProject = async () => {
+        if (initialProject?.id) {
+            try {
+                const timestamp = Date.now();
+                const response = await fetch(`/api/projects/structure?id=${initialProject.id}&t=${timestamp}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setProject(data.project as BookProject);
+                }
+            } catch (error) {
+                console.error("Error refreshing project:", error);
+            }
+        }
+    };
 
     useEffect(() => {
         if (project) {
@@ -118,12 +134,33 @@ export const BookWorkspace = ({ project: initialProject, onBack, onUpdateProject
         setConfirmModalOpen(false);
     };
 
-    const handleSave = () => {
-        if(activeItemId) {
+    const handleSave = async () => {
+        if (!activeItemId) return;
+
+        try {
+            const response = await fetch('/api/workspace/updateItemContent', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    projectRootPath: project.path,
+                    itemId: activeItemId,
+                    content: content,
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to save content');
+            }
+
             const newOutline = updateItemContentInTree(project.outline || [], activeItemId, content);
             setProject({ ...project, outline: newOutline });
+            setIsDirty(false);
+
+        } catch (error) {
+            console.error('Error saving content:', error);
+            // Here you might want to show an error to the user
         }
-        setIsDirty(false);
     };
 
     const handleSaveAndExit = () => {
@@ -399,22 +436,16 @@ export const BookWorkspace = ({ project: initialProject, onBack, onUpdateProject
             if (!response.ok) {
                 const errorData = await response.json();
                 console.error('Failed to rename item:', errorData.message || 'Unknown error');
-                setProject(prev => {
-                    if (!prev) return null;
-                    const newOutline = updateItemInTree(prev.outline, editingItemId!, item.title);
-                    return { ...prev, outline: newOutline };
-                });
+                // Revert the title change in UI
+                setEditingItemTitle(item.title);
             } else {
-                const { updatedProject } = await response.json();
-                setProject(prev => prev ? { ...prev, outline: updatedProject.outline } : null);
+                // Refresh the entire project to get updated UUIDs and structure
+                await refreshProject();
             }
         } catch (error) {
             console.error('Error renaming item:', error);
-            setProject(prev => {
-                if (!prev) return null;
-                const newOutline = updateItemInTree(prev.outline, editingItemId!, item.title);
-                return { ...prev, outline: newOutline };
-            });
+            // Revert the title change in UI
+            setEditingItemTitle(item.title);
         } finally {
             setEditingItemId(null);
             setOutlineKey(Date.now());

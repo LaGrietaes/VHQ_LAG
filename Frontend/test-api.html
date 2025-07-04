@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test</title>
+</head>
+<body>
+    <h1>API Route Test</h1>
+    <button onclick="testRenameItem()">Test Rename Item</button>
+    <button onclick="testMoveItem()">Test Move Item</button>
+    <button onclick="testAddItem()">Test Add Item</button>
+    <div id="results"></div>
+
+    <script>
+        async function testRenameItem() {
+            const results = document.getElementById('results');
+            results.innerHTML = 'Testing renameItem...';
+            
+            try {
+                const response = await fetch('/api/workspace/renameItem', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        projectRootPath: 'GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA',
+                        itemId: '5cdb2a3f-ef2a-4032-80c3-537cd7f0ac98',
+                        newTitle: '01 – BePolite.md'
+                    }),
+                });
+                
+                const data = await response.json();
+                results.innerHTML = `renameItem: ${response.status} - ${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                results.innerHTML = `renameItem error: ${error.message}`;
+            }
+        }
+
+        async function testMoveItem() {
+            const results = document.getElementById('results');
+            results.innerHTML = 'Testing moveItem...';
+            
+            try {
+                const response = await fetch('/api/workspace/moveItem', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        projectRootPath: 'GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA',
+                        itemId: '5cdb2a3f-ef2a-4032-80c3-537cd7f0ac98',
+                        targetParentId: 'fc0bac8c-0082-4a28-a0ff-c6220cfd678d'
+                    }),
+                });
+                
+                const data = await response.json();
+                results.innerHTML = `moveItem: ${response.status} - ${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                results.innerHTML = `moveItem error: ${error.message}`;
+            }
+        }
+
+        async function testAddItem() {
+            const results = document.getElementById('results');
+            results.innerHTML = 'Testing addItem...';
+            
+            try {
+                const response = await fetch('/api/workspace/addItem', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        projectRootPath: 'GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA',
+                        parentId: null,
+                        item: {
+                            id: 'test-' + Date.now(),
+                            title: 'test-file.md',
+                            type: 'file',
+                            content: '# Test File\n\nThis is a test file.'
+                        }
+                    }),
+                });
+                
+                const data = await response.json();
+                results.innerHTML = `addItem: ${response.status} - ${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                results.innerHTML = `addItem error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html> 

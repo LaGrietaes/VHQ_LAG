@@ -20,12 +20,12 @@ from textblob import TextBlob
 from transformers import pipeline
 import openai
 from language_tool_python import LanguageTool
-from py_readability_metrics import flesch_kincaid
+from readability import Readability
 
 # File processing imports
 import markdown
 from docx import Document
-import pypdf2
+import PyPDF2 as pypdf2
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet

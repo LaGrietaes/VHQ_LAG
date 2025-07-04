@@ -1,0 +1,27 @@
+{
+  "id": "GHOST_AGENT_1751580924720",
+  "agents": [
+    "GHOST_AGENT"
+  ],
+  "name": "Chat with Ghost",
+  "createdAt": "2025-07-03T22:15:24.720Z",
+  "updatedAt": "2025-07-03T22:15:48.979Z",
+  "messages": [
+    {
+      "id": "1751580947276",
+      "agentId": "GHOST_AGENT_1751580924720",
+      "content": "Ghost , puedes decirme cual es el tercer tip ?",
+      "timestamp": "2025-07-03T22:15:47.276Z",
+      "isUser": true
+    }
+  ],
+  "metadata": {
+    "tags": [],
+    "priority": "medium",
+    "isArchived": false,
+    "messageCount": 1,
+    "userMessageCount": 1,
+    "agentMessageCount": 0
+  },
+  "version": "2.0.0"
+}

@@ -1,0 +1,48 @@
+{
+  "id": "GHOST_AGENT_1751578313775",
+  "agents": [
+    "GHOST_AGENT"
+  ],
+  "name": "Chat with Ghost",
+  "createdAt": "2025-07-03T21:31:53.775Z",
+  "updatedAt": "2025-07-03T21:39:38.835Z",
+  "messages": [
+    {
+      "id": "1751578354091",
+      "agentId": "GHOST_AGENT_1751578313775",
+      "content": "Testing functionalities, puedes decirme el titulo del proyecto que agrege como contexto?",
+      "timestamp": "2025-07-03T21:32:34.091Z",
+      "isUser": true
+    },
+    {
+      "id": "1751578391558-ghost",
+      "agentId": "GHOST_AGENT",
+      "content": "\n¡Hola! Claro, puedo ayudarte con eso. El título del proyecto que estoy utilizando como contexto es \"Desarrollo de una plataforma de aprendizaje en línea\". ¿Es eso lo que estás buscando?",
+      "timestamp": "2025-07-03T21:33:11.558Z",
+      "isUser": false
+    },
+    {
+      "id": "1751578746133",
+      "agentId": "GHOST_AGENT_1751578313775",
+      "content": "Puedes darme el titulo del archivo de contexto que tienes adjunto en este chat?",
+      "timestamp": "2025-07-03T21:39:06.133Z",
+      "isUser": true
+    },
+    {
+      "id": "1751578777647-ghost",
+      "agentId": "GHOST_AGENT",
+      "content": "\n¡Hola! ¡Claro que sí! El título del archivo de contexto es \"Ejemplo de contexto\". ¿Necesitas algo más?",
+      "timestamp": "2025-07-03T21:39:37.647Z",
+      "isUser": false
+    }
+  ],
+  "metadata": {
+    "tags": [],
+    "priority": "medium",
+    "isArchived": false,
+    "messageCount": 4,
+    "userMessageCount": 2,
+    "agentMessageCount": 2
+  },
+  "version": "2.0.0"
+}

@@ -273,15 +273,20 @@ export const agentsData: Agent[] = [
   {
     id: "GHOST_AGENT",
     name: "Ghost",
-    role: "Stealth Operations",
-    status: "INACTIVE",
+    role: "Content Writer",
+    status: "OPERATIONAL",
     performance: 96,
     tasksCompleted: 130,
-    currentTasks: 0,
-    description: "Handles sensitive and confidential tasks.",
+    currentTasks: 3,
+    description: "AI-powered writing assistant for long-form content creation including books, scripts, and blog posts.",
     icon: <Ghost />,
     priority: 1,
-    capabilities: ["secure_communication", "data_anonymization", "stealth_operations"],
-    uptime: "N/A"
+    capabilities: ["content_generation", "project_management", "ai_writing", "template_management", "cross_platform_integration"],
+    uptime: "24h 0m",
+    metrics: {
+      files_managed: 45,
+      tasks_processed: 5,
+      success_rate: 94
+    }
   }
 ];

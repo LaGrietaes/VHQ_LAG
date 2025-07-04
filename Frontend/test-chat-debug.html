@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Debug Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #0A0A0A;
+            color: white;
+        }
+        .debug-info {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .test-button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #005a9e;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chat Component Debug Test</h1>
+    
+    <div class="debug-info">
+        <h3>Debug Information:</h3>
+        <p>This page will help test the chat component functionality.</p>
+        <p>Open the browser console to see debug logs.</p>
+    </div>
+
+    <div class="debug-info">
+        <h3>Test Steps:</h3>
+        <ol>
+            <li>Open browser console (F12)</li>
+            <li>Look for the chat button in bottom-right corner</li>
+            <li>Click the chat button to open the drawer</li>
+            <li>Select an agent using the checkboxes</li>
+            <li>Type a message in the input field</li>
+            <li>Press Enter or click the send button</li>
+            <li>Check console for debug messages</li>
+        </ol>
+    </div>
+
+    <div class="debug-info">
+        <h3>Manual Tests:</h3>
+        <button class="test-button" onclick="testChatButton()">Test Chat Button</button>
+        <button class="test-button" onclick="testInputField()">Test Input Field</button>
+        <button class="test-button" onclick="testSendButton()">Test Send Button</button>
+    </div>
+
+    <script>
+        function testChatButton() {
+            console.log('=== Manual Test: Chat Button ===');
+            const chatButton = document.querySelector('button[aria-label="Toggle chat"]');
+            if (chatButton) {
+                console.log('✅ Chat button found');
+                chatButton.click();
+                console.log('Chat button clicked');
+            } else {
+                console.log('❌ Chat button not found');
+            }
+        }
+
+        function testInputField() {
+            console.log('=== Manual Test: Input Field ===');
+            const drawer = document.querySelector('.fixed.top-0.right-0');
+            if (drawer) {
+                const input = drawer.querySelector('input[placeholder*="Message"]');
+                if (input) {
+                    console.log('✅ Input field found');
+                    input.focus();
+                    input.value = 'Test message';
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                    console.log('Input field tested');
+                } else {
+                    console.log('❌ Input field not found');
+                }
+            } else {
+                console.log('❌ Chat drawer not open');
+            }
+        }
+
+        function testSendButton() {
+            console.log('=== Manual Test: Send Button ===');
+            const drawer = document.querySelector('.fixed.top-0.right-0');
+            if (drawer) {
+                const sendButton = drawer.querySelector('button[title="Send message"]');
+                if (sendButton) {
+                    console.log('✅ Send button found');
+                    sendButton.click();
+                    console.log('Send button clicked');
+                } else {
+                    console.log('❌ Send button not found');
+                }
+            } else {
+                console.log('❌ Chat drawer not open');
+            }
+        }
+
+        // Auto-test when page loads
+        window.addEventListener('load', () => {
+            console.log('=== Page Loaded ===');
+            console.log('Chat component should be available');
+            console.log('Look for the chat button in the bottom-right corner');
+        });
+    </script>
+</body>
+</html> 

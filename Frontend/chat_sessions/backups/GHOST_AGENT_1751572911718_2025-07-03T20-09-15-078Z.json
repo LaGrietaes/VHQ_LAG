@@ -1,0 +1,62 @@
+{
+  "id": "GHOST_AGENT_1751572911718",
+  "agents": [
+    "GHOST_AGENT"
+  ],
+  "name": "Chat with Ghost",
+  "createdAt": "2025-07-03T20:01:51.718Z",
+  "updatedAt": "2025-07-03T20:09:15.077Z",
+  "messages": [
+    {
+      "id": "1751572964768",
+      "agentId": "GHOST_AGENT_1751572911718",
+      "content": "Test 01, funcionalidades, como se llama el titulo del archivo de contexto proporcionado en este chat?",
+      "timestamp": "2025-07-03T20:03:09.670Z",
+      "isUser": true
+    },
+    {
+      "id": "1751572989671",
+      "agentId": "GHOST_AGENT_1751572911718",
+      "content": "Test 01, funcionalidades, como se llama el titulo del archivo de contexto proporcionado en este chat?",
+      "timestamp": "2025-07-03T20:03:09.671Z",
+      "isUser": true
+    },
+    {
+      "id": "1751572997444-ghost",
+      "agentId": "GHOST_AGENT",
+      "content": "¡Hola! ¡Claro que sí! El título del archivo de contexto es \"No content found for this project.\". ¿En qué puedo ayudarte?",
+      "timestamp": "2025-07-03T20:03:17.444Z",
+      "isUser": false
+    },
+    {
+      "id": "1751573056076-ghost",
+      "agentId": "GHOST_AGENT",
+      "content": "¡Hola! Por favor, adjunte el archivo con el contenido relevante para este proyecto. Sin embargo, como no hay contenido disponible para este proyecto, no puedo proporcionar un título para el archivo que ha adjuntado. ¿Podría proporcionar más información o contexto sobre el proyecto para que pueda ayudarle mejor?",
+      "timestamp": "2025-07-03T20:04:16.076Z",
+      "isUser": false
+    },
+    {
+      "id": "1751573334956",
+      "agentId": "GHOST_AGENT_1751572911718",
+      "content": "Test de contexto 02 , cual es el titulo del contexto proporcionado.",
+      "timestamp": "2025-07-03T20:08:54.956Z",
+      "isUser": true
+    },
+    {
+      "id": "1751573353972-ghost",
+      "agentId": "GHOST_AGENT",
+      "content": "¡Hola! ¡Claro que sí! El título del contexto proporcionado es \"No content found for this project.\". ¿En qué puedo ayudarte?",
+      "timestamp": "2025-07-03T20:09:13.972Z",
+      "isUser": false
+    }
+  ],
+  "metadata": {
+    "tags": [],
+    "priority": "medium",
+    "isArchived": false,
+    "messageCount": 6,
+    "userMessageCount": 3,
+    "agentMessageCount": 4
+  },
+  "version": "2.0.0"
+}

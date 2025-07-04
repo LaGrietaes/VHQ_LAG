@@ -1,0 +1,29 @@
+{
+  "id": "test_session_123",
+  "agents": [
+    "CEO_AGENT"
+  ],
+  "name": "Test Chat with CEO",
+  "createdAt": "2025-07-03T17:23:31.704Z",
+  "updatedAt": "2025-07-03T17:23:31.706Z",
+  "messages": [
+    {
+      "id": "msg_1",
+      "agentId": "CEO_AGENT",
+      "content": "Hello, this is a test message",
+      "timestamp": "2025-07-03T17:23:31.706Z",
+      "isUser": true
+    }
+  ],
+  "metadata": {
+    "tags": [
+      "test"
+    ],
+    "priority": "medium",
+    "isArchived": false,
+    "messageCount": 1,
+    "userMessageCount": 1,
+    "agentMessageCount": 0
+  },
+  "version": "2.0.0"
+}

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Fixes Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button { margin: 5px; padding: 8px 16px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Chat Fixes Test</h1>
+    
+    <div class="test-section info">
+        <h3>Instructions</h3>
+        <p>This page helps test the chat fixes:</p>
+        <ol>
+            <li>Open the chat in your app</li>
+            <li>Select a context (project) from the dropdown</li>
+            <li>Send a message to test context integration</li>
+            <li>Try the stop/edit functionality</li>
+            <li>Check that messages appear correctly</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h3>Test Context API</h3>
+        <button onclick="testContextAPI()">Test Context API</button>
+        <div id="context-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test Ghost Agent with Context</h3>
+        <button onclick="testGhostAgent()">Test Ghost Agent</button>
+        <div id="ghost-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test CEO Agent with Context</h3>
+        <button onclick="testCEOAgent()">Test CEO Agent</button>
+        <div id="ceo-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Debug Info</h3>
+        <button onclick="showDebugInfo()">Show Debug Info</button>
+        <div id="debug-info"></div>
+    </div>
+
+    <script>
+        const testContext = {
+            id: 'Boceto_101_Tips_para_Hablar_con_la_IA',
+            title: 'Boceto 101 Tips para Hablar con la IA',
+            type: 'book',
+            path: 'GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA'
+        };
+
+        async function testContextAPI() {
+            const resultDiv = document.getElementById('context-result');
+            resultDiv.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                const params = new URLSearchParams({
+                    id: testContext.id,
+                    type: testContext.type,
+                    path: testContext.path,
+                    title: testContext.title
+                });
+                
+                const response = await fetch(`/api/projects/context?${params.toString()}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Context API Working</h4>
+                            <p><strong>Project:</strong> ${data.data.title}</p>
+                            <p><strong>Type:</strong> ${data.data.type}</p>
+                            <p><strong>Content Length:</strong> ${data.data.content.length} characters</p>
+                            <p><strong>First 200 chars:</strong></p>
+                            <pre>${data.data.content.substring(0, 200)}...</pre>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h4>❌ Context API Failed</h4>
+                            <p><strong>Status:</strong> ${response.status}</p>
+                            <p><strong>Error:</strong> ${data.error || 'Unknown error'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Context API Error</h4>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testGhostAgent() {
+            const resultDiv = document.getElementById('ghost-result');
+            resultDiv.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                const response = await fetch('/api/ai/ghost-agent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: 'What is this project about?',
+                        files: [],
+                        context: testContext
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Ghost Agent Working</h4>
+                            <p><strong>Response:</strong></p>
+                            <pre>${data.response}</pre>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h4>❌ Ghost Agent Failed</h4>
+                            <p><strong>Status:</strong> ${response.status}</p>
+                            <p><strong>Error:</strong> ${data.error || 'Unknown error'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Ghost Agent Error</h4>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testCEOAgent() {
+            const resultDiv = document.getElementById('ceo-result');
+            resultDiv.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                const response = await fetch('/api/ai/ceo-agent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: 'What is this project about?',
+                        context: testContext
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h4>✅ CEO Agent Working</h4>
+                            <p><strong>Response:</strong></p>
+                            <pre>${data.response}</pre>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h4>❌ CEO Agent Failed</h4>
+                            <p><strong>Status:</strong> ${response.status}</p>
+                            <p><strong>Error:</strong> ${data.error || 'Unknown error'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ CEO Agent Error</h4>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function showDebugInfo() {
+            const resultDiv = document.getElementById('debug-info');
+            resultDiv.innerHTML = `
+                <div class="info">
+                    <h4>🔍 Debug Information</h4>
+                    <p><strong>Test Context:</strong></p>
+                    <pre>${JSON.stringify(testContext, null, 2)}</pre>
+                    <p><strong>Current URL:</strong> ${window.location.href}</p>
+                    <p><strong>User Agent:</strong> ${navigator.userAgent}</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html> 

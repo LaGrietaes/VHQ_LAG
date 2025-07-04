@@ -1,0 +1,19 @@
+{
+  "id": "GHOST_AGENT_1751569204108",
+  "agents": [
+    "GHOST_AGENT"
+  ],
+  "name": "Chat with Ghost",
+  "createdAt": "2025-07-03T19:00:04.108Z",
+  "updatedAt": "2025-07-03T19:00:04.108Z",
+  "messages": [],
+  "metadata": {
+    "tags": [],
+    "priority": "medium",
+    "isArchived": false,
+    "messageCount": 0,
+    "userMessageCount": 0,
+    "agentMessageCount": 0
+  },
+  "version": "2.0.0"
+}

@@ -1,0 +1,48 @@
+{
+  "id": "GHOST_AGENT_1751580924720",
+  "agents": [
+    "GHOST_AGENT"
+  ],
+  "name": "Chat with Ghost",
+  "createdAt": "2025-07-03T22:15:24.720Z",
+  "updatedAt": "2025-07-03T22:17:19.742Z",
+  "messages": [
+    {
+      "id": "1751580947276",
+      "agentId": "GHOST_AGENT_1751580924720",
+      "content": "Ghost , puedes decirme cual es el tercer tip ?",
+      "timestamp": "2025-07-03T22:15:47.276Z",
+      "isUser": true
+    },
+    {
+      "id": "1751580966880-ghost",
+      "agentId": "GHOST_AGENT",
+      "content": " ¡Hola! ¡Claro que sí! Según el contexto, el tercer tip es:\n\n3. Dale contexto, obtendrás inteligencia.",
+      "timestamp": "2025-07-03T22:16:06.880Z",
+      "isUser": false
+    },
+    {
+      "id": "1751581004065",
+      "agentId": "GHOST_AGENT_1751580924720",
+      "content": "y su descripcion porfavor?",
+      "timestamp": "2025-07-03T22:16:44.065Z",
+      "isUser": true
+    },
+    {
+      "id": "1751581039712-ghost",
+      "agentId": "GHOST_AGENT",
+      "content": " ¡Hola! Como asistente experto, mi única fuente de información es el contexto proporcionado. No tengo conocimiento previo y no invento información.\n\nSi te preguntas sobre algo del contexto, busco esa información específica en el texto y, si la encuentro, la proporciono. Si no encuentro la información, responde \"No encuentro esa información en el contexto\".\n\nPor ejemplo, si me preguntas \"¿Cuál es el tip 9?\", y en el contexto dice \"9. Dale contexto, obtendrás inteligencia - Usa contexto para transformar respuestas genéricas en específicas\", mi respuesta sería solo con la descripción: \"Usa contexto para transformar respuestas genéricas en específicas\".\n\n¿En qué puedo ayudarte hoy?",
+      "timestamp": "2025-07-03T22:17:19.712Z",
+      "isUser": false
+    }
+  ],
+  "metadata": {
+    "tags": [],
+    "priority": "medium",
+    "isArchived": false,
+    "messageCount": 4,
+    "userMessageCount": 2,
+    "agentMessageCount": 2
+  },
+  "version": "2.0.0"
+}

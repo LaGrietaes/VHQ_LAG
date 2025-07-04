@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Cpu, HardDrive, Thermometer, Zap, Gpu, Users } from "lucide-react"
+import { useAgentContext } from "@/lib/agent-context"
 
 interface SystemStats {
   cpu: {
@@ -28,14 +29,13 @@ interface SystemStats {
   };
 }
 
-interface SystemMonitorProps {
-  onlineAgents: number;
-  totalAgents: number;
-}
-
-export function SystemMonitor({ onlineAgents, totalAgents }: SystemMonitorProps) {
+export function SystemMonitor() {
   const [stats, setStats] = useState<SystemStats | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const { getOnlineAgentsCount, getTotalAgentsCount } = useAgentContext()
+
+  const onlineAgents = getOnlineAgentsCount()
+  const totalAgents = getTotalAgentsCount()
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -106,7 +106,7 @@ export function SystemMonitor({ onlineAgents, totalAgents }: SystemMonitorProps)
         ) : (
           <>
             <span className="text-gray-400">{stats.cpu?.cores || 'N/A'} cores</span>
-            <span className="text-gray-500">|</span>
+        <span className="text-gray-500">|</span>
             <span className="text-gray-400">{stats.cpu?.brand || 'Unknown'}</span>
           </>
         )}
@@ -121,7 +121,7 @@ export function SystemMonitor({ onlineAgents, totalAgents }: SystemMonitorProps)
         ) : (
           <span className={getUsageColor(memoryUsagePercentage)}>
             {memoryUsedGB}GB/{memoryTotalGB}GB ({memoryUsagePercentage}%)
-          </span>
+        </span>
         )}
       </div>
 
@@ -134,7 +134,7 @@ export function SystemMonitor({ onlineAgents, totalAgents }: SystemMonitorProps)
         ) : (
           <span className="text-gray-400">
             {stats.os?.platform || 'Unknown'} {stats.os?.arch || ''}
-          </span>
+        </span>
         )}
       </div>
     </div>

@@ -1,64 +1,153 @@
 "use client"
 
-import { TriangleAlert, Save } from "lucide-react";
-import { Button } from "./button";
+import React, { useState, useEffect } from 'react';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
-type ConfirmationDialogProps = {
-  isOpen: boolean;
-  onSave?: () => void;
-  onDiscard: () => void;
-  onCancel: () => void;
-  title: string;
-  message: string;
-};
+interface ConfirmationDialogProps {
+    isOpen: boolean;
+    onCancel: () => void;
+    onConfirm: () => void;
+    title: string;
+    message: string;
+    confirmVariant?: "default" | "destructive";
+    confirmText?: string;
+    cancelText?: string;
+    requireConfirmationText?: string;
+    confirmationPlaceholder?: string;
+    onConfirmationTextChange?: (text: string) => void;
+}
 
-export const ConfirmationDialog = ({ isOpen, onSave, onDiscard, onCancel, title, message }: ConfirmationDialogProps) => {
-  if (!isOpen) {
-    return null;
-  }
+export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
+    isOpen,
+    onCancel,
+    onConfirm,
+    title,
+    message,
+    confirmVariant = "default",
+    confirmText = "Confirm",
+    cancelText = "Cancel",
+    requireConfirmationText,
+    confirmationPlaceholder,
+    onConfirmationTextChange
+}) => {
+    const [confirmationInput, setConfirmationInput] = useState("");
+    const isConfirmDisabled = requireConfirmationText && confirmationInput !== requireConfirmationText;
 
-  return (
-    <div 
-      className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center font-mono"
-      onClick={onCancel}
-    >
-      <div 
-        className="bg-gradient-to-b from-gray-900 to-black border border-gray-700 p-6 max-w-md flex flex-col gap-4 rounded-lg shadow-lg"
-        onClick={e => e.stopPropagation()}
-      >
-        <div className="flex items-center gap-4">
-          <TriangleAlert className="h-8 w-8 text-yellow-500 flex-shrink-0" />
-          <h2 className="text-xl font-bold text-white">{title}</h2>
-        </div>
-        <p className="text-gray-400 text-sm">
-          {message}
-        </p>
-        <div className="flex justify-end gap-4 mt-4">
-          <Button 
-            variant="outline" 
-            onClick={onCancel} 
-            className="border-gray-700 hover:border-white hover:bg-gray-800 hover:text-white"
-          >
-            Cancelar
-          </Button>
-          {onSave && (
-            <Button 
-              onClick={onSave}
-              className="bg-slate-700 hover:bg-slate-600 text-white font-bold flex items-center gap-2 border border-slate-500"
+    // Reset confirmation input when dialog opens/closes
+    useEffect(() => {
+        if (!isOpen) {
+            setConfirmationInput("");
+            onConfirmationTextChange?.("");
+        }
+    }, [isOpen, onConfirmationTextChange]);
+
+    const handleConfirm = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (requireConfirmationText && confirmationInput !== requireConfirmationText) {
+            console.log('Confirmation text does not match:', {
+                required: requireConfirmationText,
+                input: confirmationInput
+            });
+            return;
+        }
+        onConfirm();
+    };
+
+    const handleCancel = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setConfirmationInput("");
+        onConfirmationTextChange?.("");
+        onCancel();
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const value = e.target.value;
+        console.log('Confirmation input changed:', {
+            value,
+            required: requireConfirmationText,
+            matches: value === requireConfirmationText
+        });
+        setConfirmationInput(value);
+        onConfirmationTextChange?.(value);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        e.stopPropagation();
+        if (e.key === 'Enter' && !isConfirmDisabled) {
+            e.preventDefault();
+            handleConfirm(e as any);
+        } else if (e.key === 'Escape') {
+            e.preventDefault();
+            handleCancel(e as any);
+        }
+    };
+
+    return (
+        <Dialog 
+            open={isOpen} 
+            onOpenChange={(open) => {
+                if (!open) {
+                    handleCancel(new MouseEvent('click') as any);
+                }
+            }}
+        >
+            <DialogContent 
+                className="bg-gray-900/95 border border-gray-700 text-white shadow-xl backdrop-blur-sm max-w-md w-full mx-auto"
+                onClick={(e) => e.stopPropagation()}
             >
-              <Save className="h-4 w-4" />
-              Guardar
-            </Button>
-          )}
-          <Button 
-            variant="destructive" 
-            onClick={onDiscard}
-            className="bg-red-800 hover:bg-red-700 text-white"
-          >
-            Descartar y Salir
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
+                <DialogHeader>
+                    <DialogTitle className="text-xl font-bold text-red-500">{title}</DialogTitle>
+                    <DialogDescription className="text-gray-300 whitespace-pre-line">{message}</DialogDescription>
+                </DialogHeader>
+                {requireConfirmationText && (
+                    <div className="py-4">
+                        <Input
+                            value={confirmationInput}
+                            onChange={handleInputChange}
+                            onKeyDown={handleKeyDown}
+                            onClick={(e) => e.stopPropagation()}
+                            placeholder={confirmationPlaceholder || `Type "${requireConfirmationText}" to confirm`}
+                            className="w-full bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+                            autoFocus
+                        />
+                        {confirmationInput && confirmationInput !== requireConfirmationText && (
+                            <p className="text-sm text-red-400 mt-2">
+                                Text must match exactly: "{requireConfirmationText}"
+                            </p>
+                        )}
+                    </div>
+                )}
+                <DialogFooter className="gap-2 sm:gap-2">
+                    <Button 
+                        variant="outline" 
+                        onClick={handleCancel}
+                        className="bg-transparent hover:bg-gray-800 text-white"
+                    >
+                        {cancelText}
+                    </Button>
+                    <Button 
+                        variant={confirmVariant} 
+                        onClick={handleConfirm}
+                        disabled={Boolean(isConfirmDisabled)}
+                        className={`${confirmVariant === "destructive" ? "bg-red-600 hover:bg-red-700" : ""} ${isConfirmDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+                    >
+                        {confirmText}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
 }; 

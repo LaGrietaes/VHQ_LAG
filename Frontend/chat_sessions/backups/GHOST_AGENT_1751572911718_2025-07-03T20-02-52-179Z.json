@@ -1,0 +1,27 @@
+{
+  "id": "GHOST_AGENT_1751572911718",
+  "agents": [
+    "GHOST_AGENT"
+  ],
+  "name": "Chat with Ghost",
+  "createdAt": "2025-07-03T20:01:51.718Z",
+  "updatedAt": "2025-07-03T20:02:52.178Z",
+  "messages": [
+    {
+      "id": "1751572964768",
+      "agentId": "GHOST_AGENT_1751572911718",
+      "content": "Test 01, funcionalidades",
+      "timestamp": "2025-07-03T20:02:44.768Z",
+      "isUser": true
+    }
+  ],
+  "metadata": {
+    "tags": [],
+    "priority": "medium",
+    "isArchived": false,
+    "messageCount": 1,
+    "userMessageCount": 1,
+    "agentMessageCount": 0
+  },
+  "version": "2.0.0"
+}

@@ -1,0 +1,34 @@
+{
+  "id": "GHOST_AGENT_1751578313775",
+  "agents": [
+    "GHOST_AGENT"
+  ],
+  "name": "Chat with Ghost",
+  "createdAt": "2025-07-03T21:31:53.775Z",
+  "updatedAt": "2025-07-03T21:33:12.070Z",
+  "messages": [
+    {
+      "id": "1751578354091",
+      "agentId": "GHOST_AGENT_1751578313775",
+      "content": "Testing functionalities, puedes decirme el titulo del proyecto que agrege como contexto?",
+      "timestamp": "2025-07-03T21:32:34.091Z",
+      "isUser": true
+    },
+    {
+      "id": "1751578391558-ghost",
+      "agentId": "GHOST_AGENT",
+      "content": "\n¡Hola! Claro, puedo ayudarte con eso. El título del proyecto que estoy utilizando como contexto es \"Desarrollo de una plataforma de aprendizaje en línea\". ¿Es eso lo que estás buscando?",
+      "timestamp": "2025-07-03T21:33:11.558Z",
+      "isUser": false
+    }
+  ],
+  "metadata": {
+    "tags": [],
+    "priority": "medium",
+    "isArchived": false,
+    "messageCount": 2,
+    "userMessageCount": 1,
+    "agentMessageCount": 1
+  },
+  "version": "2.0.0"
+}

@@ -48,6 +48,15 @@ export const ImportDialog = ({ isOpen, onClose, stagedFiles, onImport }: ImportD
                 }
             });
         });
+        
+        console.log('[ImportDialog] Items to import:', itemsToImport.map(item => ({
+            id: item.id,
+            title: item.title,
+            type: item.type,
+            hasContent: !!item.content,
+            contentLength: item.content?.length || 0
+        })));
+        
         onImport(itemsToImport);
     };
     

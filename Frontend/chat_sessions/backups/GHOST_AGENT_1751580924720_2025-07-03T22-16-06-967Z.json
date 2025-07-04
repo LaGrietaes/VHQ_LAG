@@ -1,0 +1,34 @@
+{
+  "id": "GHOST_AGENT_1751580924720",
+  "agents": [
+    "GHOST_AGENT"
+  ],
+  "name": "Chat with Ghost",
+  "createdAt": "2025-07-03T22:15:24.720Z",
+  "updatedAt": "2025-07-03T22:16:06.966Z",
+  "messages": [
+    {
+      "id": "1751580947276",
+      "agentId": "GHOST_AGENT_1751580924720",
+      "content": "Ghost , puedes decirme cual es el tercer tip ?",
+      "timestamp": "2025-07-03T22:15:47.276Z",
+      "isUser": true
+    },
+    {
+      "id": "1751580966880-ghost",
+      "agentId": "GHOST_AGENT",
+      "content": " ¡Hola! ¡Claro que sí! Según el contexto, el tercer tip es:\n\n3. Dale contexto, obtendrás inteligencia.",
+      "timestamp": "2025-07-03T22:16:06.880Z",
+      "isUser": false
+    }
+  ],
+  "metadata": {
+    "tags": [],
+    "priority": "medium",
+    "isArchived": false,
+    "messageCount": 2,
+    "userMessageCount": 1,
+    "agentMessageCount": 1
+  },
+  "version": "2.0.0"
+}

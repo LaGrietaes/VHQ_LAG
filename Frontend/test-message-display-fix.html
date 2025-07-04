@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Display Fix Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #0A0A0A;
+            color: white;
+        }
+        .test-section {
+            background: #1a1a1a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+        .fix-highlight {
+            background: #ffc107;
+            color: #000;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            background: #333;
+        }
+        .status.success {
+            background: #155724;
+            border: 1px solid #28a745;
+        }
+        .status.error {
+            background: #721c24;
+            border: 1px solid #dc3545;
+        }
+        .status.info {
+            background: #0c5460;
+            border: 1px solid #17a2b8;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Message Display Fix Test</h1>
+    
+    <div class="test-section">
+        <h2>✅ What Was Fixed</h2>
+        <ul>
+            <li><span class="fix-highlight">Session ID Mismatch:</span> Fixed addMessageToHistory to use session IDs instead of agent IDs</li>
+            <li><span class="fix-highlight">Message Routing:</span> Updated all message handlers to find the correct session</li>
+            <li><span class="fix-highlight">Debug Logging:</span> Added comprehensive logging to track message flow</li>
+            <li><span class="fix-highlight">Race Condition:</span> Fixed timing issue with stopped indicator removal</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🧪 Test Instructions</h2>
+        <ol>
+            <li>Open the chat application in another tab</li>
+            <li>Select GHOST_AGENT</li>
+            <li>Send a message like "Hello"</li>
+            <li>Wait for AI response</li>
+            <li>Send another message</li>
+            <li>Verify both messages appear in chat</li>
+            <li>Now test the stop and edit feature:
+                <ul>
+                    <li>Send a message</li>
+                    <li>Click stop button when it appears</li>
+                    <li>Edit the message</li>
+                    <li>Resend it</li>
+                    <li>Verify the edited message appears in chat</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>🔍 Debug Information</h2>
+        <div id="debug-info">
+            <p>Open browser console to see debug logs:</p>
+            <ul>
+                <li>"=== sendMessage called ==="</li>
+                <li>"Adding message to history: [message object]"</li>
+                <li>"=== addMessageToHistory called ==="</li>
+                <li>"Found session at index: [number]"</li>
+                <li>"Updated session: [sessionId] with message count: [number]"</li>
+                <li>"=== Resending stopped message ==="</li>
+                <li>"Removed stopped indicator message from chat"</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🚨 Common Issues & Solutions</h2>
+        <ul>
+            <li><strong>Messages not appearing:</strong> Check console for "addMessageToHistory called" logs</li>
+            <li><strong>Wrong session:</strong> Verify "Found session at index" shows correct session</li>
+            <li><strong>Session not found:</strong> Look for "Session not found, creating new session"</li>
+            <li><strong>Message count not updating:</strong> Check "Updated session with message count" logs</li>
+            <li><strong>Edited message missing:</strong> Ensure "=== Resending stopped message ===" appears</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🎯 Expected Behavior</h2>
+        <ul>
+            <li>✅ All messages appear in chat immediately</li>
+            <li>✅ User messages show on the right (blue background)</li>
+            <li>✅ AI responses show on the left (gray background)</li>
+            <li>✅ Edited messages appear as new messages</li>
+            <li>✅ Stopped indicator is removed after resend</li>
+            <li>✅ Message count increases correctly</li>
+        </ul>
+    </div>
+
+    <script>
+        function logTest(message) {
+            console.log(`🔧 MESSAGE FIX TEST: ${message}`);
+            const debugInfo = document.getElementById('debug-info');
+            const status = document.createElement('div');
+            status.className = 'status info';
+            status.textContent = message;
+            debugInfo.appendChild(status);
+        }
+
+        logTest('Message display fix test page loaded');
+        logTest('Key fix: Session ID routing in addMessageToHistory');
+        logTest('Navigate to chat application to test message display');
+    </script>
+</body>
+</html> 

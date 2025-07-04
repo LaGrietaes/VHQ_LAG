@@ -39,24 +39,42 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ message: 'Missing required parameters' }, { status: 400 });
         }
 
-        const projectRelativePath = projectRootPath.replace('GHOST_Proyectos/', '');
-        const projectFullPath = path.join(GHOST_PROJECTS_ROOT, projectRelativePath);
+        // Clean up the project path to avoid duplication
+        const cleanProjectPath = projectRootPath.replace(/^GHOST_Proyectos[\/\\]/, '');
+        const projectFullPath = path.join(GHOST_PROJECTS_ROOT, cleanProjectPath);
+
+        // Ensure project directory exists
+        if (!fs.existsSync(projectFullPath)) {
+            console.error('[API/renameItem] Project directory not found:', projectFullPath);
+            return NextResponse.json({ message: 'Project directory not found' }, { status: 404 });
+        }
         
         const manifest = getProjectManifest(projectFullPath);
         
         const oldRelativePath = manifest[itemId];
         if (!oldRelativePath) {
+            console.error('[API/renameItem] Item not found in manifest:', { itemId, manifest });
             return NextResponse.json({ message: 'Item not found in manifest' }, { status: 404 });
         }
 
         const oldPath = path.join(projectFullPath, oldRelativePath);
+        if (!fs.existsSync(oldPath)) {
+            console.error('[API/renameItem] Old path does not exist:', oldPath);
+            return NextResponse.json({ message: 'Item not found on disk' }, { status: 404 });
+        }
+
         const newPath = path.join(path.dirname(oldPath), newTitle);
         const newRelativePath = path.relative(projectFullPath, newPath);
 
         if (fs.existsSync(newPath)) {
+            console.error('[API/renameItem] New path already exists:', newPath);
             return NextResponse.json({ message: 'An item with the new name already exists' }, { status: 409 });
         }
+
+        // Ensure parent directory exists
+        await fs.promises.mkdir(path.dirname(newPath), { recursive: true });
         
+        // Rename the file/folder
         await fs.promises.rename(oldPath, newPath);
 
         // Update and save the manifest
@@ -69,6 +87,10 @@ export async function POST(req: NextRequest) {
 
     } catch (error: any) {
         console.error('[API/renameItem] Error:', error);
-        return NextResponse.json({ message: 'Failed to rename item', details: error.message }, { status: 500 });
+        return NextResponse.json({ 
+            message: 'Failed to rename item', 
+            details: error.message,
+            path: error.path // Include path in error for debugging
+        }, { status: 500 });
     }
 } 

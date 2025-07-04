@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Book, FileText, Rss, Share2, Twitter, Twitch, Youtube, Instagram, Facebook } from "lucide-react";
+import { Book, FileText, Rss, Share2, Twitter, Twitch, Youtube, Instagram, Facebook, Trash2 } from "lucide-react";
 import { useState, useRef } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -32,14 +32,17 @@ type ProjectCardProps = {
   project: Project;
     onSelectProject: (project: Project) => void;
   onUpdateProject: (project: Project) => void;
+  onDeleteProject?: (project: Project) => void;
 };
 
-export const ProjectCard = ({ project, onSelectProject, onUpdateProject }: ProjectCardProps) => {
+export const ProjectCard = ({ project, onSelectProject, onUpdateProject, onDeleteProject }: ProjectCardProps) => {
   const [isEditing, setIsEditing] = useState(false);
     const [editedTitle, setEditedTitle] = useState(project.title);
     const [editedDescription, setEditedDescription] = useState(project.description || "");
   const [socialPlatforms, setSocialPlatforms] = useState(project.socialPlatforms || []);
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const cardRef = useRef<HTMLDivElement>(null);
 
   const isDirty = () => {
@@ -64,9 +67,9 @@ export const ProjectCard = ({ project, onSelectProject, onUpdateProject }: Proje
     const handleCancel = (e: React.MouseEvent) => {
         e.stopPropagation();
         if(isDirty()){
-          setShowSaveConfirm(true);
+            setShowSaveConfirm(true);
         } else {
-          setIsEditing(false);
+            setIsEditing(false);
         }
     };
     
@@ -82,6 +85,51 @@ export const ProjectCard = ({ project, onSelectProject, onUpdateProject }: Proje
         setSocialPlatforms(prev => 
             prev.includes(platform) ? prev.filter(p => p !== platform) : [...prev, platform]
         );
+    };
+
+    const handleDelete = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setIsEditing(false);  // Close the edit dialog first
+        setDeleteConfirmText("");  // Reset the confirmation text
+        setShowDeleteConfirm(true);
+    };
+
+    const confirmDelete = async () => {
+        try {
+            console.log('Attempting to delete project:', {
+                title: project.title,
+                confirmText: deleteConfirmText,
+                path: project.path
+            });
+
+            if (deleteConfirmText !== project.title) {
+                console.log('Delete confirmation text does not match');
+                return;
+            }
+
+            const response = await fetch('/api/workspace/deleteItem', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    projectRootPath: project.path,
+                    itemId: null // Delete entire project
+                }),
+            });
+
+            const data = await response.json();
+            console.log('Delete response:', data);
+
+            if (!response.ok) {
+                throw new Error(data.message || data.details || 'Failed to delete project');
+            }
+
+            setShowDeleteConfirm(false);
+            setDeleteConfirmText("");
+            onDeleteProject?.(project);
+        } catch (error) {
+            console.error('Error deleting project:', error);
+            alert('Failed to delete project: ' + (error as Error).message);
+        }
     };
 
     const progress = project.status === "Completed" ? 100 : (project.progress || 0);
@@ -132,61 +180,115 @@ export const ProjectCard = ({ project, onSelectProject, onUpdateProject }: Proje
                     </>
                 )}
             </CardContent>
-            <CardFooter className="mt-auto flex justify-end p-4">
-                 <Dialog open={isEditing} onOpenChange={(isOpen) => !isOpen && handleCancel(new MouseEvent('click') as any)}>
+            <CardFooter className="mt-auto flex justify-end p-4 gap-2">
+                <Dialog 
+                    open={isEditing} 
+                    onOpenChange={(isOpen) => {
+                        if (!isOpen) {
+                            handleCancel(new MouseEvent('click') as any);
+                        }
+                    }}
+                >
                     <DialogTrigger asChild>
                         <Button variant="ghost" size="sm" onClick={handleEdit} className="text-gray-400 hover:text-red-400">Edit</Button>
                     </DialogTrigger>
-                    <DialogContent onClick={(e) => e.stopPropagation()} className="bg-gray-900 border-gray-700 text-white">
+                    <DialogContent onClick={(e) => e.stopPropagation()} className="bg-gray-900/95 border-gray-700 text-white backdrop-blur-sm">
                         <DialogHeader>
-                            <DialogTitle>Edit Project Details</DialogTitle>
-                            <DialogDescription>
+                            <DialogTitle className="text-xl font-bold text-red-500">Edit Project Details</DialogTitle>
+                            <DialogDescription className="text-gray-300">
                                 Make changes to your project here. Click save when you're done.
                             </DialogDescription>
                         </DialogHeader>
                         <div className="grid gap-4 py-4">
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <label htmlFor="title" className="text-right">Title</label>
-                                <Input id="title" value={editedTitle} onChange={e => setEditedTitle(e.target.value)} className="col-span-3" />
+                                <label htmlFor="title" className="text-right text-gray-300">Title</label>
+                                <Input 
+                                    id="title" 
+                                    value={editedTitle} 
+                                    onChange={e => {
+                                        e.stopPropagation();
+                                        setEditedTitle(e.target.value);
+                                    }}
+                                    onClick={e => e.stopPropagation()}
+                                    className="col-span-3 bg-gray-800 border-gray-700 text-white" 
+                                />
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <label htmlFor="description" className="text-right">Description</label>
-                                <Textarea id="description" value={editedDescription} onChange={e => setEditedDescription(e.target.value)} className="col-span-3" />
+                                <label htmlFor="description" className="text-right text-gray-300">Description</label>
+                                <Textarea 
+                                    id="description" 
+                                    value={editedDescription} 
+                                    onChange={e => {
+                                        e.stopPropagation();
+                                        setEditedDescription(e.target.value);
+                                    }}
+                                    onClick={e => e.stopPropagation()}
+                                    className="col-span-3 bg-gray-800 border-gray-700 text-white" 
+                                />
                             </div>
                             {project.type === 'social' && (
                                 <div className="grid grid-cols-4 items-center gap-4">
-                                    <label className="text-right">Platforms</label>
+                                    <label className="text-right text-gray-300">Platforms</label>
                                     <div className="col-span-3 grid grid-cols-3 gap-2">
                                         {Object.keys(socialIcons).map(platform => (
-                  <label key={platform} className="flex items-center gap-2 text-sm cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={socialPlatforms.includes(platform)}
-                      onChange={() => handleSocialPlatformChange(platform)}
-                      className="accent-red-500"
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                    {platform}
-                  </label>
-                ))}
-              </div>
-            </div>
-          )}
-              </div>
-                        <DialogFooter>
-                            <Button variant="outline" onClick={handleCancel}>Cancel</Button>
-                            <Button onClick={handleSave}>Save Changes</Button>
+                                            <label key={platform} className="flex items-center gap-2 text-sm cursor-pointer text-gray-300">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={socialPlatforms.includes(platform)}
+                                                    onChange={(e) => {
+                                                        e.stopPropagation();
+                                                        handleSocialPlatformChange(platform);
+                                                    }}
+                                                    onClick={(e) => e.stopPropagation()}
+                                                    className="accent-red-500"
+                                                />
+                                                {platform}
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        <DialogFooter className="gap-2">
+                            <Button variant="outline" onClick={handleCancel} className="bg-transparent hover:bg-gray-800">Cancel</Button>
+                            <Button 
+                                variant="destructive" 
+                                onClick={handleDelete} 
+                                className="bg-red-600 hover:bg-red-700"
+                            >
+                                Delete Project
+                            </Button>
+                            <Button onClick={handleSave} className="bg-primary hover:bg-primary/90">Save Changes</Button>
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>
-        <ConfirmationDialog
-            isOpen={showSaveConfirm}
-                    onClose={() => setShowSaveConfirm(false)}
+
+                <ConfirmationDialog
+                    isOpen={showSaveConfirm}
+                    onCancel={() => setShowSaveConfirm(false)}
                     onConfirm={handleConfirmLeave}
                     title="Discard changes?"
-                    description="You have unsaved changes. Are you sure you want to discard them?"
+                    message="You have unsaved changes. Are you sure you want to discard them?"
+                    confirmText="Discard"
+                    confirmVariant="destructive"
+                />
+
+                <ConfirmationDialog
+                    isOpen={showDeleteConfirm}
+                    onCancel={() => {
+                        setShowDeleteConfirm(false);
+                        setDeleteConfirmText("");
+                    }}
+                    onConfirm={confirmDelete}
+                    onConfirmationTextChange={setDeleteConfirmText}
+                    title="Delete Project Permanently"
+                    message={`This will permanently delete the project "${project.title}" and ALL its files. This action cannot be undone.\n\nType "${project.title}" to confirm deletion.`}
+                    confirmText="Delete Project"
+                    confirmVariant="destructive"
+                    requireConfirmationText={project.title}
+                    confirmationPlaceholder={`Type "${project.title}" to confirm`}
                 />
             </CardFooter>
         </Card>
-  );
+    );
 }; 

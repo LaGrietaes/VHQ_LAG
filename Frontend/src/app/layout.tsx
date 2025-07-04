@@ -3,6 +3,7 @@ import { Inter, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
+import { AgentProvider } from "@/lib/agent-context";
 
 const fontSans = Inter({ 
   subsets: ["latin"],
@@ -34,7 +35,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <AgentProvider>
           {children}
+          </AgentProvider>
         </ThemeProvider>
       </body>
     </html>

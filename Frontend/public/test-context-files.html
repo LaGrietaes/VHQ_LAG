@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Context Files Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        pre { background: #f8f9fa; padding: 10px; overflow-x: auto; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug: Context Files Issue</h1>
+    
+    <div class="test-section info">
+        <h3>📋 Instrucciones</h3>
+        <p>Este test verifica si el agente puede leer correctamente el contexto del archivo "101 Tips para Hablar con la IA.md"</p>
+        <p>El segundo tip debería ser: <strong>"Usa IA con empatía"</strong></p>
+    </div>
+
+    <div class="test-section">
+        <h3>🧪 Test 1: Cargar Contexto</h3>
+        <button onclick="testContext()">Cargar Contexto</button>
+        <div id="context-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>🤖 Test 2: Preguntar al Agente</h3>
+        <button onclick="testAgent()">Preguntar al Ghost Agent</button>
+        <div id="agent-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>📊 Logs del Sistema</h3>
+        <div id="logs"></div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const logsDiv = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            logsDiv.innerHTML += `<div class="${type}">[${timestamp}] ${message}</div>`;
+        }
+
+        async function testContext() {
+            log('🔄 Iniciando test de contexto...');
+            const resultDiv = document.getElementById('context-result');
+            
+            try {
+                const response = await fetch('/api/projects/context?path=GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA&file=GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA/Ideas Tips/101 Tips para Hablar con la IA.md');
+                const data = await response.json();
+                
+                if (data.success) {
+                    log('✅ Contexto cargado exitosamente', 'success');
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Contexto Cargado</h4>
+                            <p><strong>Longitud:</strong> ${data.data.content.length} caracteres</p>
+                            <p><strong>Tipo:</strong> ${data.data.contextType}</p>
+                            <details>
+                                <summary>Ver contenido (primeros 1000 caracteres)</summary>
+                                <pre>${data.data.content.substring(0, 1000)}...</pre>
+                            </details>
+                        </div>
+                    `;
+                    
+                    // Verificar si contiene el segundo tip
+                    if (data.data.content.includes('Usa IA con empatía')) {
+                        log('✅ El contexto contiene el segundo tip correcto', 'success');
+                    } else {
+                        log('❌ El contexto NO contiene el segundo tip esperado', 'error');
+                    }
+                } else {
+                    log('❌ Error al cargar contexto: ' + data.error, 'error');
+                    resultDiv.innerHTML = `<div class="error">❌ Error: ${data.error}</div>`;
+                }
+            } catch (error) {
+                log('❌ Error de red: ' + error.message, 'error');
+                resultDiv.innerHTML = `<div class="error">❌ Error de red: ${error.message}</div>`;
+            }
+        }
+
+        async function testAgent() {
+            log('🔄 Iniciando test del agente...');
+            const resultDiv = document.getElementById('agent-result');
+            
+            try {
+                const response = await fetch('/api/ai/ghost-agent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: '¿Cuál es el nombre del segundo tip del contexto? Responde SOLO con el nombre del tip, nada más.',
+                        context: {
+                            path: 'GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA',
+                            specificFile: 'GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA/Ideas Tips/101 Tips para Hablar con la IA.md'
+                        }
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log('✅ Agente respondió exitosamente', 'success');
+                    
+                    const agentResponse = data.response || data.message || 'Sin respuesta';
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h4>🤖 Respuesta del Agente</h4>
+                            <p><strong>Respuesta:</strong> ${agentResponse}</p>
+                            <p><strong>Esperado:</strong> "Usa IA con empatía"</p>
+                        </div>
+                    `;
+                    
+                    // Verificar si la respuesta es correcta
+                    if (agentResponse.includes('Usa IA con empatía') || agentResponse.includes('empatía')) {
+                        log('✅ El agente respondió correctamente', 'success');
+                    } else {
+                        log('❌ El agente NO respondió correctamente', 'error');
+                        log('Respuesta recibida: ' + agentResponse, 'error');
+                    }
+                } else {
+                    const errorText = await response.text();
+                    log('❌ Error del agente: ' + response.status, 'error');
+                    resultDiv.innerHTML = `<div class="error">❌ Error ${response.status}: ${errorText}</div>`;
+                }
+            } catch (error) {
+                log('❌ Error de red: ' + error.message, 'error');
+                resultDiv.innerHTML = `<div class="error">❌ Error de red: ${error.message}</div>`;
+            }
+        }
+
+        // Auto-run context test on load
+        window.onload = function() {
+            log('🚀 Página cargada, iniciando tests...');
+            setTimeout(testContext, 1000);
+        };
+    </script>
+</body>
+</html> 

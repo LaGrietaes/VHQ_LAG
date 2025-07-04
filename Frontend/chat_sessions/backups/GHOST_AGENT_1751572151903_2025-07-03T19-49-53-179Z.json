@@ -1,0 +1,41 @@
+{
+  "id": "GHOST_AGENT_1751572151903",
+  "agents": [
+    "GHOST_AGENT"
+  ],
+  "name": "Chat with Ghost",
+  "createdAt": "2025-07-03T19:49:11.903Z",
+  "updatedAt": "2025-07-03T19:49:53.177Z",
+  "messages": [
+    {
+      "id": "1751572162953-stopped",
+      "agentId": "GHOST_AGENT",
+      "content": "🛑 Message generation stopped. You can edit and resend your message.",
+      "timestamp": "2025-07-03T19:49:22.953Z",
+      "isUser": false
+    },
+    {
+      "id": "1751572182283",
+      "agentId": "GHOST_AGENT_1751572151903",
+      "content": "Fresh test 01, como se llama el titulo del contexto agregado en este chat?",
+      "timestamp": "2025-07-03T19:49:42.283Z",
+      "isUser": true
+    },
+    {
+      "id": "1751572192502-ghost",
+      "agentId": "GHOST_AGENT",
+      "content": "¡Hola! El título del contexto agregado en este chat es \"Fresh test 01\". ¡Espero que te sea útil! ¿Hay algo más en lo que pueda ayudarte?",
+      "timestamp": "2025-07-03T19:49:52.502Z",
+      "isUser": false
+    }
+  ],
+  "metadata": {
+    "tags": [],
+    "priority": "medium",
+    "isArchived": false,
+    "messageCount": 3,
+    "userMessageCount": 1,
+    "agentMessageCount": 2
+  },
+  "version": "2.0.0"
+}

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixed Stop & Edit Feature Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #0A0A0A;
+            color: white;
+        }
+        .test-section {
+            background: #1a1a1a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            background: #333;
+        }
+        .status.success {
+            background: #155724;
+            border: 1px solid #28a745;
+        }
+        .status.error {
+            background: #721c24;
+            border: 1px solid #dc3545;
+        }
+        .status.info {
+            background: #0c5460;
+            border: 1px solid #17a2b8;
+        }
+        .fix-highlight {
+            background: #ffc107;
+            color: #000;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🛠️ Fixed Stop & Edit Feature Test</h1>
+    
+    <div class="test-section">
+        <h2>✅ What Was Fixed</h2>
+        <ul>
+            <li><span class="fix-highlight">Request Cancellation:</span> Added AbortController to actually stop AI agent requests</li>
+            <li><span class="fix-highlight">Message Capture:</span> Now captures the actual sent message, not empty input</li>
+            <li><span class="fix-highlight">Visual Feedback:</span> Shows "🛑 Message generation stopped" indicator in chat</li>
+            <li><span class="fix-highlight">Proper State Management:</span> Fixed state handling for editing mode</li>
+            <li><span class="fix-highlight">Cleanup:</span> Removes stopped indicator when resending or canceling</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🧪 Test Instructions</h2>
+        <ol>
+            <li>Open the chat application in another tab</li>
+            <li>Select GHOST_AGENT</li>
+            <li>Type a message like "Write a short story about a robot"</li>
+            <li>Send the message</li>
+            <li>Wait for the stop button (red square) to appear</li>
+            <li><strong>Click the stop button</strong></li>
+            <li>Verify:
+                <ul>
+                    <li>✅ AI stops responding immediately</li>
+                    <li>✅ "🛑 Message generation stopped" appears in chat</li>
+                    <li>✅ Input field shows your original message for editing</li>
+                    <li>✅ Green border around input field</li>
+                    <li>✅ Green send button and gray X button appear</li>
+                </ul>
+            </li>
+            <li>Edit the message (e.g., change "robot" to "cat")</li>
+            <li>Press Enter or click the green send button</li>
+            <li>Verify the edited message is sent and AI responds</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>🔍 Debug Information</h2>
+        <div id="debug-info">
+            <p>Open browser console to see debug logs:</p>
+            <ul>
+                <li>"=== Stopping message generation ==="</li>
+                <li>"Aborting current request..."</li>
+                <li>"Capturing last sent message for editing: [your message]"</li>
+                <li>"Message stopped, ready for editing: [your message]"</li>
+                <li>"=== Resending stopped message ==="</li>
+                <li>"=== Canceling edit ==="</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🚨 Common Issues & Solutions</h2>
+        <ul>
+            <li><strong>Stop button doesn't appear:</strong> Make sure you're sending to GHOST_AGENT or CEO_AGENT</li>
+            <li><strong>Message not captured:</strong> Check console for "Capturing last sent message" log</li>
+            <li><strong>Edit field is empty:</strong> Verify "last sent message" is being stored correctly</li>
+            <li><strong>AI keeps responding:</strong> Check if AbortController is working (look for "Aborting current request" log)</li>
+            <li><strong>Stopped indicator doesn't appear:</strong> Check if addMessageToHistory is being called</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🎯 Expected Behavior</h2>
+        <ul>
+            <li>✅ Stop button appears during AI processing</li>
+            <li>✅ Clicking stop immediately halts AI response</li>
+            <li>✅ Original message appears in edit field</li>
+            <li>✅ Stopped indicator appears in chat</li>
+            <li>✅ Edit interface is clearly visible (green border)</li>
+            <li>✅ Edited message is sent correctly</li>
+            <li>✅ Stopped indicator is removed after resend/cancel</li>
+        </ul>
+    </div>
+
+    <script>
+        function logTest(message) {
+            console.log(`🧪 FIXED TEST: ${message}`);
+            const debugInfo = document.getElementById('debug-info');
+            const status = document.createElement('div');
+            status.className = 'status info';
+            status.textContent = message;
+            debugInfo.appendChild(status);
+        }
+
+        logTest('Fixed Stop & Edit feature test page loaded');
+        logTest('Key fixes: Request cancellation + proper message capture');
+        logTest('Navigate to chat application to test the improved feature');
+    </script>
+</body>
+</html> 

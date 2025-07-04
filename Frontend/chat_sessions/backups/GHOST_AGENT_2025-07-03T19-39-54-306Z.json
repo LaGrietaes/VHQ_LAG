@@ -1,0 +1,62 @@
+{
+  "id": "GHOST_AGENT",
+  "agents": [
+    "GHOST_AGENT"
+  ],
+  "name": "Chat with Ghost",
+  "createdAt": "2025-07-03T19:22:39.559Z",
+  "updatedAt": "2025-07-03T19:39:54.305Z",
+  "messages": [
+    {
+      "id": "1751570559557-ghost",
+      "agentId": "GHOST_AGENT",
+      "content": " ¡Hola! ¡Claro que sí! Estoy aquí para ayudarte en lo que necesites. ¿En qué puedo ayudarte hoy?",
+      "timestamp": "2025-07-03T19:22:39.557Z",
+      "isUser": false
+    },
+    {
+      "id": "1751571332439",
+      "agentId": "GHOST_AGENT",
+      "content": "estoy probando funcionalidades...",
+      "timestamp": "2025-07-03T19:35:32.439Z",
+      "isUser": true
+    },
+    {
+      "id": "1751571359945-ghost",
+      "agentId": "GHOST_AGENT",
+      "content": " ¡Hola! ¡Claro que sí! Estoy aquí para ayudarte en lo que necesites. ¿En qué puedo ayudarte hoy? ¿Quieres probar alguna función específica o tienes alguna pregunta sobre el uso de mi plataforma? ¡Estoy listo para ayudarte en lo que necesites!",
+      "timestamp": "2025-07-03T19:35:59.945Z",
+      "isUser": false
+    },
+    {
+      "id": "1751571554004",
+      "agentId": "GHOST_AGENT",
+      "content": "once again testing functionalities",
+      "timestamp": "2025-07-03T19:39:14.004Z",
+      "isUser": true
+    },
+    {
+      "id": "1751571556772-stopped",
+      "agentId": "GHOST_AGENT",
+      "content": "🛑 Message generation stopped. You can edit and resend your message.",
+      "timestamp": "2025-07-03T19:39:16.772Z",
+      "isUser": false
+    },
+    {
+      "id": "1751571594163",
+      "agentId": "GHOST_AGENT",
+      "content": "once again testing functionalities, lets see if you can read the context added here, please respond with the name of the file to verify you do get the context.",
+      "timestamp": "2025-07-03T19:39:54.163Z",
+      "isUser": true
+    }
+  ],
+  "metadata": {
+    "tags": [],
+    "priority": "medium",
+    "isArchived": false,
+    "messageCount": 6,
+    "userMessageCount": 3,
+    "agentMessageCount": 3
+  },
+  "version": "2.0.0"
+}

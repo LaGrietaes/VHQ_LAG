@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -5,7 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { Book, FileText, Rss, Share2, ListChecks, Clock, Bot } from "lucide-react";
 import { Project, ScriptProject, BlogPostProject, BookProject } from "@/lib/ghost-agent-data";
 import { useState, useEffect, useCallback } from "react";
-import { BookWorkspace } from "./BookWorkspace";
+import BookWorkspace from "./BookWorkspace";
 import { ScriptWorkspace } from "./ScriptWorkspace";
 import { BlogWorkspace } from "./BlogWorkspace";
 import { cn } from "@/lib/utils";
@@ -124,23 +126,26 @@ const NewProjectDialog = ({ isOpen, onClose, onProjectCreated }: NewProjectDialo
     );
 };
 
-const ProjectList = ({ projects, onProjectSelect, onUpdateProject }: { 
+const ProjectList = ({ projects, onProjectSelect, onUpdateProject, onDeleteProject }: { 
   projects: Project[], 
   onProjectSelect: (project: Project) => void,
-  onUpdateProject: (project: Project) => void
+  onUpdateProject: (project: Project) => void,
+  onDeleteProject: (project: Project) => void
 }) => {
-  if (projects.length === 0) {
-    return <p className="text-center text-muted-foreground mt-8">No projects in this category.</p>;
+  if (!projects || projects.length === 0) {
+    return <div className="text-gray-500 text-center py-8">No projects found.</div>;
   }
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {projects.map((p) => (
-        <ProjectCard 
-          key={p.id}
-          project={p}
-          onSelectProject={onProjectSelect}
-          onUpdateProject={onUpdateProject}
-        />
+      {projects.map((project) => (
+        <div key={project.id}>
+          <ProjectCard 
+            project={project}
+            onSelectProject={onProjectSelect}
+            onUpdateProject={onUpdateProject}
+            onDeleteProject={onDeleteProject}
+          />
+        </div>
       ))}
     </div>
   );
@@ -263,6 +268,35 @@ export const GhostWriterView = () => {
   
   const allProjects = [...projectsData.scripts, ...projectsData.blogs, ...projectsData.books];
 
+  const handleDeleteProject = async (project: Project) => {
+    try {
+      // Remove the project from state immediately for better UX
+      setProjectsData(prevData => {
+        const categoryKey = project.type === 'script' ? 'scripts' 
+                        : project.type === 'blog' ? 'blogs' 
+                        : 'books';
+        return {
+          ...prevData,
+          [categoryKey]: prevData[categoryKey].filter(p => p.id !== project.id)
+        };
+      });
+
+      // If this was the selected project, clear the selection
+      if (selectedProject?.id === project.id) {
+        setSelectedProject(null);
+      }
+
+      // Refresh the projects list to ensure sync with backend
+      await fetchProjects();
+
+    } catch (error) {
+      console.error('Error handling project deletion:', error);
+      // Revert the state change if there was an error
+      fetchProjects();
+      alert('Failed to delete project: ' + (error as Error).message);
+    }
+  };
+
   return (
     <div className="flex flex-col h-full w-full">
       {selectedProject ? (
@@ -317,6 +351,7 @@ export const GhostWriterView = () => {
                 projects={projectsData.scripts.filter(p => scriptCategory === 'all' || p.category === scriptCategory)} 
                 onProjectSelect={handleProjectSelect}
                 onUpdateProject={handleUpdateProject}
+                onDeleteProject={handleDeleteProject}
               />
             </TabsContent>
             <TabsContent value="blogs" className="mt-6">
@@ -325,6 +360,7 @@ export const GhostWriterView = () => {
                 projects={projectsData.blogs.filter(p => blogCategory === 'all' || p.blogCategory === blogCategory)} 
                 onProjectSelect={handleProjectSelect}
                 onUpdateProject={handleUpdateProject}
+                onDeleteProject={handleDeleteProject}
               />
             </TabsContent>
             <TabsContent value="books" className="mt-6">
@@ -332,6 +368,7 @@ export const GhostWriterView = () => {
                 projects={projectsData.books} 
                 onProjectSelect={handleProjectSelect} 
                 onUpdateProject={handleUpdateProject}
+                onDeleteProject={handleDeleteProject}
               />
             </TabsContent>
           </Tabs>
@@ -341,7 +378,6 @@ export const GhostWriterView = () => {
             onClose={() => setIsNewProjectDialogOpen(false)}
             onProjectCreated={() => {
               fetchProjects();
-              // Optionally switch to the tab of the new project type
             }}
           />
         </div>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Simple Context</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #00ff00;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #333;
+            border-radius: 5px;
+        }
+        .success { color: #00ff00; }
+        .error { color: #ff0000; }
+        .info { color: #ffff00; }
+        button {
+            background: #333;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        button:hover {
+            background: #00ff00;
+            color: #000;
+        }
+        pre {
+            background: #111;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Simple Context System</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Project Files (Filtered)</h2>
+        <button onclick="testProjectFiles()">Test Project Files</button>
+        <div id="test1-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: Specific File Context</h2>
+        <button onclick="testSpecificFile()">Test Specific File</button>
+        <div id="test2-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Ghost Agent with Context</h2>
+        <button onclick="testGhostAgent()">Test Ghost Agent</button>
+        <div id="test3-result"></div>
+    </div>
+
+    <script>
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : 'info';
+            element.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+        }
+
+        async function testProjectFiles() {
+            const resultId = 'test1-result';
+            log(resultId, 'Testing filtered project files...');
+            
+            try {
+                const response = await fetch('/api/projects/files?path=GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA');
+                const data = await response.json();
+                
+                if (data.success) {
+                    log(resultId, '✅ Project files loaded successfully', 'success');
+                    log(resultId, `Total files shown: ${data.data.files.length}`);
+                    
+                    const contentFiles = data.data.files.filter(f => f.isContentFile);
+                    const directories = data.data.files.filter(f => f.type === 'directory');
+                    
+                    log(resultId, `Directories: ${directories.length}`);
+                    log(resultId, `Content files: ${contentFiles.length}`);
+                    
+                    if (contentFiles.length > 0) {
+                        log(resultId, 'Content files found:');
+                        contentFiles.forEach(file => {
+                            log(resultId, `  - ${file.name} (${file.size} bytes)`);
+                        });
+                    }
+                } else {
+                    log(resultId, `❌ Failed: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                log(resultId, `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testSpecificFile() {
+            const resultId = 'test2-result';
+            log(resultId, 'Testing specific file context...');
+            
+            try {
+                const response = await fetch('/api/projects/context?path=GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA&file=GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA/101 Tips para Hablar con la IA');
+                const data = await response.json();
+                
+                if (data.success) {
+                    log(resultId, '✅ Context loaded successfully', 'success');
+                    log(resultId, `Context type: ${data.data.contextType}`);
+                    log(resultId, `Content length: ${data.data.content.length} characters`);
+                    
+                    // Show first 500 characters of content
+                    const preview = data.data.content.substring(0, 500);
+                    log(resultId, `Content preview:`);
+                    log(resultId, `<pre>${preview}...</pre>`);
+                } else {
+                    log(resultId, `❌ Failed: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                log(resultId, `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGhostAgent() {
+            const resultId = 'test3-result';
+            log(resultId, 'Testing ghost agent with specific file context...');
+            
+            try {
+                const response = await fetch('/api/ai/ghost-agent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: '¿Puedes leer el contenido del archivo seleccionado y darme un resumen de qué trata?',
+                        context: {
+                            path: 'GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA',
+                            specificFile: 'GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA/101 Tips para Hablar con la IA'
+                        }
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(resultId, '✅ Ghost agent responded successfully', 'success');
+                    log(resultId, `Response: ${data.response}`);
+                } else {
+                    log(resultId, `❌ Ghost agent failed: ${response.status}`, 'error');
+                    const errorText = await response.text();
+                    log(resultId, `Error details: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                log(resultId, `❌ Error: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html> 

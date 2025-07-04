@@ -1,0 +1,62 @@
+{
+  "id": "GHOST_AGENT",
+  "agents": [
+    "GHOST_AGENT"
+  ],
+  "name": "Chat with Ghost",
+  "createdAt": "2025-07-03T19:22:39.559Z",
+  "updatedAt": "2025-07-03T19:42:44.425Z",
+  "messages": [
+    {
+      "id": "1751570559557-ghost",
+      "agentId": "GHOST_AGENT",
+      "content": " ¡Hola! ¡Claro que sí! Estoy aquí para ayudarte en lo que necesites. ¿En qué puedo ayudarte hoy?",
+      "timestamp": "2025-07-03T19:22:39.557Z",
+      "isUser": false
+    },
+    {
+      "id": "1751571332439",
+      "agentId": "GHOST_AGENT",
+      "content": "estoy probando funcionalidades...",
+      "timestamp": "2025-07-03T19:35:32.439Z",
+      "isUser": true
+    },
+    {
+      "id": "1751571359945-ghost",
+      "agentId": "GHOST_AGENT",
+      "content": " ¡Hola! ¡Claro que sí! Estoy aquí para ayudarte en lo que necesites. ¿En qué puedo ayudarte hoy? ¿Quieres probar alguna función específica o tienes alguna pregunta sobre el uso de mi plataforma? ¡Estoy listo para ayudarte en lo que necesites!",
+      "timestamp": "2025-07-03T19:35:59.945Z",
+      "isUser": false
+    },
+    {
+      "id": "1751571554004",
+      "agentId": "GHOST_AGENT",
+      "content": "once again testing functionalities",
+      "timestamp": "2025-07-03T19:39:14.004Z",
+      "isUser": true
+    },
+    {
+      "id": "1751571604399-ghost",
+      "agentId": "GHOST_AGENT",
+      "content": "\n ¡Hola! ¡Claro que sí! Estoy listo para ayudarte en lo que necesites. El nombre del archivo que estás buscando es \"context_added.txt\". ¿Es este el archivo que estás intentando verificar?",
+      "timestamp": "2025-07-03T19:40:04.399Z",
+      "isUser": false
+    },
+    {
+      "id": "1751571763695",
+      "agentId": "GHOST_AGENT",
+      "content": "Test 03 functionalities",
+      "timestamp": "2025-07-03T19:42:43.695Z",
+      "isUser": true
+    }
+  ],
+  "metadata": {
+    "tags": [],
+    "priority": "medium",
+    "isArchived": false,
+    "messageCount": 6,
+    "userMessageCount": 3,
+    "agentMessageCount": 4
+  },
+  "version": "2.0.0"
+}

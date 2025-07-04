@@ -29,9 +29,6 @@ export default function AgentDetailPage() {
     )
   }
 
-  const onlineAgents = agentsData.filter(agent => agent.status === "OPERATIONAL").length;
-  const totalAgents = agentsData.length;
-
   return (
     <div className="flex h-screen bg-background text-foreground font-mono">
       <Sidebar />
@@ -47,7 +44,7 @@ export default function AgentDetailPage() {
             </div>
             <h1 className="text-xl font-bold tracking-widest text-primary uppercase flex-1 text-center">{agent.name.replace("_AGENT", "")}</h1>
             <div className="flex-1 flex justify-end items-center gap-4">
-                <SystemMonitor onlineAgents={onlineAgents} totalAgents={totalAgents} />
+                <SystemMonitor />
                 <div className="flex-shrink-0">
                   <ChatNotification onDrawerStateChange={setIsChatOpen} />
                 </div>

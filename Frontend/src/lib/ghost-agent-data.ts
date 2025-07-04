@@ -47,6 +47,7 @@ interface BaseProject {
   progress: number;
   description?: string;
   relatedProjectIds?: string[];
+  path: string;
 }
 
 export interface ScriptProject extends BaseProject {
@@ -68,7 +69,6 @@ export interface BookProject extends BaseProject {
   type: 'book';
   status: "Escribiendo" | "Planificado";
   name: string;
-  path: string;
   outline: OutlineItem[];
 }
 
@@ -84,20 +84,20 @@ export type Project = ScriptProject | BlogPostProject | BookProject | SocialPost
 
 // Let's fix the mock data
 mockProjects.scripts = [
-    { ...mockProjects.scripts[0], type: 'script' as const },
-    { ...mockProjects.scripts[1], type: 'script' as const },
-    { ...mockProjects.scripts[2], type: 'script' as const },
-    { ...mockProjects.scripts[3], type: 'script' as const },
+    { ...mockProjects.scripts[0], type: 'script' as const, path: 'GHOST_Proyectos/scripts/el-guion-perdido' },
+    { ...mockProjects.scripts[1], type: 'script' as const, path: 'GHOST_Proyectos/scripts/cronicas-del-futuro' },
+    { ...mockProjects.scripts[2], type: 'script' as const, path: 'GHOST_Proyectos/scripts/proyecto-quantum' },
+    { ...mockProjects.scripts[3], type: 'script' as const, path: 'GHOST_Proyectos/scripts/promo-el-guion-perdido' },
 ];
 
 mockProjects.blogs = [
-    { ...mockProjects.blogs[0], type: 'blog' as const },
-    { ...mockProjects.blogs[1], type: 'blog' as const },
+    { ...mockProjects.blogs[0], type: 'blog' as const, path: 'GHOST_Proyectos/blog_posts/minimalismo-digital' },
+    { ...mockProjects.blogs[1], type: 'blog' as const, path: 'GHOST_Proyectos/blog_posts/el-arte-del-storytelling' },
 ];
 
 mockProjects.socials = [
-    { ...mockProjects.socials[0], type: 'social' as const },
-    { ...mockProjects.socials[1], type: 'social' as const },
+    { ...mockProjects.socials[0], type: 'social' as const, path: 'GHOST_Proyectos/social/tweet-el-guion-perdido' },
+    { ...mockProjects.socials[1], type: 'social' as const, path: 'GHOST_Proyectos/social/instagram-el-guion-perdido' },
 ];
 
 // The books data was fixed in a previous step, but let's ensure it conforms to the new structure.

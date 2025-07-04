@@ -127,6 +127,30 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Disable outline for drag and drop elements */
+  [data-rbd-draggable-id] {
+    outline: none !important;
+  }
+  
+  /* Disable focus outline for drag elements */
+  [data-rbd-draggable-id]:focus {
+    outline: none !important;
+  }
+  
+  /* Disable any dotted borders during drag operations */
+  [data-rbd-draggable-id] * {
+    outline: none !important;
+  }
+  
+  /* Disable browser default drag feedback */
+  [data-rbd-draggable-id] {
+    -webkit-user-drag: element;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
 }
 
 @keyframes glitch-in {

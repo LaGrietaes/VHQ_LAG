@@ -357,4 +357,4 @@
 - **Paso 2:** Diseña un agente IA con prompts para una tarea específica.  
 - **Paso 3:** Integra contexto, rol y formato en el entrenamiento.  
 - **Paso 4:** Evalúa y ajusta el rendimiento del agente.  
-**Resultado:** Un asistente IA personalizado y funcional..
+**Resultado:** Un asistente IA personalizado y funcional.

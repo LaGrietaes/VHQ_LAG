@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghost Agent File Creation Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button { margin: 5px; padding: 8px 16px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        .file-operation { background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; margin: 10px 0; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>Ghost Agent File Creation Test</h1>
+    
+    <div class="test-section info">
+        <h3>Instructions</h3>
+        <p>This page tests the Ghost Agent's file creation capabilities:</p>
+        <ol>
+            <li>Test creating a simple file</li>
+            <li>Test creating a file with content</li>
+            <li>Test creating a folder</li>
+            <li>Test updating an existing file</li>
+            <li>Verify files are created in the workspace</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 1: Create Simple File</h3>
+        <button onclick="testCreateSimpleFile()">Create Simple File</button>
+        <div id="test1-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 2: Create File with Content</h3>
+        <button onclick="testCreateFileWithContent()">Create File with Content</button>
+        <div id="test2-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 3: Create Folder</h3>
+        <button onclick="testCreateFolder()">Create Folder</button>
+        <div id="test3-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 4: Update Existing File</h3>
+        <button onclick="testUpdateFile()">Update File</button>
+        <div id="test4-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 5: Complex Content Creation</h3>
+        <button onclick="testComplexContent()">Create Complex Content</button>
+        <div id="test5-result"></div>
+    </div>
+
+    <script>
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : 'info';
+            element.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+        }
+
+        async function testCreateSimpleFile() {
+            const resultId = 'test1-result';
+            log(resultId, 'Testing simple file creation...');
+            
+            try {
+                const response = await fetch('/api/ai/ghost-agent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: 'Crea un archivo llamado "test_simple.md" en el proyecto "Boceto_101_Tips_para_Hablar_con_la_IA" con el contenido "Este es un archivo de prueba simple."',
+                        contexts: []
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(resultId, '✅ File creation test successful', 'success');
+                    log(resultId, `Response: ${data.response}`);
+                    
+                    if (data.fileOperations) {
+                        log(resultId, '📁 File operations:', 'info');
+                        data.fileOperations.forEach((op: any) => {
+                            log(resultId, `${op.success ? '✅' : '❌'} ${op.message}`, op.success ? 'success' : 'error');
+                        });
+                    }
+                } else {
+                    log(resultId, `❌ File creation test failed: ${response.status}`, 'error');
+                    const errorText = await response.text();
+                    log(resultId, `Error details: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                log(resultId, `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCreateFileWithContent() {
+            const resultId = 'test2-result';
+            log(resultId, 'Testing file creation with content...');
+            
+            try {
+                const response = await fetch('/api/ai/ghost-agent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: 'Crea un archivo llamado "guia_escritura.md" en el proyecto "Boceto_101_Tips_para_Hablar_con_la_IA" con el siguiente contenido: "# Guía de Escritura\n\n## Introducción\nEsta es una guía completa para mejorar tus habilidades de escritura.\n\n## Consejos Principales\n1. Lee mucho\n2. Escribe regularmente\n3. Revisa tu trabajo\n\n## Conclusión\nLa práctica hace al maestro.',
+                        contexts: []
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(resultId, '✅ File creation with content test successful', 'success');
+                    log(resultId, `Response: ${data.response}`);
+                    
+                    if (data.fileOperations) {
+                        log(resultId, '📁 File operations:', 'info');
+                        data.fileOperations.forEach((op: any) => {
+                            log(resultId, `${op.success ? '✅' : '❌'} ${op.message}`, op.success ? 'success' : 'error');
+                        });
+                    }
+                } else {
+                    log(resultId, `❌ File creation with content test failed: ${response.status}`, 'error');
+                    const errorText = await response.text();
+                    log(resultId, `Error details: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                log(resultId, `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCreateFolder() {
+            const resultId = 'test3-result';
+            log(resultId, 'Testing folder creation...');
+            
+            try {
+                const response = await fetch('/api/ai/ghost-agent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: 'Crea una carpeta llamada "recursos_adicionales" en el proyecto "Boceto_101_Tips_para_Hablar_con_la_IA"',
+                        contexts: []
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(resultId, '✅ Folder creation test successful', 'success');
+                    log(resultId, `Response: ${data.response}`);
+                    
+                    if (data.fileOperations) {
+                        log(resultId, '📁 File operations:', 'info');
+                        data.fileOperations.forEach((op: any) => {
+                            log(resultId, `${op.success ? '✅' : '❌'} ${op.message}`, op.success ? 'success' : 'error');
+                        });
+                    }
+                } else {
+                    log(resultId, `❌ Folder creation test failed: ${response.status}`, 'error');
+                    const errorText = await response.text();
+                    log(resultId, `Error details: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                log(resultId, `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testUpdateFile() {
+            const resultId = 'test4-result';
+            log(resultId, 'Testing file update...');
+            
+            try {
+                const response = await fetch('/api/ai/ghost-agent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: 'Actualiza el archivo "test_simple.md" en el proyecto "Boceto_101_Tips_para_Hablar_con_la_IA" con el nuevo contenido: "Este archivo ha sido actualizado con nuevo contenido. Fecha de actualización: ' + new Date().toLocaleDateString() + '"',
+                        contexts: []
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(resultId, '✅ File update test successful', 'success');
+                    log(resultId, `Response: ${data.response}`);
+                    
+                    if (data.fileOperations) {
+                        log(resultId, '📁 File operations:', 'info');
+                        data.fileOperations.forEach((op: any) => {
+                            log(resultId, `${op.success ? '✅' : '❌'} ${op.message}`, op.success ? 'success' : 'error');
+                        });
+                    }
+                } else {
+                    log(resultId, `❌ File update test failed: ${response.status}`, 'error');
+                    const errorText = await response.text();
+                    log(resultId, `Error details: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                log(resultId, `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testComplexContent() {
+            const resultId = 'test5-result';
+            log(resultId, 'Testing complex content creation...');
+            
+            try {
+                const response = await fetch('/api/ai/ghost-agent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: 'Crea un archivo llamado "manual_completo.md" en el proyecto "Boceto_101_Tips_para_Hablar_con_la_IA" con un manual completo sobre comunicación efectiva. Incluye secciones sobre: 1) Introducción a la comunicación, 2) Técnicas de escucha activa, 3) Comunicación no verbal, 4) Resolución de conflictos, y 5) Mejores prácticas. Cada sección debe tener al menos 3 párrafos de contenido detallado.',
+                        contexts: []
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(resultId, '✅ Complex content creation test successful', 'success');
+                    log(resultId, `Response: ${data.response}`);
+                    
+                    if (data.fileOperations) {
+                        log(resultId, '📁 File operations:', 'info');
+                        data.fileOperations.forEach((op: any) => {
+                            log(resultId, `${op.success ? '✅' : '❌'} ${op.message}`, op.success ? 'success' : 'error');
+                        });
+                    }
+                } else {
+                    log(resultId, `❌ Complex content creation test failed: ${response.status}`, 'error');
+                    const errorText = await response.text();
+                    log(resultId, `Error details: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                log(resultId, `❌ Error: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html> 

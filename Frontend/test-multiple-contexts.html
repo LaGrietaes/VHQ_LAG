@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiple Contexts Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button { margin: 5px; padding: 8px 16px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Multiple Contexts Test</h1>
+    
+    <div class="test-section info">
+        <h3>Instructions</h3>
+        <p>This page tests the multiple contexts functionality:</p>
+        <ol>
+            <li>Test with single context (backward compatibility)</li>
+            <li>Test with multiple contexts</li>
+            <li>Test with no contexts</li>
+            <li>Verify that agents can access all contexts</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h3>Test Single Context (Backward Compatibility)</h3>
+        <button onclick="testSingleContext()">Test Single Context</button>
+        <div id="single-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test Multiple Contexts</h3>
+        <button onclick="testMultipleContexts()">Test Multiple Contexts</button>
+        <div id="multiple-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test No Contexts</h3>
+        <button onclick="testNoContexts()">Test No Contexts</button>
+        <div id="no-result"></div>
+    </div>
+
+    <script>
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : 'info';
+            element.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+        }
+
+        async function testSingleContext() {
+            const resultId = 'single-result';
+            log(resultId, 'Testing single context (backward compatibility)...');
+            
+            try {
+                const response = await fetch('/api/ai/ghost-agent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: '¿Cuál es el título del archivo de contexto que tienes adjunto?',
+                        contexts: [{
+                            path: 'GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA',
+                            specificFile: 'GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA/101 Tips para Hablar con la IA'
+                        }]
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(resultId, '✅ Single context test successful', 'success');
+                    log(resultId, `Response: ${data.response}`);
+                } else {
+                    log(resultId, `❌ Single context test failed: ${response.status}`, 'error');
+                    const errorText = await response.text();
+                    log(resultId, `Error details: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                log(resultId, `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testMultipleContexts() {
+            const resultId = 'multiple-result';
+            log(resultId, 'Testing multiple contexts...');
+            
+            try {
+                const response = await fetch('/api/ai/ghost-agent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: '¿Cuántos archivos de contexto tienes adjuntos y cuáles son sus nombres?',
+                        contexts: [
+                            {
+                                path: 'GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA',
+                                specificFile: 'GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA/101 Tips para Hablar con la IA'
+                            },
+                            {
+                                path: 'GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA',
+                                specificFile: 'GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA/Ejemplos e Ideas/01 – BePolite_ Ser educado con la IA.md'
+                            }
+                        ]
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(resultId, '✅ Multiple contexts test successful', 'success');
+                    log(resultId, `Response: ${data.response}`);
+                } else {
+                    log(resultId, `❌ Multiple contexts test failed: ${response.status}`, 'error');
+                    const errorText = await response.text();
+                    log(resultId, `Error details: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                log(resultId, `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testNoContexts() {
+            const resultId = 'no-result';
+            log(resultId, 'Testing no contexts...');
+            
+            try {
+                const response = await fetch('/api/ai/ghost-agent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: '¿Tienes algún archivo de contexto adjunto?',
+                        contexts: null
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(resultId, '✅ No contexts test successful', 'success');
+                    log(resultId, `Response: ${data.response}`);
+                } else {
+                    log(resultId, `❌ No contexts test failed: ${response.status}`, 'error');
+                    const errorText = await response.text();
+                    log(resultId, `Error details: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                log(resultId, `❌ Error: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html> 

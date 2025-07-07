@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Quick Actions Test</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0A0A0A;
+            color: #00FF00;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #00FF00;
+            padding-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #00FF00;
+            border-radius: 5px;
+        }
+        .success {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            color: #00FF00;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .warning {
+            background: rgba(255, 255, 0, 0.1);
+            border: 1px solid rgba(255, 255, 0, 0.3);
+            color: #FFFF00;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .code {
+            background: #1A1A1A;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+        }
+        .demo-panel {
+            background: #1A1A1A;
+            border: 1px solid #333;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .quick-action {
+            display: inline-block;
+            margin: 5px;
+            padding: 8px 12px;
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            color: #00FF00;
+            text-decoration: none;
+            border-radius: 3px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .quick-action:hover {
+            background: rgba(0, 255, 0, 0.2);
+            border-color: rgba(0, 255, 0, 0.5);
+        }
+        .green { border-color: #00FF00; color: #00FF00; }
+        .blue { border-color: #0080FF; color: #0080FF; }
+        .purple { border-color: #8000FF; color: #8000FF; }
+        .orange { border-color: #FF8000; color: #FF8000; }
+        .indigo { border-color: #4B0082; color: #4B0082; }
+        .gray { border-color: #808080; color: #808080; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Enhanced Quick Actions System</h1>
+            <p>Sistema mejorado de acciones rápidas para diferentes tipos de libros</p>
+        </div>
+
+        <div class="section">
+            <h2>✨ Nuevas Características</h2>
+            <div class="success">
+                <ul>
+                    <li><strong>Multi-idioma:</strong> Soporte para español e inglés</li>
+                    <li><strong>Tipos de libro flexibles:</strong> Tips, Guías, Historias, Técnico</li>
+                    <li><strong>Contexto inteligente:</strong> Carga automática de archivos de muestra</li>
+                    <li><strong>Acciones dinámicas:</strong> Se adaptan al tipo de libro</li>
+                    <li><strong>Feedback en tiempo real:</strong> Resultados y errores visibles</li>
+                    <li><strong>Organización por categorías:</strong> Contenido, Estructura, Organización</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📚 Tipos de Libro Soportados</h2>
+            
+            <div class="demo-panel">
+                <h3>1. Libro de Tips (Tips Book)</h3>
+                <p><strong>Descripción:</strong> Libro estructurado con consejos y tips prácticos</p>
+                <p><strong>Acciones disponibles:</strong> Generar Tip, Generar Capítulo, Generar Contenido, Crear Sección, Crear Esquema, Organizar Workspace</p>
+                <p><strong>Archivos de muestra:</strong> tip_template.md, tips_list.md, chapter_template.md</p>
+            </div>
+
+            <div class="demo-panel">
+                <h3>2. Guía Práctica (Practical Guide)</h3>
+                <p><strong>Descripción:</strong> Guía paso a paso con instrucciones detalladas</p>
+                <p><strong>Acciones disponibles:</strong> Generar Capítulo, Generar Contenido, Crear Sección, Crear Esquema, Organizar Workspace</p>
+                <p><strong>Archivos de muestra:</strong> guide_template.md, step_template.md, example_template.md</p>
+            </div>
+
+            <div class="demo-panel">
+                <h3>3. Libro de Historias (Story Book)</h3>
+                <p><strong>Descripción:</strong> Colección de historias y narrativas</p>
+                <p><strong>Acciones disponibles:</strong> Generar Capítulo, Generar Contenido, Crear Sección, Crear Esquema, Organizar Workspace</p>
+                <p><strong>Archivos de muestra:</strong> story_template.md, character_template.md, plot_template.md</p>
+            </div>
+
+            <div class="demo-panel">
+                <h3>4. Libro Técnico (Technical Book)</h3>
+                <p><strong>Descripción:</strong> Documentación técnica y manuales</p>
+                <p><strong>Acciones disponibles:</strong> Generar Capítulo, Generar Contenido, Crear Sección, Crear Esquema, Organizar Workspace</p>
+                <p><strong>Archivos de muestra:</strong> technical_template.md, code_template.md, diagram_template.md</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🎯 Demo del Panel de Acciones Rápidas</h2>
+            
+            <div class="demo-panel">
+                <div style="margin-bottom: 10px;">
+                    <span style="font-size: 12px; color: #888; font-weight: bold;">Quick Actions</span>
+                    <span style="float: right; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 3px; font-size: 10px;">Libro de Tips</span>
+                </div>
+
+                <!-- Project Info -->
+                <div style="margin-bottom: 15px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 3px; font-size: 12px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span style="color: #888;">Progreso:</span>
+                        <span style="color: #00FF00;">45%</span>
+                    </div>
+                    <div style="height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-bottom: 5px;">
+                        <div style="width: 45%; height: 100%; background: #00FF00; border-radius: 2px;"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; color: #666;">
+                        <span>12 archivos</span>
+                        <span>3,450 palabras</span>
+                    </div>
+                </div>
+
+                <!-- Content Actions -->
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 8px; font-weight: bold;">Contenido</div>
+                    <button class="quick-action green">💡 Generar Tip</button>
+                    <button class="quick-action purple">📖 Generar Capítulo</button>
+                    <button class="quick-action blue">📄 Generar Contenido</button>
+                    <button class="quick-action orange">📝 Crear Sección</button>
+                </div>
+
+                <!-- Structure Actions -->
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 8px; font-weight: bold;">Estructura</div>
+                    <button class="quick-action indigo">📋 Crear Esquema</button>
+                </div>
+
+                <!-- Organization Actions -->
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 8px; font-weight: bold;">Organización</div>
+                    <button class="quick-action gray">📁 Organizar Workspace</button>
+                </div>
+
+                <!-- Tips Info -->
+                <div style="padding: 8px; background: rgba(0,128,255,0.1); border: 1px solid rgba(0,128,255,0.3); border-radius: 3px; font-size: 12px;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                        <span style="color: #0080FF; font-weight: bold;">Tips Disponibles:</span>
+                        <span style="background: rgba(0,128,255,0.2); border: 1px solid rgba(0,128,255,0.4); padding: 1px 4px; border-radius: 2px; font-size: 10px;">120</span>
+                    </div>
+                    <p style="color: #888; margin: 0;">
+                        Usa "Generar Tip" para crear nuevos tips siguiendo el formato del proyecto.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🔧 Arquitectura del Sistema</h2>
+            
+            <h3>1. ProjectContextLoader</h3>
+            <div class="code">// Carga contexto inteligente del proyecto
+const contextLoader = ProjectContextLoader.getInstance();
+const context = await contextLoader.loadProjectContext(projectPath, language);
+
+// Detecta automáticamente el tipo de libro
+// Carga archivos de muestra
+// Analiza estructura del proyecto
+// Genera metadatos</div>
+
+            <h3>2. QuickActionsManager</h3>
+            <div class="code">// Gestiona acciones dinámicas
+const actionsManager = QuickActionsManager.getInstance();
+const actions = actionsManager.getAvailableActions(context);
+
+// Filtra acciones por tipo de libro
+// Construye prompts contextuales
+// Ejecuta acciones con feedback</div>
+
+            <h3>3. QuickActionsPanel</h3>
+            <div class="code">// Interfaz de usuario reactiva
+&lt;QuickActionsPanel
+  projectContext={context}
+  onActionComplete={handleResult}
+  onRefreshProject={refreshProject}
+/&gt;
+
+// Muestra progreso del proyecto
+// Organiza acciones por categorías
+// Proporciona feedback en tiempo real</div>
+        </div>
+
+        <div class="section">
+            <h2>🚀 Ventajas del Nuevo Sistema</h2>
+            <div class="success">
+                <ul>
+                    <li><strong>Flexibilidad:</strong> Soporta múltiples tipos de libro y idiomas</li>
+                    <li><strong>Inteligencia:</strong> Detecta automáticamente el tipo de proyecto</li>
+                    <li><strong>Contexto:</strong> Usa archivos de muestra como plantillas</li>
+                    <li><strong>Escalabilidad:</strong> Fácil agregar nuevos tipos de libro</li>
+                    <li><strong>Experiencia de usuario:</strong> Feedback inmediato y resultados visibles</li>
+                    <li><strong>Mantenibilidad:</strong> Código modular y bien estructurado</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📋 Próximos Pasos</h2>
+            <ol>
+                <li><strong>Probar el sistema:</strong> Abrir el BookWorkspace y verificar que las acciones funcionen</li>
+                <li><strong>Crear nuevos tipos de libro:</strong> Agregar plantillas para otros géneros</li>
+                <li><strong>Mejorar prompts:</strong> Refinar las plantillas de prompts para cada tipo</li>
+                <li><strong>Agregar validaciones:</strong> Validar archivos de muestra y estructura</li>
+                <li><strong>Optimizar rendimiento:</strong> Cachear contextos y resultados</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>✅ Estado de Implementación</h2>
+            <div class="success">
+                <ul>
+                    <li>✅ ProjectContextLoader implementado</li>
+                    <li>✅ QuickActionsManager implementado</li>
+                    <li>✅ QuickActionsPanel implementado</li>
+                    <li>✅ API enhanced context creada</li>
+                    <li>✅ BookWorkspace actualizado</li>
+                    <li>✅ Soporte multi-idioma</li>
+                    <li>✅ Detección automática de tipos</li>
+                    <li>🔄 Pendiente: Pruebas de integración</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Demo functionality
+        document.querySelectorAll('.quick-action').forEach(button => {
+            button.addEventListener('click', function() {
+                const action = this.textContent.trim();
+                alert(`Acción "${action}" ejecutada!\n\nEn el sistema real, esto:\n1. Cargaría el contexto del proyecto\n2. Ejecutaría la acción específica\n3. Mostraría resultados en tiempo real\n4. Actualizaría el workspace automáticamente.`);
+            });
+        });
+    </script>
+</body>
+</html> 

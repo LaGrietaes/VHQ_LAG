@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Quick Action Buttons - BookWorkspace</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0A0A0A;
+            color: #00FF00;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #00FF00;
+            padding-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #00FF00;
+            border-radius: 5px;
+        }
+        .button-demo {
+            display: inline-block;
+            margin: 5px;
+            padding: 8px 12px;
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            color: #00FF00;
+            text-decoration: none;
+            border-radius: 3px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .button-demo:hover {
+            background: rgba(0, 255, 0, 0.2);
+            border-color: rgba(0, 255, 0, 0.5);
+        }
+        .green { border-color: #00FF00; color: #00FF00; }
+        .blue { border-color: #0080FF; color: #0080FF; }
+        .purple { border-color: #8000FF; color: #8000FF; }
+        .orange { border-color: #FF8000; color: #FF8000; }
+        .code {
+            background: #1A1A1A;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+        }
+        .warning {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            color: #FF0000;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            color: #00FF00;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .workspace-mock {
+            background: #1A1A1A;
+            border: 1px solid #333;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .workspace-header {
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .quick-actions {
+            background: #2A2A2A;
+            border: 1px solid #444;
+            border-radius: 3px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .quick-actions-title {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Quick Action Buttons - BookWorkspace</h1>
+            <p>Botones de acción rápida integrados directamente en el workspace</p>
+        </div>
+
+        <div class="section">
+            <h2>✨ ¿Dónde están los botones?</h2>
+            <p>Los Quick Action Buttons ahora están integrados directamente en el <strong>BookWorkspace</strong> del Ghost Agent, no en el chat.</p>
+            
+            <div class="workspace-mock">
+                <div class="workspace-header">
+                    <h3>📚 BookWorkspace - 101 Tips para Hablar con la IA</h3>
+                </div>
+                
+                <div class="quick-actions">
+                    <div class="quick-actions-title">Quick Actions</div>
+                    <button class="button-demo green">➕ Nuevo Tip</button>
+                    <button class="button-demo blue">📄 Generar Contenido</button>
+                    <button class="button-demo purple">📖 Nuevo Capítulo</button>
+                    <button class="button-demo orange">📁 Organizar</button>
+                </div>
+                
+                <p>Los botones aparecen en el panel izquierdo del workspace, justo debajo de los botones de herramientas existentes.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🎯 Cómo acceder a los botones</h2>
+            <ol>
+                <li><strong>Abre el Ghost Agent</strong> - Ve a la sección Ghost en el menú principal</li>
+                <li><strong>Selecciona un proyecto de libro</strong> - O crea uno nuevo</li>
+                <li><strong>Entra al BookWorkspace</strong> - Haz clic en el proyecto para abrir el workspace</li>
+                <li><strong>Busca la sección "Quick Actions"</strong> - Está en el panel izquierdo</li>
+                <li><strong>¡Usa los botones!</strong> - Un clic y el Ghost Agent creará el contenido</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>🔧 Funcionalidad de los botones</h2>
+            
+            <h3>📝 Nuevo Tip (Verde)</h3>
+            <p>Envía automáticamente este comando al Ghost Agent:</p>
+            <div class="code">Crea un nuevo tip para el libro '101 Tips para Hablar con la IA' siguiendo el formato del archivo 01-BePolite. El tip debe ser práctico, útil y bien estructurado. Usa el formato === FILE_OPERATION === para crear el archivo.</div>
+
+            <h3>📄 Generar Contenido (Azul)</h3>
+            <p>Envía automáticamente este comando al Ghost Agent:</p>
+            <div class="code">Genera contenido para el libro '101 Tips para Hablar con la IA' basándote en el contexto del proyecto actual. Crea secciones bien estructuradas y detalladas. Usa el formato === FILE_OPERATION === para crear el archivo.</div>
+
+            <h3>📖 Nuevo Capítulo (Púrpura)</h3>
+            <p>Envía automáticamente este comando al Ghost Agent:</p>
+            <div class="code">Crea un nuevo capítulo para el libro '101 Tips para Hablar con la IA' con un tema específico y bien estructurado. Incluye introducción, desarrollo y conclusiones. Usa el formato === FILE_OPERATION === para crear el archivo.</div>
+
+            <h3>📁 Organizar (Naranja)</h3>
+            <p>Envía automáticamente este comando al Ghost Agent:</p>
+            <div class="code">Organiza y estructura el workspace del libro '101 Tips para Hablar con la IA'. Crea carpetas apropiadas y mueve archivos a sus ubicaciones correctas. Usa el formato === FILE_OPERATION === para crear archivos y carpetas.</div>
+        </div>
+
+        <div class="section">
+            <h2>✅ Ventajas de esta implementación</h2>
+            <div class="success">
+                <ul>
+                    <li><strong>Acceso directo:</strong> Los botones están donde realmente los necesitas</li>
+                    <li><strong>Contexto automático:</strong> El proyecto actual se envía automáticamente</li>
+                    <li><strong>Sin comandos manuales:</strong> No necesitas escribir nada</li>
+                    <li><strong>Feedback inmediato:</strong> Sabes que el comando se envió</li>
+                    <li><strong>Actualización automática:</strong> El workspace se refresca para mostrar nuevos archivos</li>
+                    <li><strong>Comandos optimizados:</strong> Incluyen el formato correcto para crear archivos</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>⚠️ Diferencias con el chat</h2>
+            <div class="warning">
+                <strong>Antes:</strong> Tenías que ir al chat, seleccionar el Ghost Agent, escribir comandos largos, y esperar respuestas.
+                <br><br>
+                <strong>Ahora:</strong> Los botones están directamente en el workspace, envían comandos optimizados automáticamente, y el workspace se actualiza para mostrar los nuevos archivos.
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🚀 Próximos pasos</h2>
+            <ol>
+                <li>Abre el Ghost Agent en tu aplicación</li>
+                <li>Selecciona o crea un proyecto de libro</li>
+                <li>Entra al BookWorkspace</li>
+                <li>Busca la sección "Quick Actions" en el panel izquierdo</li>
+                <li>Prueba los botones - ¡deberían crear archivos automáticamente!</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>🔍 Ubicación exacta</h2>
+            <p>Los Quick Action Buttons están ubicados en:</p>
+            <div class="code">frontend/src/components/ghost/BookWorkspace.tsx
+Líneas: ~1420-1460</div>
+            <p>Aparecen como una nueva sección en el panel izquierdo del workspace, justo después de los botones de herramientas existentes (Nuevo Archivo, Nueva Carpeta, Importar, etc.).</p>
+        </div>
+    </div>
+
+    <script>
+        // Demo functionality for the buttons
+        document.querySelectorAll('.button-demo').forEach(button => {
+            button.addEventListener('click', function() {
+                const action = this.textContent.trim();
+                alert(`Botón "${action}" clickeado!\n\nEn el workspace real, esto enviaría un comando optimizado al Ghost Agent y crearía archivos automáticamente.`);
+            });
+        });
+    </script>
+</body>
+</html> 

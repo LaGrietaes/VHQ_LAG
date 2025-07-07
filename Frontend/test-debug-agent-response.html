@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Agent Response</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            max-height: 600px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .debug {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            color: #495057;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐛 Debug Agent Response</h1>
+        <p>Esta página muestra exactamente qué está respondiendo el agente para diagnosticar el problema.</p>
+
+        <button onclick="testSimpleResponse()">Test Respuesta Simple</button>
+        <button onclick="testFileCreation()">Test Creación de Archivo</button>
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        async function testSimpleResponse() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '🔄 Probando respuesta simple...';
+            resultDiv.className = 'result info';
+
+            try {
+                const response = await fetch('/api/ai/ghost-agent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: 'Responde solo con "Hola, estoy funcionando"'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `✅ Respuesta simple recibida\n\nRespuesta completa:\n${data.response}\n\nDatos completos:\n${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.innerHTML = `❌ Error: ${data.error || 'Error desconocido'}\n\nStatus: ${response.status}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Error de conexión: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        async function testFileCreation() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '🔄 Probando creación de archivo...';
+            resultDiv.className = 'result info';
+
+            try {
+                const response = await fetch('/api/ai/ghost-agent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: `Crea un archivo de prueba usando EXACTAMENTE este formato:
+
+=== FILE_OPERATION ===
+{
+  "type": "create_file",
+  "targetProject": "Boceto_101_Tips_para_Hablar_con_la_IA",
+  "fileName": "Generated_Content/debug_test.md",
+  "content": "# Archivo de Debug\n\nEste es un archivo de prueba para debug.\n\nFecha: ${new Date().toLocaleString()}"
+}
+=== END_FILE_OPERATION ===
+
+NO escribas nada más. SOLO el formato FILE_OPERATION.`
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `✅ Respuesta de creación recibida\n\nRespuesta completa:\n${data.response}\n\nOperaciones de archivo:\n${JSON.stringify(data.fileOperations, null, 2)}\n\nDatos completos:\n${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result debug';
+                } else {
+                    resultDiv.innerHTML = `❌ Error: ${data.error || 'Error desconocido'}\n\nStatus: ${response.status}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Error de conexión: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+    </script>
+</body>
+</html> 

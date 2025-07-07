@@ -5,66 +5,140 @@ import { InteractiveTodoItem } from '@/components/interactive-todo';
 
 interface TodoContextType {
   todos: InteractiveTodoItem[];
-  addTodo: (todo: InteractiveTodoItem) => void;
-  updateTodo: (id: number, updates: Partial<InteractiveTodoItem>) => void;
-  deleteTodo: (id: number) => void;
-  toggleTodo: (id: number) => void;
-  clearCompleted: () => void;
+  addTodo: (todo: InteractiveTodoItem) => Promise<void>;
+  updateTodo: (id: number, updates: Partial<InteractiveTodoItem>) => Promise<void>;
+  deleteTodo: (id: number) => Promise<void>;
+  toggleTodo: (id: number) => Promise<void>;
+  clearCompleted: () => Promise<void>;
+  loading: boolean;
+  error: string | null;
 }
 
 const TodoContext = createContext<TodoContextType | undefined>(undefined);
 
 export function TodoProvider({ children }: { children: ReactNode }) {
   const [todos, setTodos] = useState<InteractiveTodoItem[]>([]);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Load todos from localStorage on mount
+  // Load todos from API on mount
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('vhq-todo-tasks');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        setTodos(parsed);
-      }
-    } catch (error) {
-      console.error('Error loading todos from localStorage:', error);
-    }
-    setIsInitialized(true);
+    loadTodos();
   }, []);
 
-  // Save todos to localStorage whenever they change
-  useEffect(() => {
-    if (isInitialized) {
-      try {
-        localStorage.setItem('vhq-todo-tasks', JSON.stringify(todos));
-      } catch (error) {
-        console.error('Error saving todos to localStorage:', error);
+  const loadTodos = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await fetch('/api/todos');
+      const data = await response.json();
+      
+      if (data.success) {
+        setTodos(data.todos);
+      } else {
+        setError(data.error || 'Failed to load todos');
       }
+    } catch (error) {
+      console.error('Error loading todos:', error);
+      setError('Failed to load todos');
+    } finally {
+      setLoading(false);
     }
-  }, [todos, isInitialized]);
-
-  const addTodo = (todo: InteractiveTodoItem) => {
-    setTodos(prev => [...prev, todo]);
   };
 
-  const updateTodo = (id: number, updates: Partial<InteractiveTodoItem>) => {
-    setTodos(prev => prev.map(todo => 
-      todo.id === id ? { ...todo, ...updates } : todo
-    ));
+  const addTodo = async (todo: InteractiveTodoItem) => {
+    try {
+      setError(null);
+      const response = await fetch('/api/todos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: todo.text,
+          deadline: todo.deadline,
+          taggedAgents: todo.taggedAgents,
+          priority: todo.priority,
+          complexity: todo.complexity,
+          description: todo.description
+        })
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setTodos(prev => [...prev, data.todo]);
+      } else {
+        setError(data.error || 'Failed to add todo');
+      }
+    } catch (error) {
+      console.error('Error adding todo:', error);
+      setError('Failed to add todo');
+    }
   };
 
-  const deleteTodo = (id: number) => {
-    setTodos(prev => prev.filter(todo => todo.id !== id));
+  const updateTodo = async (id: number, updates: Partial<InteractiveTodoItem>) => {
+    try {
+      setError(null);
+      const response = await fetch('/api/todos', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, updates })
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setTodos(prev => prev.map(todo => 
+          todo.id === id ? { ...todo, ...updates } : todo
+        ));
+      } else {
+        setError(data.error || 'Failed to update todo');
+      }
+    } catch (error) {
+      console.error('Error updating todo:', error);
+      setError('Failed to update todo');
+    }
   };
 
-  const toggleTodo = (id: number) => {
-    setTodos(prev => prev.map(todo => 
-      todo.id === id ? { ...todo, done: !todo.done } : todo
-    ));
+  const deleteTodo = async (id: number) => {
+    try {
+      setError(null);
+      const response = await fetch(`/api/todos?id=${id}`, {
+        method: 'DELETE'
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setTodos(prev => prev.filter(todo => todo.id !== id));
+      } else {
+        setError(data.error || 'Failed to delete todo');
+      }
+    } catch (error) {
+      console.error('Error deleting todo:', error);
+      setError('Failed to delete todo');
+    }
   };
 
-  const clearCompleted = () => {
-    setTodos(prev => prev.filter(todo => !todo.done));
+  const toggleTodo = async (id: number) => {
+    const todo = todos.find(t => t.id === id);
+    if (todo) {
+      await updateTodo(id, { done: !todo.done });
+    }
+  };
+
+  const clearCompleted = async () => {
+    try {
+      setError(null);
+      const completedTodos = todos.filter(todo => todo.done);
+      
+      // Delete all completed todos
+      for (const todo of completedTodos) {
+        await deleteTodo(todo.id);
+      }
+    } catch (error) {
+      console.error('Error clearing completed todos:', error);
+      setError('Failed to clear completed todos');
+    }
   };
 
   const value: TodoContextType = {
@@ -74,6 +148,8 @@ export function TodoProvider({ children }: { children: ReactNode }) {
     deleteTodo,
     toggleTodo,
     clearCompleted,
+    loading,
+    error
   };
 
   return (

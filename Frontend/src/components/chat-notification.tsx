@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import { MessageSquare, X, Send, Search, PlusSquare, History, Paperclip, XCircle, Link2, Trash2, ChevronDown, FolderOpen, FileText, BookOpen, Square, ChevronLeft, ChevronRight } from 'lucide-react'
+import { MessageSquare, X, Send, Search, PlusSquare, History, Paperclip, XCircle, Link2, Trash2, ChevronDown, FolderOpen, FileText, BookOpen, Square, ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import { agentsData } from '@/lib/agents-data'
 import { cn } from '@/lib/utils'
 import { Button } from "@/components/ui/button"
@@ -1091,7 +1091,7 @@ export function ChatNotification({ onDrawerStateChange }: ChatNotificationProps)
         const requestBody = {
             message: content,
             files: files.map(f => ({ name: f.name, type: f.type })),
-            context: selectedContexts.length > 0 ? selectedContexts[0] : null
+            contexts: selectedContexts.length > 0 ? selectedContexts : null
         };
         
         console.log('Sending request to ghost agent:', requestBody);
@@ -1110,11 +1110,45 @@ export function ChatNotification({ onDrawerStateChange }: ChatNotificationProps)
         const data = await response.json();
         console.log('Ghost agent response received:', data);
         
+        // Handle file operations if any
+        let responseContent = data.response;
+        if (data.fileOperations && data.fileOperations.length > 0) {
+          const fileOperationMessages = data.fileOperations.map((op: any) => {
+            if (op.success) {
+              let message = `✅ ${op.message}`;
+              
+              // Add more details for autonomous operations
+              if (op.createdContent) {
+                const preview = op.createdContent.length > 100 
+                  ? op.createdContent.substring(0, 100) + '...' 
+                  : op.createdContent;
+                message += `\n📄 **Vista previa:** ${preview}`;
+              }
+              
+              if (op.filePath) {
+                const relativePath = op.filePath.split('GHOST_Proyectos/').pop() || op.filePath;
+                message += `\n📂 **Ubicación:** ${relativePath}`;
+              }
+              
+              return message;
+            } else {
+              return `❌ ${op.message}`;
+            }
+          }).join('\n\n');
+          
+          responseContent += `\n\n📁 **Operaciones autónomas del workspace:**\n${fileOperationMessages}`;
+          
+          // Add workspace structure info if available
+          if (data.workspaceStructure) {
+            responseContent += `\n\n🏗️ **Estructura del workspace:**\nProyectos disponibles: ${data.workspaceStructure.availableProjects.join(', ')}`;
+          }
+        }
+        
         // Add the ghost agent's response to the chat
         const ghostResponse: Message = {
             id: `${Date.now()}-ghost`,
             agentId: 'GHOST_AGENT',
-            content: data.response,
+            content: responseContent,
             timestamp: new Date(),
             isUser: false
         }
@@ -1189,7 +1223,7 @@ export function ChatNotification({ onDrawerStateChange }: ChatNotificationProps)
     console.log('Selected contexts:', selectedContexts);
     
     try {
-      const requestBody = { message: content, context: selectedContexts.length > 0 ? selectedContexts[0] : null };
+      const requestBody = { message: content, contexts: selectedContexts.length > 0 ? selectedContexts : null };
       console.log('Sending request to CEO agent:', requestBody);
       
       const response = await fetch('/api/ai/ceo-agent', {
@@ -1932,6 +1966,68 @@ export function ChatNotification({ onDrawerStateChange }: ChatNotificationProps)
                     >Limpiar</button>
                   )}
                 </div>
+                
+                {/* Quick Action Buttons for Ghost Agent */}
+                {selectedAgents.includes('ghost') && (
+                  <div className="flex flex-wrap gap-2 mb-2 min-w-0">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const tipCommand = "Crea un nuevo tip para el libro '101 Tips para Hablar con la IA' siguiendo el formato del archivo 01-BePolite. El tip debe ser práctico, útil y bien estructurado.";
+                        setMessageInput(tipCommand);
+                        messageInputRef.current?.focus();
+                      }}
+                      className="text-xs h-7 px-2 bg-green-500/10 border-green-500/30 text-green-400 hover:bg-green-500/20 hover:border-green-500/50"
+                      title="Crear nuevo tip para el libro"
+                    >
+                      <Plus className="w-3 h-3 mr-1" />
+                      Nuevo Tip
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const contentCommand = "Genera contenido para el libro '101 Tips para Hablar con la IA' basándote en el contexto seleccionado. Crea secciones bien estructuradas y detalladas.";
+                        setMessageInput(contentCommand);
+                        messageInputRef.current?.focus();
+                      }}
+                      className="text-xs h-7 px-2 bg-blue-500/10 border-blue-500/30 text-blue-400 hover:bg-blue-500/20 hover:border-blue-500/50"
+                      title="Generar contenido para el libro"
+                    >
+                      <FileText className="w-3 h-3 mr-1" />
+                      Generar Contenido
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const chapterCommand = "Crea un nuevo capítulo para el libro '101 Tips para Hablar con la IA' con un tema específico y bien estructurado. Incluye introducción, desarrollo y conclusiones.";
+                        setMessageInput(chapterCommand);
+                        messageInputRef.current?.focus();
+                      }}
+                      className="text-xs h-7 px-2 bg-purple-500/10 border-purple-500/30 text-purple-400 hover:bg-purple-500/20 hover:border-purple-500/50"
+                      title="Crear nuevo capítulo"
+                    >
+                      <BookOpen className="w-3 h-3 mr-1" />
+                      Nuevo Capítulo
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const organizeCommand = "Organiza y estructura el workspace del libro '101 Tips para Hablar con la IA'. Crea carpetas apropiadas y mueve archivos a sus ubicaciones correctas.";
+                        setMessageInput(organizeCommand);
+                        messageInputRef.current?.focus();
+                      }}
+                      className="text-xs h-7 px-2 bg-orange-500/10 border-orange-500/30 text-orange-400 hover:bg-orange-500/20 hover:border-orange-500/50"
+                      title="Organizar workspace"
+                    >
+                      <FolderOpen className="w-3 h-3 mr-1" />
+                      Organizar
+                    </Button>
+                  </div>
+                )}
                 <input
                   ref={messageInputRef}
                   value={messageInput}

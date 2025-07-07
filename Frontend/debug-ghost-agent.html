@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Ghost Agent - File Operations</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f7fafc;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2d3748;
+            text-align: center;
+        }
+        .debug-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+        .debug-button {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .debug-button:hover {
+            background: #3182ce;
+        }
+        .response-area {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        .success { color: #48bb78; }
+        .error { color: #f56565; }
+        .info { color: #4299e1; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐛 Debug Ghost Agent - File Operations</h1>
+        
+        <div class="debug-section">
+            <h3>Test 1: Simple File Creation</h3>
+            <button class="debug-button" onclick="testSimpleFile()">Create Simple File</button>
+            <div id="response1" class="response-area">Waiting...</div>
+        </div>
+
+        <div class="debug-section">
+            <h3>Test 2: Tip Creation with Context</h3>
+            <button class="debug-button" onclick="testTipCreation()">Create Tip 02</button>
+            <div id="response2" class="response-area">Waiting...</div>
+        </div>
+
+        <div class="debug-section">
+            <h3>Test 3: Direct FILE_OPERATION Request</h3>
+            <button class="debug-button" onclick="testDirectOperation()">Direct Operation</button>
+            <div id="response3" class="response-area">Waiting...</div>
+        </div>
+    </div>
+
+    <script>
+        function updateResponse(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : 'ℹ️';
+            element.textContent += `\n[${timestamp}] ${prefix} ${message}`;
+            element.scrollTop = element.scrollHeight;
+        }
+
+        function clearResponse(elementId) {
+            document.getElementById(elementId).textContent = '';
+        }
+
+        async function sendToGhostAgent(message, contexts = null) {
+            try {
+                const requestBody = { message };
+                if (contexts) {
+                    requestBody.contexts = contexts;
+                }
+
+                const response = await fetch('/api/ai/ghost-agent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                return await response.json();
+            } catch (error) {
+                throw error;
+            }
+        }
+
+        async function testSimpleFile() {
+            clearResponse('response1');
+            updateResponse('response1', 'Testing simple file creation...', 'info');
+
+            const message = `Crea un archivo simple llamado "test_simple.md" con el contenido "Este es un archivo de prueba." Usa FILE_OPERATION.`;
+
+            try {
+                const data = await sendToGhostAgent(message);
+                updateResponse('response1', 'Response received:', 'success');
+                updateResponse('response1', `Response: ${data.response}`, 'info');
+                
+                if (data.fileOperations) {
+                    updateResponse('response1', `File operations: ${data.fileOperations.length}`, 'success');
+                    data.fileOperations.forEach(op => {
+                        updateResponse('response1', `${op.success ? '✅' : '❌'} ${op.message}`, op.success ? 'success' : 'error');
+                    });
+                } else {
+                    updateResponse('response1', 'No file operations detected', 'error');
+                }
+            } catch (error) {
+                updateResponse('response1', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testTipCreation() {
+            clearResponse('response2');
+            updateResponse('response2', 'Testing tip creation with context...', 'info');
+
+            const contexts = [
+                {
+                    id: 'Boceto_101_Tips_para_Hablar_con_la_IA',
+                    title: 'Boceto 101 Tips para Hablar con la IA',
+                    type: 'book',
+                    path: 'GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA',
+                    specificFile: 'GHOST_Proyectos\\libros\\Boceto_101_Tips_para_Hablar_con_la_IA\\Ejemplos e Ideas\\01 – BePolite_ Ser educado con la IA.md'
+                },
+                {
+                    id: 'Boceto_101_Tips_para_Hablar_con_la_IA',
+                    title: 'Boceto 101 Tips para Hablar con la IA',
+                    type: 'book',
+                    path: 'GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA',
+                    specificFile: 'GHOST_Proyectos\\libros\\Boceto_101_Tips_para_Hablar_con_la_IA\\Ejemplos e Ideas\\101 Tips para Hablar con la IA.md'
+                }
+            ];
+
+            const message = `Crea el tip 02 "Usa IA con empatía" siguiendo el formato del tip 01. Usa FILE_OPERATION para crear el archivo.`;
+
+            try {
+                const data = await sendToGhostAgent(message, contexts);
+                updateResponse('response2', 'Response received:', 'success');
+                updateResponse('response2', `Response: ${data.response}`, 'info');
+                
+                if (data.fileOperations) {
+                    updateResponse('response2', `File operations: ${data.fileOperations.length}`, 'success');
+                    data.fileOperations.forEach(op => {
+                        updateResponse('response2', `${op.success ? '✅' : '❌'} ${op.message}`, op.success ? 'success' : 'error');
+                    });
+                } else {
+                    updateResponse('response2', 'No file operations detected', 'error');
+                }
+            } catch (error) {
+                updateResponse('response2', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testDirectOperation() {
+            clearResponse('response3');
+            updateResponse('response3', 'Testing direct FILE_OPERATION request...', 'info');
+
+            const message = `Crea un archivo usando este formato exacto:
+
+=== FILE_OPERATION ===
+{
+  "type": "create_file",
+  "targetProject": "Boceto_101_Tips_para_Hablar_con_la_IA",
+  "fileName": "test_direct.md",
+  "content": "# Test Direct\n\nEste es un archivo creado directamente con FILE_OPERATION."
+}
+=== END_FILE_OPERATION ===`;
+
+            try {
+                const data = await sendToGhostAgent(message);
+                updateResponse('response3', 'Response received:', 'success');
+                updateResponse('response3', `Response: ${data.response}`, 'info');
+                
+                if (data.fileOperations) {
+                    updateResponse('response3', `File operations: ${data.fileOperations.length}`, 'success');
+                    data.fileOperations.forEach(op => {
+                        updateResponse('response3', `${op.success ? '✅' : '❌'} ${op.message}`, op.success ? 'success' : 'error');
+                    });
+                } else {
+                    updateResponse('response3', 'No file operations detected', 'error');
+                }
+            } catch (error) {
+                updateResponse('response3', `Error: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html> 

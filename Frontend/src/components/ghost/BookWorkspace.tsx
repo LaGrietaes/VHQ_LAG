@@ -3,7 +3,8 @@
 import React, { useRef } from 'react';
 import { Project, OutlineItem, BookProject } from "@/lib/ghost-agent-data";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, BrainCircuit, Globe, Settings2, FileSignature, BookText, Share2, Save, ChevronsUp, FilePlus as FilePlusIcon, Upload, Link, FolderPlus, FileUp, FolderUp, LayoutPanelLeft, ExternalLink, Trash2, RefreshCw, FileText } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, BrainCircuit, Globe, Settings2, FileSignature, BookText, Share2, Save, ChevronsUp, FilePlus as FilePlusIcon, Upload, Link, FolderPlus, FileUp, FolderUp, LayoutPanelLeft, ExternalLink, Trash2, RefreshCw, FileText, Plus, FolderOpen, BookOpen, Lightbulb } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,7 +27,189 @@ import * as path from 'path';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import dynamic from "next/dynamic";
+import { SimpleBookGenerator } from "./SimpleBookGenerator";
+import { SmartBookGenerator } from "./SmartBookGenerator";
+import { FileItemView } from './FileItemView';
+import { GhostAgentPanel } from './GhostAgentPanel';
+import { BatchProgressWidget } from './BatchProgressWidget';
 
+// Tree utility class to consolidate all tree operations
+class TreeUtils {
+  // Find item by ID in tree
+  static findItem(nodes: OutlineItem[], id: string): OutlineItem | null {
+    if (!nodes || !Array.isArray(nodes)) return null;
+    
+    for (const node of nodes) {
+      if (node && node.id === id) return node;
+      if (node && node.children) {
+        const found = this.findItem(node.children, id);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+
+  // Find parent of item by ID
+  static findParent(nodes: OutlineItem[], id: string, parent: OutlineItem | null = null): OutlineItem | null {
+    for (const node of nodes) {
+      if (node.id === id) return parent;
+      if (node.children) {
+        const found = this.findParent(node.children, id, node);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+
+  // Update item title in tree
+  static updateItemTitle(nodes: OutlineItem[], id: string, newTitle: string): OutlineItem[] {
+    return nodes.map(node => {
+      if (node.id === id) {
+        return { ...node, title: newTitle };
+      }
+      if (node.children) {
+        return { ...node, children: this.updateItemTitle(node.children, id, newTitle) };
+      }
+      return node;
+    });
+  }
+
+  // Update item content in tree
+  static updateItemContent(nodes: OutlineItem[], id: string, newContent: string): OutlineItem[] {
+    return nodes.map(node => {
+      if (node.id === id) {
+        return { ...node, content: newContent };
+      }
+      if (node.children) {
+        return { ...node, children: this.updateItemContent(node.children, id, newContent) };
+      }
+      return node;
+    });
+  }
+
+  // Add template content to item
+  static addTemplateContent(nodes: OutlineItem[], id: string, templateContent: string): OutlineItem[] {
+    return nodes.map(node => {
+      if (node.id === id) {
+        return { ...node, content: (node.content || "") + "\n" + templateContent };
+      }
+      if (node.children) {
+        return { ...node, children: this.addTemplateContent(node.children, id, templateContent) };
+      }
+      return node;
+    });
+  }
+
+  // Remove item from tree
+  static removeItem(nodes: OutlineItem[], id: string): OutlineItem[] {
+    return nodes.reduce((acc, node) => {
+      if (node.id === id) {
+        return acc;
+      }
+      if (node.children) {
+        node.children = this.removeItem(node.children, id);
+      }
+      acc.push(node);
+      return acc;
+    }, [] as OutlineItem[]);
+  }
+
+  // Set item as persisted
+  static setItemPersisted(nodes: OutlineItem[], id: string, newTitle: string): OutlineItem[] {
+    return nodes.map(node => {
+      if (node.id === id) {
+        return { ...node, title: newTitle, isNew: false };
+      }
+      if (node.children) {
+        return { ...node, children: this.setItemPersisted(node.children, id, newTitle) };
+      }
+      return node;
+    });
+  }
+
+  // Find item path
+  static findItemPath(nodes: OutlineItem[], id: string, currentPath: string[] = []): string | null {
+    for(const node of nodes) {
+      const nextPath = [...currentPath, node.title];
+      if (node.id === id) {
+        return path.join(...nextPath);
+      }
+      if (node.children) {
+        const foundPath = this.findItemPath(node.children, id, nextPath);
+        if (foundPath) return foundPath;
+      }
+    }
+    return null;
+  }
+
+  // Check if item is child of parent
+  static isChildOf(parentId: string, childPath: string | undefined, nodes: OutlineItem[]): boolean {
+    if (!childPath || !parentId) return false;
+    
+    const parentNode = this.findItem(nodes, parentId);
+    if (!parentNode || !parentNode.children) {
+      return false;
+    }
+    
+    function searchInTree(nodes: OutlineItem[], targetPath: string): boolean {
+      for (const node of nodes) {
+        if (node.title === targetPath) {
+          return true;
+        }
+        if (node.children && node.children.length > 0) {
+          if (searchInTree(node.children, targetPath)) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+    
+    return searchInTree(parentNode.children, childPath);
+  }
+
+  // Flatten tree for rendering
+  static flattenTree(tree: OutlineItem[], expandedItems: Set<string>): RenderableItem[] {
+    if (!tree || !Array.isArray(tree)) {
+      console.warn('flattenTree: Invalid tree input:', tree);
+      return [];
+    }
+    
+    const result: RenderableItem[] = [];
+    function recurse(nodes: OutlineItem[], level: number) {
+      if (!nodes || !Array.isArray(nodes)) return;
+      
+      for (const node of nodes) {
+        if (!node || !node.id) {
+          console.warn('flattenTree: Invalid node found:', node);
+          continue;
+        }
+        
+        result.push({ ...node, level });
+        if (node.children && expandedItems.has(node.id)) {
+          recurse(node.children, level + 1);
+        }
+      }
+    }
+    recurse(tree, 0);
+    return result;
+  }
+
+  // Get all file names from tree (for conflict detection)
+  static getAllFileNames(items: OutlineItem[]): Set<string> {
+    const existingFiles = new Set<string>();
+    const flattenFiles = (items: OutlineItem[]) => {
+      items.forEach(item => {
+        existingFiles.add(item.title);
+        if (item.children) {
+          flattenFiles(item.children);
+        }
+      });
+    };
+    flattenFiles(items);
+    return existingFiles;
+  }
+}
 
 type RenderableItem = OutlineItem & { level: number };
 
@@ -189,6 +372,12 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
     const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
     const [projectNameToDelete, setProjectNameToDelete] = useState('');
     const [isChatDrawerOpen, setIsChatDrawerOpen] = useState(false);
+    const [showSimpleGenerator, setShowSimpleGenerator] = useState(false);
+    const [showSmartGenerator, setShowSmartGenerator] = useState(false);
+    const [exampleFile, setExampleFile] = useState<string>('');
+    const [ideasFile, setIdeasFile] = useState<string>('');
+    const [showGhostAgent, setShowGhostAgent] = useState(false);
+
 
     // Convert SimpleFileItem[] to OutlineItem[] - moved before useEffect
     const convertSimpleItemsToOutline = (items: any[]): OutlineItem[] => {
@@ -259,17 +448,17 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
                         const newExpandedItems = new Set<string>();
                         currentExpandedItems.forEach(itemId => {
                             // Check if the item still exists in the updated project
-                            if (findItemInTree(updatedProject.outline || [], itemId)) {
+                            if (TreeUtils.findItem(updatedProject.outline || [], itemId)) {
                                 newExpandedItems.add(itemId);
                             }
                         });
                         setExpandedItems(newExpandedItems);
                         
                         // Restore active item if it still exists
-                        if (currentActiveItemId && findItemInTree(updatedProject.outline || [], currentActiveItemId)) {
+                        if (currentActiveItemId && TreeUtils.findItem(updatedProject.outline || [], currentActiveItemId)) {
                             setActiveItemId(currentActiveItemId);
                             // Restore content if it's a file
-                            const activeItem = findItemInTree(updatedProject.outline || [], currentActiveItemId);
+                            const activeItem = TreeUtils.findItem(updatedProject.outline || [], currentActiveItemId);
                             if (activeItem?.type === 'file') {
                                 setContent(activeItem.content || currentContent);
                             }
@@ -303,7 +492,7 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
 
     useEffect(() => {
         if (project && editingMode === 'project') {
-            const activeItem = activeItemId ? findItemInTree(project.outline || [], activeItemId) : null;
+            const activeItem = activeItemId ? TreeUtils.findItem(project.outline || [], activeItemId) : null;
             setContent(activeItem?.content || "");
         }
     }, [project, editingMode, activeItemId]);
@@ -324,7 +513,7 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
 
     useEffect(() => {
         if (project && editingMode === 'project') {
-            const activeItem = activeItemId ? findItemInTree(project.outline || [], activeItemId) : null;
+            const activeItem = activeItemId ? TreeUtils.findItem(project.outline || [], activeItemId) : null;
             setIsDirty(content !== (activeItem?.content || ""));
         }
     }, [content, project, editingMode, activeItemId]);
@@ -389,7 +578,7 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
         if (!activeItemId) return;
 
         // Check if the selected item is a file (not a folder)
-        const activeItem = findItemInTree(project.outline || [], activeItemId);
+        const activeItem = TreeUtils.findItem(project.outline || [], activeItemId);
         if (!activeItem) {
             console.error('Active item not found');
             return;
@@ -437,7 +626,7 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
         // For now, we'll use a simple approach to open the project folder
         // This functionality can be enhanced later with proper backend support
         try {
-            const activeItem = activeItemId ? findItemInTree(project.outline || [], activeItemId) : null;
+            const activeItem = activeItemId ? TreeUtils.findItem(project.outline || [], activeItemId) : null;
             const itemType = activeItem?.type === 'folder' ? 'carpeta' : 'archivo';
             
             console.log(`Opening ${itemType || 'project folder'} in explorer`);
@@ -532,6 +721,8 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
         }
     };
 
+
+
     const handleSaveAndExit = () => {
         handleSave();
         onBack();
@@ -562,51 +753,14 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
                         let parsedStructure: OutlineItem[] = [];
 
                         if (file.type === "text/plain" || file.type === "text/markdown" || file.name.endsWith('.md')) {
-                            const lines = text.split('\n');
-                            const tempTree: OutlineItem[] = [];
-                            const parentStack: OutlineItem[] = [];
-
-                            lines.forEach((line, lineIndex) => {
-                                const match = line.match(/^(#+)\s(.*)/);
-                                if (match) {
-                                    const level = match[1].length;
-                                    const title = match[2].trim();
-                                    
-                                    // Find the content for this heading (until the next heading or end of file)
-                                    let content = '';
-                                    let nextLineIndex = lineIndex + 1;
-                                    while (nextLineIndex < lines.length) {
-                                        const nextLine = lines[nextLineIndex];
-                                        if (nextLine.match(/^(#+)\s/)) {
-                                            break; // Found next heading
-                                        }
-                                        content += nextLine + '\n';
-                                        nextLineIndex++;
-                                    }
-                                    
-                                    const newItem: OutlineItem = {
+                            // For single file imports, preserve the entire content as-is
+                            // Don't try to parse headings into separate files
+                            parsedStructure = [{ 
                                         id: uuidv4(),
-                                        title: title.endsWith('.md') ? title : title + '.md',
+                                title: file.name.endsWith('.md') ? file.name : file.name + '.md', 
                                         type: 'file',
-                                        content: content.trim(),
-                                        children: []
-                                    };
-
-                                    while (parentStack.length >= level) {
-                                        parentStack.pop();
-                                    }
-
-                                    const parent = parentStack[parentStack.length - 1];
-                                    if (parent) {
-                                        parent.children = parent.children || [];
-                                        parent.children.push(newItem);
-                                    } else {
-                                        tempTree.push(newItem);
-                                    }
-                                    parentStack.push(newItem);
-                                }
-                            });
-                            parsedStructure = tempTree;
+                                content: text.trim()
+                            }];
 
                         } else {
                             parsedStructure = [{ 
@@ -695,11 +849,14 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
                     // Ensure proper file extension
                     const finalFileName = fileName.endsWith('.md') ? fileName : fileName + '.md';
                     
+                    // Clean up the content - remove trailing newlines and normalize
+                    const cleanContent = content.trim().replace(/\n{3,}/g, '\n\n');
+                    
                     pathMap[currentPath].children?.push({
                         id: uuidv4(),
                         title: finalFileName,
                         type: 'file',
-                        content,
+                        content: cleanContent,
                     });
                 });
                 setStagedFiles([{ file: new File([], "folder"), parsedStructure: root.children || [] }]);
@@ -750,7 +907,7 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
             console.warn("No active item to apply template to.");
             return;
         }
-        const updatedOutline = addTemplateContentInTree(project.outline, activeItemId, templateContent);
+        const updatedOutline = TreeUtils.addTemplateContent(project.outline, activeItemId, templateContent);
         setProject({ ...project, outline: updatedOutline });
     };
 
@@ -780,84 +937,10 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
         }
     };
 
-    const updateItemInTree = (nodes: OutlineItem[], id: string, newTitle: string): OutlineItem[] => {
-        return nodes.map(node => {
-            if (node.id === id) {
-                return { ...node, title: newTitle };
-            }
-            if (node.children) {
-                return { ...node, children: updateItemInTree(node.children, id, newTitle) };
-            }
-            return node;
-        });
-    };
-
-    const findItemInTree = (nodes: OutlineItem[], id: string): OutlineItem | null => {
-        if (!nodes || !Array.isArray(nodes)) return null;
-        
-        for (const node of nodes) {
-            if (node && node.id === id) return node;
-            if (node && node.children) {
-                const found = findItemInTree(node.children, id);
-                if (found) return found;
-            }
-        }
-        return null;
-    };
-
-    const findParent = (nodes: OutlineItem[], id: string, parent: OutlineItem | null = null): OutlineItem | null => {
-        for (const node of nodes) {
-            if (node.id === id) return parent;
-            if (node.children) {
-                const found = findParent(node.children, id, node);
-                if (found) return found;
-            }
-        }
-        return null;
-    };
-
-    const updateItemContentInTree = (nodes: OutlineItem[], id: string, newContent: string): OutlineItem[] => {
-        return nodes.map(node => {
-            if (node.id === id) {
-                return { ...node, content: newContent };
-            }
-            if (node.children) {
-                return { ...node, children: updateItemContentInTree(node.children, id, newContent) };
-            }
-            return node;
-        });
-    };
-
-    const addTemplateContentInTree = (nodes: OutlineItem[], id: string, templateContent: string): OutlineItem[] => {
-        return nodes.map(node => {
-            if (node.id === id) {
-                return { ...node, content: (node.content || "") + "\n" + templateContent };
-            }
-            if (node.children) {
-                return { ...node, children: addTemplateContentInTree(node.children, id, templateContent) };
-            }
-            return node;
-        });
-    };
-
-    const findItemPath = (nodes: OutlineItem[], id: string, currentPath: string[] = []): string | null => {
-        for(const node of nodes) {
-            const nextPath = [...currentPath, node.title];
-            if (node.id === id) {
-                return path.join(...nextPath);
-            }
-            if (node.children) {
-                const foundPath = findItemPath(node.children, id, nextPath);
-                if (foundPath) return foundPath;
-            }
-        }
-        return null;
-    };
-
     const handleTitleBlur = async () => {
         if (!editingItemId) return;
 
-        const item = findItemInTree(project.outline, editingItemId);
+        const item = TreeUtils.findItem(project.outline, editingItemId);
         if (!item) return;
 
         if (editingItemTitle === item.title) {
@@ -934,7 +1017,7 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
     const moveItem = async (dragIndex: number, hoverIndex: number) => {
         if (!project) return;
 
-        const flattenedOutline = flattenTree(project.outline || []);
+        const flattenedOutline = TreeUtils.flattenTree(project.outline || [], expandedItems);
         const draggedItem = flattenedOutline[dragIndex];
         const targetItem = flattenedOutline[hoverIndex];
 
@@ -957,7 +1040,7 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
             targetParentPath = targetItem.title;
         } else {
             // If target is a file, move to its parent
-            const targetParent = findParent(project.outline || [], targetItem.id);
+            const targetParent = TreeUtils.findParent(project.outline || [], targetItem.id);
             targetParentPath = targetParent?.title;
         }
 
@@ -968,7 +1051,7 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
         }
 
         // Check if target is a child of the dragged item
-        if (targetParentPath && isChildOf(draggedItem.id, targetParentPath, project.outline || [])) {
+        if (targetParentPath && TreeUtils.isChildOf(draggedItem.id, targetParentPath, project.outline || [])) {
             console.log('Cannot move item into its own child');
             return;
         }
@@ -1006,7 +1089,7 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
                 
                 // Expand target parent if moving into a folder
                 if (targetParentPath) {
-                    const targetParent = findItemInTree(outlineItems, targetParentPath);
+                    const targetParent = TreeUtils.findItem(outlineItems, targetParentPath);
                     if (targetParent) {
                         currentExpandedItems.add(targetParent.id);
                     }
@@ -1028,59 +1111,6 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
             console.error('Failed to move item:', error);
             alert(`Error al mover ${draggedItem.type === 'folder' ? 'carpeta' : 'archivo'}: ${(error as Error).message}`);
         }
-    };
-
-    const isChildOf = (parentId: string, childPath: string | undefined, nodes: OutlineItem[]): boolean => {
-        if (!childPath || !parentId) return false;
-        
-        // Find the parent node by ID
-        const parentNode = findItemInTree(nodes, parentId);
-        if (!parentNode || !parentNode.children) {
-            return false;
-        }
-        
-        // Search for childPath in the parent's children
-        function searchInTree(nodes: OutlineItem[], targetPath: string): boolean {
-            for (const node of nodes) {
-                if (node.title === targetPath) {
-                    return true;
-                }
-                if (node.children && node.children.length > 0) {
-                    if (searchInTree(node.children, targetPath)) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-        
-        return searchInTree(parentNode.children, childPath);
-    };
-
-    const flattenTree = (tree: OutlineItem[]): RenderableItem[] => {
-        if (!tree || !Array.isArray(tree)) {
-            console.warn('flattenTree: Invalid tree input:', tree);
-            return [];
-        }
-        
-        const result: RenderableItem[] = [];
-        function recurse(nodes: OutlineItem[], level: number) {
-            if (!nodes || !Array.isArray(nodes)) return;
-            
-            for (const node of nodes) {
-                if (!node || !node.id) {
-                    console.warn('flattenTree: Invalid node found:', node);
-                    continue;
-                }
-                
-                result.push({ ...node, level });
-                if (node.children && expandedItems.has(node.id)) {
-                    recurse(node.children, level + 1);
-                }
-            }
-        }
-        recurse(tree, 0);
-        return result;
     };
 
     const handleAddItem = async (type: 'file' | 'folder') => {
@@ -1105,7 +1135,7 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
                     fileName: type === 'file' ? newItem.title : undefined,
                     folderName: type === 'folder' ? newItem.title : undefined,
                     content: type === 'file' ? newItem.content : undefined,
-                    parentPath: parentId ? findItemInTree(project.outline || [], parentId)?.title : undefined,
+                                         parentPath: parentId ? TreeUtils.findItem(project.outline || [], parentId)?.title : undefined,
                 }),
             });
 
@@ -1124,7 +1154,7 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
                 setProject({ ...project, outline: outlineItems });
                 
                 // Find the newly created item in the updated structure
-                const newItemInStructure = findItemInTree(outlineItems, newItem.title);
+                const newItemInStructure = TreeUtils.findItem(outlineItems, newItem.title);
                 if (newItemInStructure) {
                     setActiveItemId(newItemInStructure.id);
                     setEditingItemId(newItemInStructure.id);
@@ -1154,41 +1184,6 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
             alert(`Error al crear ${type === 'file' ? 'archivo' : 'carpeta'}: ${(error as Error).message}`);
         }
     };
-
-    const removeItemFromTree = (nodes: OutlineItem[], id: string): OutlineItem[] => {
-        return nodes.reduce((acc, node) => {
-            if (node.id === id) {
-                return acc;
-            }
-            if (node.children) {
-                node.children = removeItemFromTree(node.children, id);
-            }
-            acc.push(node);
-            return acc;
-        }, [] as OutlineItem[]);
-    };
-
-    const setItemPersisted = (nodes: OutlineItem[], id: string, newTitle: string): OutlineItem[] => {
-      return nodes.map(node => {
-        if (node.id === id) {
-          return { ...node, title: newTitle, isNew: false };
-        }
-        if (node.children) {
-          return { ...node, children: setItemPersisted(node.children, id, newTitle) };
-        }
-        return node;
-      });
-    };
-
-    const filteredAndFlattenedOutline = flattenTree(
-        (project.outline || []).filter(item => {
-            if (!item || !item.title) {
-                console.warn('Invalid item in project outline:', item);
-                return false;
-            }
-            return item.title.toLowerCase().includes(searchTerm.toLowerCase());
-        })
-    );
 
     const handleRenameProject = async () => {
         if (!project || !editedProjectName.trim()) return;
@@ -1298,6 +1293,38 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
         }
     };
 
+    // Handle batch generation
+    const handleGenerateBatch = async (batchSize: number) => {
+        if (!project) return;
+        
+        try {
+            const response = await fetch('/api/ai/ghost-agent', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: `genera ${batchSize} elementos`,
+                    projectPath: project.path
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error ${response.status}: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            
+            // Refresh project to show new files
+            await refreshProject();
+            
+            // Show success message
+            alert(`Lote de ${batchSize} tips generado exitosamente. Revisa los archivos creados.`);
+            
+        } catch (error) {
+            console.error('Error generating batch:', error);
+            alert(`Error al generar lote: ${(error as Error).message}`);
+        }
+    };
+
     // Convert JSX to string for the 'message' prop
     const editProjectNameMessage = "Enter new project name";
     const deleteProjectMessage = "This will delete ALL project files and cannot be undone.";
@@ -1309,22 +1336,27 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
                 "w-1/4 min-w-[300px] border-r border-gray-800 flex flex-col bg-gray-900/50 h-full min-h-0",
                 isChatDrawerOpen && "w-1/5 min-w-[250px]"
             )}>
-                <div className="p-4 flex-shrink-0">
+                {/* Header Section */}
+                <div className="p-4 flex-shrink-0 border-b border-gray-800">
                     <Button
                         variant="ghost"
                         size="sm"
                         onClick={handleBack}
-                        className="mb-4"
+                        className="mb-3"
                         type="button"
                     >
                         <ArrowLeft className="mr-2 h-4 w-4" /> Volver a Proyectos
                     </Button>
-                    <div className="flex items-center gap-2">
+                    
+                    <div className="flex items-center justify-between mb-3">
+                        <h2 className="text-xl font-bold truncate text-primary flex-1">{project?.title}</h2>
+                        <div className="flex items-center gap-1">
                         <Button
                             variant="ghost"
                             size="icon"
                             onClick={() => setIsEditDialogOpen(true)}
                             title="Edit Project Name"
+                                className="h-8 w-8"
                         >
                             <FileSignature className="h-4 w-4" />
                         </Button>
@@ -1336,22 +1368,25 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
                                 setDeleteConfirmationOpen(true);
                             }}
                             title="Delete Project"
-                            className="text-destructive hover:text-destructive/80"
+                                className="text-destructive hover:text-destructive/80 h-8 w-8"
                         >
                             <Trash2 className="h-4 w-4" />
                         </Button>
                     </div>
-                    <h2 className="text-2xl font-bold truncate text-primary">{project?.title}</h2>
+                    </div>
+                    
                     <Input
                         type="search"
                         placeholder="Buscar en el esquema..."
-                        className="mt-4"
+                        className="w-full"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
 
-                <div className="flex-shrink-0 px-4 pb-2 border-b border-gray-800 flex items-center justify-between">
+                {/* Toolbar Section */}
+                <div className="flex-shrink-0 px-4 py-2 border-b border-gray-800">
+                    <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1">
                         <Button
                             variant="ghost"
@@ -1359,6 +1394,7 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
                             onClick={() => handleAddItem('file')}
                             title="Nuevo Archivo"
                             type="button"
+                                className="h-8 w-8"
                         >
                             <FilePlusIcon className="h-4 w-4" />
                         </Button>
@@ -1368,6 +1404,7 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
                             onClick={() => handleAddItem('folder')}
                             title="Nueva Carpeta"
                             type="button"
+                                className="h-8 w-8"
                         >
                             <FolderPlus className="h-4 w-4" />
                         </Button>
@@ -1378,6 +1415,7 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
                             onClick={() => handleImportFile(false)}
                             title="Importar Archivo"
                             type="button"
+                                className="h-8 w-8"
                         >
                             <FileUp className="h-4 w-4" />
                         </Button>
@@ -1387,42 +1425,119 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
                             onClick={() => handleImportFile(true)}
                             title="Importar Carpeta"
                             type="button"
+                                className="h-8 w-8"
                         >
                             <FolderUp className="h-4 w-4" />
                         </Button>
-                        <div className="w-px h-6 bg-gray-800 mx-1" />
+                        </div>
+                        <div className="flex items-center gap-1">
                         <Button
                             variant="ghost"
                             size="icon"
                             onClick={() => setIsLinkDialogOpen(true)}
                             title="Vincular Proyecto"
                             type="button"
+                                className="h-8 w-8"
                         >
                             <Link className="h-4 w-4" />
                         </Button>
-                        <div className="w-px h-6 bg-gray-800 mx-1" />
                         <Button
                             variant="ghost"
                             size="icon"
                             onClick={refreshProject}
                             title="Refrescar Proyecto"
                             type="button"
+                                className="h-8 w-8"
                         >
                             <RefreshCw className="h-4 w-4" />
                         </Button>
-
+                        </div>
                     </div>
                 </div>
 
+                {/* AI Tools Section - Collapsible */}
+                <div className="flex-shrink-0 border-b border-gray-800">
+                    <Button
+                        onClick={() => setShowGhostAgent(!showGhostAgent)}
+                        variant="ghost"
+                        className="w-full justify-between px-4 py-2 h-auto"
+                        size="sm"
+                    >
+                        <div className="flex items-center gap-2">
+                            <BrainCircuit className="w-4 h-4" />
+                            <span>Herramientas IA</span>
+                        </div>
+                        <Badge variant="outline" className="text-xs">
+                            {showGhostAgent ? 'Ocultar' : 'Mostrar'}
+                        </Badge>
+                    </Button>
+                    
+                    {/* File Status Indicators - Compact */}
+                    {(exampleFile || ideasFile) && (
+                        <div className="px-4 pb-2">
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                {exampleFile && (
+                                    <div className="flex items-center gap-1">
+                                        <BookOpen className="w-3 h-3 text-blue-500" />
+                                        <span className="text-blue-400">Ejemplo:</span>
+                                        <span className="text-gray-400 truncate max-w-[120px]">{exampleFile}</span>
+                                    </div>
+                                )}
+                                {ideasFile && (
+                                    <div className="flex items-center gap-1">
+                                        <Lightbulb className="w-3 h-3 text-yellow-500" />
+                                        <span className="text-yellow-400">Ideas:</span>
+                                        <span className="text-gray-400 truncate max-w-[120px]">{ideasFile}</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* AI Tools Content */}
+                {showGhostAgent && project && (
+                    <div className="flex-shrink-0 border-b border-gray-800">
+                        <div className="p-3">
+                        <GhostAgentPanel
+                            projectPath={project.path}
+                            exampleFile={exampleFile}
+                            ideasFile={ideasFile}
+                            onContentGenerated={refreshProject}
+                        />
+                    </div>
+
+                        {/* Compact Progress Widget */}
+                        <div className="p-3 border-t border-gray-800">
+                        <BatchProgressWidget
+                            projectPath={project.path}
+                            onGenerateBatch={handleGenerateBatch}
+                        />
+                        </div>
+                    </div>
+                )}
+
+                {/* File Tree Section */}
                 <div className="flex-grow overflow-y-auto min-h-0">
                     <DndProvider backend={HTML5Backend}>
-                        <div className="p-4 space-y-1">
-                            {filteredAndFlattenedOutline.map((item, index) => (
+                        <div className="p-3 space-y-1">
+                            {TreeUtils.flattenTree(
+                                (project.outline || []).filter(item => {
+                                    if (!item || !item.title) {
+                                        console.warn('Invalid item in project outline:', item);
+                                        return false;
+                                    }
+                                    return item.title.toLowerCase().includes(searchTerm.toLowerCase());
+                                }), expandedItems
+                            ).map((item, index) => (
                                 <div key={item.id}>
-                                    <DraggableItem
+                                    <FileItemView
                                         item={item}
-                                        index={index}
-                                        moveItem={moveItem}
+                                        level={item.level}
+                                        isSelected={activeItemId === item.id}
+                                        isExpanded={expandedItems.has(item.id)}
+                                        isExampleFile={exampleFile === item.title}
+                                        isIdeasFile={ideasFile === item.title}
                                         onSelect={() => {
                                             console.log('[BookWorkspace] Item selected:', {
                                                 id: item.id,
@@ -1440,19 +1555,35 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
                                                 handleToggleExpand(item.id);
                                             }
                                         }}
-                                        isSelected={activeItemId === item.id}
                                         onDoubleClick={() => {
                                             // Allow both files and folders to be renamed
                                             handleTitleDoubleClick(item);
                                         }}
+                                        onToggleExpand={() => handleToggleExpand(item.id)}
+                                        onMarkAsExample={() => {
+                                            if (item.type === 'file') {
+                                                setExampleFile(item.title);
+                                            }
+                                        }}
+                                        onMarkAsIdeas={() => {
+                                            if (item.type === 'file') {
+                                                setIdeasFile(item.title);
+                                            }
+                                        }}
+                                        onClearMarking={() => {
+                                            if (exampleFile === item.title) {
+                                                setExampleFile('');
+                                            }
+                                            if (ideasFile === item.title) {
+                                                setIdeasFile('');
+                                            }
+                                        }}
+                                        onDelete={() => handleDeleteItem(item)}
                                         isEditing={editingItemId === item.id}
                                         editingTitle={editingItemTitle}
                                         onTitleChange={handleTitleChange}
                                         onTitleBlur={handleTitleBlur}
                                         onTitleKeyDown={handleTitleKeyDown}
-                                        isExpanded={expandedItems.has(item.id)}
-                                        onToggleExpand={() => handleToggleExpand(item.id)}
-                                        onDelete={() => handleDeleteItem(item)}
                                     />
                                 </div>
                             ))}
@@ -1478,7 +1609,7 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
                         {activeItemId && editingMode === 'project' ? (
                             <div className="text-center">
                                 {(() => {
-                                    const activeItem = findItemInTree(project.outline || [], activeItemId);
+                                    const activeItem = TreeUtils.findItem(project.outline || [], activeItemId);
                                     const isFolder = activeItem?.type === 'folder';
                                     return (
                                         <div className="flex flex-col items-center">
@@ -1511,8 +1642,8 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
                         variant="ghost" 
                         size="icon" 
                         onClick={handleSave} 
-                        disabled={!isDirty || (activeItemId ? findItemInTree(project.outline || [], activeItemId)?.type === 'folder' : false)}
-                        title={activeItemId && findItemInTree(project.outline || [], activeItemId)?.type === 'folder' ? 'No se puede guardar contenido en una carpeta' : 'Guardar cambios'}
+                        disabled={!isDirty || (activeItemId ? TreeUtils.findItem(project.outline || [], activeItemId)?.type === 'folder' : false)}
+                        title={activeItemId && TreeUtils.findItem(project.outline || [], activeItemId)?.type === 'folder' ? 'No se puede guardar contenido en una carpeta' : 'Guardar cambios'}
                     >
                         <Save className={cn("h-5 w-5", isDirty ? "text-primary" : "")} />
                     </Button>
@@ -1521,7 +1652,7 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
                         size="icon" 
                         onClick={handleRevealInExplorer}
                         title={activeItemId ? 
-                            (findItemInTree(project.outline || [], activeItemId)?.type === 'folder' ? 
+                            (TreeUtils.findItem(project.outline || [], activeItemId)?.type === 'folder' ? 
                                 "Abrir carpeta en explorador" : 
                                 "Localizar archivo en explorador") : 
                             "Abrir carpeta del proyecto"}
@@ -1545,8 +1676,8 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
                             <Button 
                                 variant="ghost" 
                                 size="icon"
-                                disabled={activeItemId ? findItemInTree(project.outline || [], activeItemId)?.type === 'folder' : false}
-                                title={activeItemId && findItemInTree(project.outline || [], activeItemId)?.type === 'folder' ? 'No disponible para carpetas' : 'Opciones de IA'}
+                                disabled={activeItemId ? TreeUtils.findItem(project.outline || [], activeItemId)?.type === 'folder' : false}
+                                title={activeItemId && TreeUtils.findItem(project.outline || [], activeItemId)?.type === 'folder' ? 'No disponible para carpetas' : 'Opciones de IA'}
                             >
                                 <ChevronsUp className="h-5 w-5" />
                             </Button>
@@ -1556,21 +1687,21 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
                             <DropdownMenuSeparator />
                             <DropdownMenuItem 
                                 onClick={() => handleAISuggestion('improve')}
-                                disabled={activeItemId ? findItemInTree(project.outline || [], activeItemId)?.type === 'folder' : false}
+                                disabled={activeItemId ? TreeUtils.findItem(project.outline || [], activeItemId)?.type === 'folder' : false}
                                 className="hover:bg-primary/10 focus:bg-primary/10"
                             >
                                 Sugerir Mejoras
                             </DropdownMenuItem>
                             <DropdownMenuItem 
                                 onClick={() => handleAISuggestion('seo')}
-                                disabled={activeItemId ? findItemInTree(project.outline || [], activeItemId)?.type === 'folder' : false}
+                                disabled={activeItemId ? TreeUtils.findItem(project.outline || [], activeItemId)?.type === 'folder' : false}
                                 className="hover:bg-primary/10 focus:bg-primary/10"
                             >
                                 Optimizar para SEO
                             </DropdownMenuItem>
                             <DropdownMenuItem 
                                 onClick={() => handleAISuggestion('tone')}
-                                disabled={activeItemId ? findItemInTree(project.outline || [], activeItemId)?.type === 'folder' : false}
+                                disabled={activeItemId ? TreeUtils.findItem(project.outline || [], activeItemId)?.type === 'folder' : false}
                                 className="hover:bg-primary/10 focus:bg-primary/10"
                             >
                                 Cambiar Tono
@@ -1578,7 +1709,7 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
                             <DropdownMenuSeparator />
                             <DropdownMenuItem 
                                 onClick={() => handleGenerateContent()}
-                                disabled={activeItemId ? findItemInTree(project.outline || [], activeItemId)?.type === 'folder' : false}
+                                disabled={activeItemId ? TreeUtils.findItem(project.outline || [], activeItemId)?.type === 'folder' : false}
                                 className="hover:bg-primary/10 focus:bg-primary/10"
                             >
                                 Generar Contenido con IA
@@ -1752,22 +1883,44 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
                 onClose={() => setIsImportDialogOpen(false)}
                 stagedFiles={stagedFiles}
                 onImport={async (itemsToImport: OutlineItem[]) => {
-                    try {
                         console.log('[BookWorkspace] Importing items:', itemsToImport);
                         console.log('[BookWorkspace] Project path:', project.path);
                         console.log('[BookWorkspace] Active item ID:', activeItemId);
                         
-                        // Convert OutlineItem[] to the format expected by the API
-                        const filesToImport = itemsToImport.map(item => ({
-                            name: item.title,
+                    // Check for potential conflicts with existing files
+                    const existingFiles = TreeUtils.getAllFileNames(project.outline || []);
+                    
+                    // Filter out items that would conflict and create unique names
+                    const filesToImport = itemsToImport.map(item => {
+                        let fileName = item.title;
+                        let counter = 1;
+                        
+                        // If file exists, create a unique name
+                        while (existingFiles.has(fileName)) {
+                            const nameWithoutExt = fileName.replace(/\.md$/, '');
+                            const ext = fileName.endsWith('.md') ? '.md' : '';
+                            fileName = `${nameWithoutExt}_${counter}${ext}`;
+                            counter++;
+                        }
+                        
+                        // Add to existing files set to prevent conflicts within the same import
+                        existingFiles.add(fileName);
+                        
+                        return {
+                            name: fileName,
                             content: item.content || ''
-                        }));
+                        };
+                    });
+                    
+                    // Only use parentPath if the active item is a folder
+                    const activeItem = activeItemId ? TreeUtils.findItem(project.outline || [], activeItemId) : null;
+                    const parentPath = activeItem && activeItem.type === 'folder' ? activeItem.title : undefined;
                         
                         const requestBody = {
                             action: 'import',
                             projectPath: project.path,
                             files: filesToImport,
-                            parentPath: activeItemId ? findItemInTree(project.outline || [], activeItemId)?.title : undefined,
+                        parentPath: parentPath,
                         };
                         
                         console.log('[BookWorkspace] Import request body:', requestBody);
@@ -1782,23 +1935,64 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
                         console.log('[BookWorkspace] Import response:', data);
 
                         if (!data.success) {
+                        // Check if it's a file conflict error
+                        if (data.message && data.message.includes('already exists')) {
+                            // Try to import with unique names
+                            const uniqueFilesToImport = itemsToImport.map(item => {
+                                let fileName = item.title;
+                                let counter = 1;
+                                
+                                while (existingFiles.has(fileName)) {
+                                    const nameWithoutExt = fileName.replace(/\.md$/, '');
+                                    const ext = fileName.endsWith('.md') ? '.md' : '';
+                                    fileName = `${nameWithoutExt}_${counter}${ext}`;
+                                    counter++;
+                                }
+                                
+                                existingFiles.add(fileName);
+                                
+                                return {
+                                    name: fileName,
+                                    content: item.content || ''
+                                };
+                            });
+                            
+                            const retryRequestBody = {
+                                action: 'import',
+                                projectPath: project.path,
+                                files: uniqueFilesToImport,
+                                parentPath: parentPath,
+                            };
+                            
+                            const retryResponse = await fetch('/api/unified-file-operations', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(retryRequestBody),
+                            });
+                            
+                            const retryData = await retryResponse.json();
+                            
+                            if (!retryData.success) {
+                                throw new Error(retryData.message || 'Failed to import files after conflict resolution');
+                            }
+                            
+                            if (retryData.updatedStructure) {
+                                const outlineItems = convertSimpleItemsToOutline(retryData.updatedStructure.items);
+                                setProject({ ...project, outline: outlineItems });
+                            }
+                        } else {
                             throw new Error(data.message || 'Failed to import files');
                         }
-
+                    } else {
                         if (data.updatedStructure) {
                             const outlineItems = convertSimpleItemsToOutline(data.updatedStructure.items);
                             setProject({ ...project, outline: outlineItems });
                         }
-                        
-                        setIsImportDialogOpen(false);
+                        }
                         
                         // Disparar evento para refrescar contextos en el chat
                         if (typeof window !== 'undefined') {
                             window.dispatchEvent(new CustomEvent('workspace-refresh'));
-                        }
-                    } catch (error) {
-                        console.error('[BookWorkspace] Import failed:', error);
-                        alert(`Error al importar archivos: ${(error as Error).message}`);
                     }
                 }}
             />
@@ -1851,6 +2045,29 @@ const BookWorkspace: React.FC<BookWorkspaceProps> = ({ project: initialProject, 
                 requireConfirmationText={project?.title}
                 confirmationPlaceholder={`Type "${project?.title}" to confirm`}
             />
+
+            {/* Simple Book Generator Modal */}
+            {showSimpleGenerator && project && (
+                <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+                    <div className="bg-background border border-border rounded-lg w-full max-w-4xl h-[90vh] overflow-hidden">
+                        <SimpleBookGenerator 
+                            projectPath={project.path}
+                            onBack={() => setShowSimpleGenerator(false)}
+                        />
+                    </div>
+                </div>
+            )}
+            {/* Smart Book Generator Modal */}
+            {showSmartGenerator && project && (
+                <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+                    <div className="bg-background border border-border rounded-lg w-full max-w-4xl h-[90vh] overflow-hidden">
+                        <SmartBookGenerator 
+                            projectPath={project.path}
+                            onBack={() => setShowSmartGenerator(false)}
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

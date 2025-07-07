@@ -109,9 +109,28 @@ export function TodoPopup({ isOpen, onClose }: Omit<TodoPopupProps, 'onAddTodo'>
 
     const taggedAgents = parseMentions(form.text);
     
+    // Convert DD/MM format to ISO format for calendar compatibility
+    let deadlineDate: string | undefined;
+    if (form.deadline && form.deadline.trim()) {
+      const parts = form.deadline.split('/');
+      if (parts.length === 2) {
+        const [day, month] = parts.map(Number);
+        const currentYear = new Date().getFullYear();
+        const currentMonth = new Date().getMonth() + 1; // 1-12
+        
+        // Smart year handling: if we're in December and select January, it's next year
+        let year = currentYear;
+        if (currentMonth === 12 && month === 1) {
+          year = currentYear + 1;
+        }
+        
+        deadlineDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      }
+    }
+    
     const todoItem: TodoPopupItem = {
       text: form.text,
-      deadline: form.deadline || undefined,
+      deadline: deadlineDate,
       taggedAgents: taggedAgents.length > 0 ? taggedAgents : undefined,
       priority: form.priority || undefined,
       complexity: form.complexity || undefined,
@@ -179,7 +198,50 @@ export function TodoPopup({ isOpen, onClose }: Omit<TodoPopupProps, 'onAddTodo'>
             <input
               type="text"
               value={form.deadline}
-              onChange={(e) => setForm({ ...form, deadline: e.target.value })}
+              onChange={(e) => {
+                const value = e.target.value;
+                
+                // Allow backspace and deletion
+                if (value === '') {
+                  setForm({ ...form, deadline: '' });
+                  return;
+                }
+                
+                // Only allow digits and forward slash
+                const cleanValue = value.replace(/[^\d/]/g, '');
+                
+                // Prevent multiple slashes
+                const slashCount = (cleanValue.match(/\//g) || []).length;
+                if (slashCount > 1) return;
+                
+                // Format as user types
+                if (cleanValue.length <= 5) {
+                  let formatted = cleanValue;
+                  
+                  // Auto-add slash after 2 digits if no slash exists
+                  if (cleanValue.length === 2 && !cleanValue.includes('/')) {
+                    const day = parseInt(cleanValue);
+                    if (day >= 1 && day <= 31) {
+                      formatted = cleanValue + '/';
+                    }
+                  }
+                  
+                  // Validate day and month as user types
+                  if (cleanValue.includes('/')) {
+                    const [day, month] = cleanValue.split('/');
+                    const dayNum = parseInt(day);
+                    const monthNum = parseInt(month);
+                    
+                    // Validate day (1-31)
+                    if (day && (dayNum < 1 || dayNum > 31)) return;
+                    
+                    // Validate month (1-12) if month is provided
+                    if (month && (monthNum < 1 || monthNum > 12)) return;
+                  }
+                  
+                  setForm({ ...form, deadline: formatted });
+                }
+              }}
               placeholder="DD/MM"
               className="w-20 h-8 px-2 bg-gray-800 border border-gray-600 text-white font-mono text-sm text-center placeholder-gray-500 focus:outline-none focus:border-orange-400"
             />
@@ -248,7 +310,24 @@ export function TodoPopup({ isOpen, onClose }: Omit<TodoPopupProps, 'onAddTodo'>
               </div>
               {form.deadline && (
                 <div className="flex items-center gap-1 text-xs text-gray-400 font-mono mt-1">
-                  <CalendarIcon className="h-3 w-3" /> {form.deadline}
+                  <CalendarIcon className="h-3 w-3" /> 
+                  {form.deadline}
+                  {form.deadline.includes('/') && (
+                    <span className="text-gray-500"> → {(() => {
+                      const parts = form.deadline.split('/');
+                      if (parts.length === 2) {
+                        const [day, month] = parts.map(Number);
+                        const currentYear = new Date().getFullYear();
+                        const currentMonth = new Date().getMonth() + 1;
+                        let year = currentYear;
+                        if (currentMonth === 12 && month === 1) {
+                          year = currentYear + 1;
+                        }
+                        return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                      }
+                      return '';
+                    })()}</span>
+                  )}
                 </div>
               )}
             </div>

@@ -78,6 +78,13 @@ export async function POST(req: NextRequest) {
                 );
                 break;
 
+            case 'getContent':
+                result = await unifiedFileManager.getFileContent(
+                    projectPath,
+                    params.filePath
+                );
+                break;
+
             default:
                 return NextResponse.json({ 
                     success: false, 

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Ghost Agent - Creación de Tips</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            background: #f7fafc;
+        }
+        .test-section h2 {
+            color: #4a5568;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        .test-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .test-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .response-area {
+            margin-top: 20px;
+            padding: 15px;
+            background: #2d3748;
+            color: #e2e8f0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .loading {
+            color: #4299e1;
+            font-style: italic;
+        }
+        .success {
+            color: #48bb78;
+        }
+        .error {
+            color: #f56565;
+        }
+        .info {
+            color: #4299e1;
+        }
+        .instruction-box {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .instruction-box h2 {
+            margin-bottom: 15px;
+        }
+        .instruction-box ul {
+            list-style: none;
+            padding: 0;
+        }
+        .instruction-box li {
+            margin: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        .instruction-box li:before {
+            content: "✅";
+            position: absolute;
+            left: 0;
+        }
+        .example-request {
+            background: #edf2f7;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #4299e1;
+        }
+        .example-request h3 {
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        .example-request p {
+            color: #4a5568;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧙‍♂️ Ghost Agent - Test de Creación de Tips</h1>
+        
+        <div class="instruction-box">
+            <h2>📋 Instrucciones para Crear Tips</h2>
+            <ul>
+                <li><strong>Analiza el contexto:</strong> Lee el formato del tip 01 (BePolite) en el contexto</li>
+                <li><strong>Crea contenido completo:</strong> Incluye todas las secciones del formato original</li>
+                <li><strong>Usa FILE_OPERATION:</strong> Siempre incluye el bloque JSON para crear archivos</li>
+                <li><strong>Sé específico:</strong> Usa el nombre exacto del proyecto y archivo</li>
+                <li><strong>Incluye contenido completo:</strong> Todo el contenido debe estar en el JSON</li>
+            </ul>
+        </div>
+
+        <div class="example-request">
+            <h3>💡 Ejemplo de Solicitud Correcta</h3>
+            <p><strong>Usuario:</strong> "Ghost, toma el tip 01 del archivo 101 tips para hablar con la IA, y genera un tip completo usando el archivo 01-BePolite como ejemplo de formato. Crea un archivo nuevo para el tip 02."</p>
+            <p><strong>Ghost Agent debe:</strong></p>
+            <ul>
+                <li>Analizar el formato del tip 01 (BePolite) en el contexto</li>
+                <li>Leer la descripción del tip 02 en el contexto</li>
+                <li>Crear contenido completo con todas las secciones</li>
+                <li>Usar FILE_OPERATION para crear el archivo</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 Pruebas de Creación de Tips</h2>
+            <button class="test-button" onclick="testTip02()">Crear Tip 02 - Usa IA con empatía</button>
+            <button class="test-button" onclick="testTip03()">Crear Tip 03 - Haz foco: una idea por vez</button>
+            <button class="test-button" onclick="testTip04()">Crear Tip 04 - Estructura tus ideas</button>
+            <button class="test-button" onclick="testTip05()">Crear Tip 05 - Iterar sin perderte</button>
+        </div>
+
+        <div class="test-section">
+            <h2>🔧 Pruebas Específicas</h2>
+            <button class="test-button" onclick="testSpecificRequest()">Solicitud Específica - Tip 02</button>
+            <button class="test-button" onclick="testFormatAnalysis()">Análisis de Formato</button>
+            <button class="test-button" onclick="testFileOperation()">Verificar FILE_OPERATION</button>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 Respuesta del Sistema</h2>
+            <div id="response" class="response-area">Esperando instrucciones...</div>
+        </div>
+    </div>
+
+    <script>
+        const responseArea = document.getElementById('response');
+        let isProcessing = false;
+
+        function updateResponse(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : 'ℹ️';
+            responseArea.textContent += `\n[${timestamp}] ${prefix} ${message}`;
+            responseArea.scrollTop = responseArea.scrollHeight;
+        }
+
+        function clearResponse() {
+            responseArea.textContent = '';
+        }
+
+        async function sendToGhostAgent(message) {
+            if (isProcessing) {
+                updateResponse('Ya hay una operación en progreso...', 'error');
+                return null;
+            }
+
+            isProcessing = true;
+            updateResponse('Enviando solicitud al Ghost Agent...', 'info');
+
+            try {
+                const response = await fetch('/api/ai/ghost-agent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        message,
+                        contexts: [
+                            {
+                                id: 'Boceto_101_Tips_para_Hablar_con_la_IA',
+                                title: 'Boceto 101 Tips para Hablar con la IA',
+                                type: 'book',
+                                path: 'GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA',
+                                specificFile: 'GHOST_Proyectos\\libros\\Boceto_101_Tips_para_Hablar_con_la_IA\\Ejemplos e Ideas\\01 – BePolite_ Ser educado con la IA.md'
+                            },
+                            {
+                                id: 'Boceto_101_Tips_para_Hablar_con_la_IA',
+                                title: 'Boceto 101 Tips para Hablar con la IA',
+                                type: 'book',
+                                path: 'GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA',
+                                specificFile: 'GHOST_Proyectos\\libros\\Boceto_101_Tips_para_Hablar_con_la_IA\\Ejemplos e Ideas\\101 Tips para Hablar con la IA.md'
+                            }
+                        ]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                updateResponse(`Error: ${error.message}`, 'error');
+                return null;
+            } finally {
+                isProcessing = false;
+            }
+        }
+
+        async function testTip02() {
+            clearResponse();
+            updateResponse('🧪 Probando creación del Tip 02 - Usa IA con empatía...', 'info');
+            
+            const message = `Ghost, toma el tip 01 del archivo 101 tips para hablar con la IA, y genera un tip completo usando el archivo 01-BePolite como ejemplo de formato. Crea un archivo nuevo para el tip 02 "Usa IA con empatía". Incluye todas las secciones del formato original: Resumen, Historia, ¿Por qué importa?, Cómo aplicarlo, Ejemplo práctico, Frase para recordar, Tips extra, ¿Dónde aplicarlo?, Mini reto práctico, y Cierre.`;
+            
+            const data = await sendToGhostAgent(message);
+            if (data) {
+                updateResponse('Respuesta del Ghost Agent:', 'success');
+                updateResponse(data.response, 'info');
+                
+                if (data.fileOperations) {
+                    updateResponse('Operaciones de archivos realizadas:', 'success');
+                    data.fileOperations.forEach(op => {
+                        updateResponse(`${op.success ? '✅' : '❌'} ${op.message}`, op.success ? 'success' : 'error');
+                        if (op.createdContent) {
+                            const preview = op.createdContent.length > 200 
+                                ? op.createdContent.substring(0, 200) + '...' 
+                                : op.createdContent;
+                            updateResponse(`📄 Vista previa: ${preview}`, 'info');
+                        }
+                    });
+                } else {
+                    updateResponse('⚠️ No se detectaron operaciones de archivos. El agente debe usar FILE_OPERATION.', 'error');
+                }
+            }
+        }
+
+        async function testTip03() {
+            clearResponse();
+            updateResponse('🧪 Probando creación del Tip 03 - Haz foco: una idea por vez...', 'info');
+            
+            const message = `Crea el tip 03 "Haz foco: una idea por vez" usando el formato exacto del tip 01 (BePolite). Analiza el contexto del tip 01 para entender la estructura completa y crea un archivo nuevo con todas las secciones: Resumen, Historia, ¿Por qué importa?, Cómo aplicarlo, Ejemplo práctico, Frase para recordar, Tips extra, ¿Dónde aplicarlo?, Mini reto práctico, y Cierre. Usa FILE_OPERATION para crear el archivo.`;
+            
+            const data = await sendToGhostAgent(message);
+            if (data) {
+                updateResponse('Respuesta del Ghost Agent:', 'success');
+                updateResponse(data.response, 'info');
+                
+                if (data.fileOperations) {
+                    updateResponse('Operaciones de archivos realizadas:', 'success');
+                    data.fileOperations.forEach(op => {
+                        updateResponse(`${op.success ? '✅' : '❌'} ${op.message}`, op.success ? 'success' : 'error');
+                    });
+                } else {
+                    updateResponse('⚠️ No se detectaron operaciones de archivos. El agente debe usar FILE_OPERATION.', 'error');
+                }
+            }
+        }
+
+        async function testTip04() {
+            clearResponse();
+            updateResponse('🧪 Probando creación del Tip 04 - Estructura tus ideas...', 'info');
+            
+            const message = `Genera el tip 04 "Estructura tus ideas: piensa como un índice" siguiendo el formato del tip 01. Crea un archivo completo con todas las secciones del formato original. Usa FILE_OPERATION para crear el archivo.`;
+            
+            const data = await sendToGhostAgent(message);
+            if (data) {
+                updateResponse('Respuesta del Ghost Agent:', 'success');
+                updateResponse(data.response, 'info');
+                
+                if (data.fileOperations) {
+                    updateResponse('Operaciones de archivos realizadas:', 'success');
+                    data.fileOperations.forEach(op => {
+                        updateResponse(`${op.success ? '✅' : '❌'} ${op.message}`, op.success ? 'success' : 'error');
+                    });
+                } else {
+                    updateResponse('⚠️ No se detectaron operaciones de archivos. El agente debe usar FILE_OPERATION.', 'error');
+                }
+            }
+        }
+
+        async function testTip05() {
+            clearResponse();
+            updateResponse('🧪 Probando creación del Tip 05 - Iterar sin perderte...', 'info');
+            
+            const message = `Crea el tip 05 "Iterar sin perderte: mejora paso a paso" usando el formato del tip 01. Incluye todas las secciones y crea un archivo completo. Usa FILE_OPERATION.`;
+            
+            const data = await sendToGhostAgent(message);
+            if (data) {
+                updateResponse('Respuesta del Ghost Agent:', 'success');
+                updateResponse(data.response, 'info');
+                
+                if (data.fileOperations) {
+                    updateResponse('Operaciones de archivos realizadas:', 'success');
+                    data.fileOperations.forEach(op => {
+                        updateResponse(`${op.success ? '✅' : '❌'} ${op.message}`, op.success ? 'success' : 'error');
+                    });
+                } else {
+                    updateResponse('⚠️ No se detectaron operaciones de archivos. El agente debe usar FILE_OPERATION.', 'error');
+                }
+            }
+        }
+
+        async function testSpecificRequest() {
+            clearResponse();
+            updateResponse('🧪 Probando solicitud específica para Tip 02...', 'info');
+            
+            const message = `Ghost, necesito que crees el tip 02 "Usa IA con empatía" siguiendo exactamente el formato del tip 01 que está en el contexto. Analiza el formato del tip 01 (BePolite) y crea un archivo completo para el tip 02 con todas las secciones: Resumen, Historia, ¿Por qué importa?, Cómo aplicarlo, Ejemplo práctico, Frase para recordar, Tips extra, ¿Dónde aplicarlo?, Mini reto práctico, y Cierre. Usa FILE_OPERATION para crear el archivo.`;
+            
+            const data = await sendToGhostAgent(message);
+            if (data) {
+                updateResponse('Respuesta del Ghost Agent:', 'success');
+                updateResponse(data.response, 'info');
+                
+                if (data.fileOperations) {
+                    updateResponse('Operaciones de archivos realizadas:', 'success');
+                    data.fileOperations.forEach(op => {
+                        updateResponse(`${op.success ? '✅' : '❌'} ${op.message}`, op.success ? 'success' : 'error');
+                    });
+                } else {
+                    updateResponse('⚠️ No se detectaron operaciones de archivos. El agente debe usar FILE_OPERATION.', 'error');
+                }
+            }
+        }
+
+        async function testFormatAnalysis() {
+            clearResponse();
+            updateResponse('🧪 Probando análisis de formato...', 'info');
+            
+            const message = `Analiza el formato del tip 01 (BePolite) en el contexto y dime qué secciones incluye. Luego crea el tip 02 "Usa IA con empatía" siguiendo exactamente ese formato. Usa FILE_OPERATION para crear el archivo.`;
+            
+            const data = await sendToGhostAgent(message);
+            if (data) {
+                updateResponse('Respuesta del Ghost Agent:', 'success');
+                updateResponse(data.response, 'info');
+                
+                if (data.fileOperations) {
+                    updateResponse('Operaciones de archivos realizadas:', 'success');
+                    data.fileOperations.forEach(op => {
+                        updateResponse(`${op.success ? '✅' : '❌'} ${op.message}`, op.success ? 'success' : 'error');
+                    });
+                } else {
+                    updateResponse('⚠️ No se detectaron operaciones de archivos. El agente debe usar FILE_OPERATION.', 'error');
+                }
+            }
+        }
+
+        async function testFileOperation() {
+            clearResponse();
+            updateResponse('🧪 Probando verificación de FILE_OPERATION...', 'info');
+            
+            const message = `Crea un archivo de prueba llamado "test_tip_creation.md" con el contenido "Este es un archivo de prueba para verificar que FILE_OPERATION funciona correctamente." Usa FILE_OPERATION para crear el archivo.`;
+            
+            const data = await sendToGhostAgent(message);
+            if (data) {
+                updateResponse('Respuesta del Ghost Agent:', 'success');
+                updateResponse(data.response, 'info');
+                
+                if (data.fileOperations) {
+                    updateResponse('Operaciones de archivos realizadas:', 'success');
+                    data.fileOperations.forEach(op => {
+                        updateResponse(`${op.success ? '✅' : '❌'} ${op.message}`, op.success ? 'success' : 'error');
+                    });
+                } else {
+                    updateResponse('⚠️ No se detectaron operaciones de archivos. El agente debe usar FILE_OPERATION.', 'error');
+                }
+            }
+        }
+
+        // Inicialización
+        updateResponse('🚀 Ghost Agent - Test de Creación de Tips iniciado', 'success');
+        updateResponse('Este test verifica que el Ghost Agent puede crear tips completos usando FILE_OPERATION', 'info');
+        updateResponse('Los tests incluyen análisis de formato y creación de archivos completos', 'info');
+    </script>
+</body>
+</html> 

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Quick Action Buttons - Ghost Agent</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0A0A0A;
+            color: #00FF00;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #00FF00;
+            padding-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #00FF00;
+            border-radius: 5px;
+        }
+        .button-demo {
+            display: inline-block;
+            margin: 5px;
+            padding: 8px 12px;
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            color: #00FF00;
+            text-decoration: none;
+            border-radius: 3px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .button-demo:hover {
+            background: rgba(0, 255, 0, 0.2);
+            border-color: rgba(0, 255, 0, 0.5);
+        }
+        .green { border-color: #00FF00; color: #00FF00; }
+        .blue { border-color: #0080FF; color: #0080FF; }
+        .purple { border-color: #8000FF; color: #8000FF; }
+        .orange { border-color: #FF8000; color: #FF8000; }
+        .code {
+            background: #1A1A1A;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+        }
+        .warning {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            color: #FF0000;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            color: #00FF00;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Quick Action Buttons - Ghost Agent</h1>
+            <p>Nuevos botones para crear contenido de forma rápida y fácil</p>
+        </div>
+
+        <div class="section">
+            <h2>✨ ¿Qué son los Quick Action Buttons?</h2>
+            <p>Son botones que aparecen automáticamente cuando seleccionas el Ghost Agent en el chat. Te permiten crear contenido con un solo clic, sin tener que escribir comandos largos.</p>
+            
+            <div class="success">
+                <strong>✅ Beneficios:</strong>
+                <ul>
+                    <li>No más comandos largos y complejos</li>
+                    <li>Interfaz visual e intuitiva</li>
+                    <li>Acceso rápido a las funciones más comunes</li>
+                    <li>Comandos optimizados para el formato correcto</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🎯 Botones Disponibles</h2>
+            
+            <h3>📝 Nuevo Tip (Verde)</h3>
+            <button class="button-demo green">➕ Nuevo Tip</button>
+            <p>Genera automáticamente el comando para crear un nuevo tip siguiendo el formato del archivo 01-BePolite.</p>
+            <div class="code">Crea un nuevo tip para el libro '101 Tips para Hablar con la IA' siguiendo el formato del archivo 01-BePolite. El tip debe ser práctico, útil y bien estructurado.</div>
+
+            <h3>📄 Generar Contenido (Azul)</h3>
+            <button class="button-demo blue">📄 Generar Contenido</button>
+            <p>Genera contenido basándose en el contexto seleccionado.</p>
+            <div class="code">Genera contenido para el libro '101 Tips para Hablar con la IA' basándote en el contexto seleccionado. Crea secciones bien estructuradas y detalladas.</div>
+
+            <h3>📖 Nuevo Capítulo (Púrpura)</h3>
+            <button class="button-demo purple">📖 Nuevo Capítulo</button>
+            <p>Crea un nuevo capítulo completo con estructura profesional.</p>
+            <div class="code">Crea un nuevo capítulo para el libro '101 Tips para Hablar con la IA' con un tema específico y bien estructurado. Incluye introducción, desarrollo y conclusiones.</div>
+
+            <h3>📁 Organizar (Naranja)</h3>
+            <button class="button-demo orange">📁 Organizar</button>
+            <p>Organiza y estructura el workspace del libro.</p>
+            <div class="code">Organiza y estructura el workspace del libro '101 Tips para Hablar con la IA'. Crea carpetas apropiadas y mueve archivos a sus ubicaciones correctas.</div>
+        </div>
+
+        <div class="section">
+            <h2>🔧 Cómo Usar los Botones</h2>
+            <ol>
+                <li><strong>Abre el chat</strong> - Haz clic en el icono de chat en la esquina inferior derecha</li>
+                <li><strong>Selecciona el Ghost Agent</strong> - En el panel izquierdo, marca la casilla del Ghost Agent</li>
+                <li><strong>Verás los botones</strong> - Los Quick Action Buttons aparecerán automáticamente</li>
+                <li><strong>Haz clic en un botón</strong> - El comando se insertará automáticamente en el campo de texto</li>
+                <li><strong>Personaliza si es necesario</strong> - Puedes editar el comando antes de enviarlo</li>
+                <li><strong>Envía el mensaje</strong> - El Ghost Agent creará el archivo automáticamente</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>⚠️ Importante: Formato Correcto</h2>
+            <div class="warning">
+                <strong>Recuerda:</strong> El Ghost Agent debe usar el formato especial <code>=== FILE_OPERATION ===</code> para crear archivos. Los botones generan comandos que le indican al agente que use este formato.
+            </div>
+            
+            <p>Si el agente no crea archivos y solo describe lo que haría, significa que no está usando el formato correcto. Los botones están diseñados para generar comandos que eviten este problema.</p>
+        </div>
+
+        <div class="section">
+            <h2>🎨 Características de los Botones</h2>
+            <ul>
+                <li><strong>Colores distintivos:</strong> Cada botón tiene un color único para fácil identificación</li>
+                <li><strong>Iconos descriptivos:</strong> Cada botón tiene un icono que representa su función</li>
+                <li><strong>Tooltips informativos:</strong> Pasa el mouse sobre los botones para ver descripciones</li>
+                <li><strong>Comandos optimizados:</strong> Los comandos están diseñados para obtener mejores resultados</li>
+                <li><strong>Focus automático:</strong> Al hacer clic, el foco se mueve al campo de texto</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>🚀 Próximos Pasos</h2>
+            <ol>
+                <li>Prueba los botones con el Ghost Agent</li>
+                <li>Verifica que los archivos se creen correctamente</li>
+                <li>Personaliza los comandos según tus necesidades</li>
+                <li>Comparte feedback sobre la funcionalidad</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>📞 Soporte</h2>
+            <p>Si tienes problemas con los botones o la creación de archivos:</p>
+            <ul>
+                <li>Verifica que el Ghost Agent esté seleccionado</li>
+                <li>Asegúrate de que el agente esté funcionando correctamente</li>
+                <li>Revisa los logs del sistema para errores</li>
+                <li>Prueba con comandos manuales si es necesario</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Demo functionality for the buttons
+        document.querySelectorAll('.button-demo').forEach(button => {
+            button.addEventListener('click', function() {
+                const command = this.nextElementSibling?.textContent || 'Comando de ejemplo';
+                alert('Comando que se insertaría:\n\n' + command);
+            });
+        });
+    </script>
+</body>
+</html> 

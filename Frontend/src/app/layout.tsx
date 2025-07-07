@@ -4,6 +4,9 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AgentProvider } from "@/lib/agent-context";
+import { TimerProvider } from "@/lib/timer-context";
+import { TodoProvider } from "@/lib/todo-context";
+import { GlobalTodoShortcut } from "@/components/global-todo-shortcut";
 
 const fontSans = Inter({ 
   subsets: ["latin"],
@@ -36,7 +39,12 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AgentProvider>
-          {children}
+            <TimerProvider>
+              <TodoProvider>
+                <GlobalTodoShortcut />
+                {children}
+              </TodoProvider>
+            </TimerProvider>
           </AgentProvider>
         </ThemeProvider>
       </body>

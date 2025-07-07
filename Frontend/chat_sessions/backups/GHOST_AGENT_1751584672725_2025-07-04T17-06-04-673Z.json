@@ -1,0 +1,34 @@
+{
+  "id": "GHOST_AGENT_1751584672725",
+  "agents": [
+    "GHOST_AGENT"
+  ],
+  "name": "Chat with Ghost",
+  "createdAt": "2025-07-03T23:17:52.725Z",
+  "updatedAt": "2025-07-04T17:06:04.672Z",
+  "messages": [
+    {
+      "id": "1751648730120",
+      "agentId": "GHOST_AGENT_1751584672725",
+      "content": "Ghost, me puedes dcir cual seria el tip numero 3 segun el contexto?",
+      "timestamp": "2025-07-04T17:05:30.120Z",
+      "isUser": true
+    },
+    {
+      "id": "1751648764020-ghost",
+      "agentId": "GHOST_AGENT",
+      "content": " ¡Hola! ¡Claro que sí! Según el contexto, el número 3 es \"Dale contexto, obtendrás inteligencia\".",
+      "timestamp": "2025-07-04T17:06:04.020Z",
+      "isUser": false
+    }
+  ],
+  "metadata": {
+    "tags": [],
+    "priority": "medium",
+    "isArchived": false,
+    "messageCount": 2,
+    "userMessageCount": 1,
+    "agentMessageCount": 1
+  },
+  "version": "2.0.0"
+}

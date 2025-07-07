@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Date Conversion Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #0a0a0a;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        input {
+            background: #333;
+            border: 1px solid #555;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .result {
+            background: #2a2a2a;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .success { color: #4ade80; }
+        .error { color: #f87171; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Date Conversion Test</h1>
+        
+        <div class="test-section">
+            <h2>Test Date Conversion</h2>
+            <div class="input-group">
+                <label>Enter DD/MM format:</label><br>
+                <input type="text" id="dateInput" placeholder="DD/MM" maxlength="5">
+            </div>
+            <div id="result" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Expected Results</h2>
+            <ul>
+                <li>15/07 → 2024-07-15 (current year)</li>
+                <li>01/01 → 2025-01-01 (next year if current month is December)</li>
+                <li>31/12 → 2024-12-31 (current year)</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function convertDate(ddmm) {
+            if (!ddmm || !ddmm.includes('/')) return null;
+            
+            const parts = ddmm.split('/');
+            if (parts.length !== 2) return null;
+            
+            const [day, month] = parts.map(Number);
+            if (day < 1 || day > 31 || month < 1 || month > 12) return null;
+            
+            const currentYear = new Date().getFullYear();
+            const currentMonth = new Date().getMonth() + 1; // 1-12
+            
+            // Smart year handling: if we're in December and select January, it's next year
+            let year = currentYear;
+            if (currentMonth === 12 && month === 1) {
+                year = currentYear + 1;
+            }
+            
+            return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        }
+
+        function validateInput(value) {
+            // Only allow digits and forward slash
+            const cleanValue = value.replace(/[^\d/]/g, '');
+            
+            // Prevent multiple slashes
+            const slashCount = (cleanValue.match(/\//g) || []).length;
+            if (slashCount > 1) return false;
+            
+            // Format as user types
+            if (cleanValue.length <= 5) {
+                // Auto-add slash after 2 digits if no slash exists
+                if (cleanValue.length === 2 && !cleanValue.includes('/')) {
+                    const day = parseInt(cleanValue);
+                    if (day >= 1 && day <= 31) {
+                        return cleanValue + '/';
+                    }
+                }
+                
+                // Validate day and month as user types
+                if (cleanValue.includes('/')) {
+                    const [day, month] = cleanValue.split('/');
+                    const dayNum = parseInt(day);
+                    const monthNum = parseInt(month);
+                    
+                    // Validate day (1-31)
+                    if (day && (dayNum < 1 || dayNum > 31)) return false;
+                    
+                    // Validate month (1-12) if month is provided
+                    if (month && (monthNum < 1 || monthNum > 12)) return false;
+                }
+                
+                return cleanValue;
+            }
+            return false;
+        }
+
+        const dateInput = document.getElementById('dateInput');
+        const resultDiv = document.getElementById('result');
+
+        dateInput.addEventListener('input', (e) => {
+            const value = e.target.value;
+            
+            // Allow backspace and deletion
+            if (value === '') {
+                resultDiv.innerHTML = '';
+                return;
+            }
+            
+            const validated = validateInput(value);
+            if (validated === false) {
+                resultDiv.innerHTML = '<span class="error">Invalid date format</span>';
+                return;
+            }
+            
+            if (validated !== value) {
+                e.target.value = validated;
+            }
+            
+            const converted = convertDate(validated);
+            if (converted) {
+                resultDiv.innerHTML = `
+                    <span class="success">✅ ${validated} → ${converted}</span><br>
+                    <small>This will appear in the calendar widget</small>
+                `;
+            } else {
+                resultDiv.innerHTML = '<span class="error">❌ Invalid date</span>';
+            }
+        });
+
+        // Test some examples
+        const testCases = ['15/07', '01/01', '31/12', '05/03'];
+        console.log('Testing date conversion:');
+        testCases.forEach(test => {
+            const result = convertDate(test);
+            console.log(`${test} → ${result}`);
+        });
+    </script>
+</body>
+</html> 

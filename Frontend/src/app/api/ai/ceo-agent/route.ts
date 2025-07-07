@@ -178,33 +178,43 @@ async function getProjectContent(project: ProjectContext): Promise<ProjectConten
 
 export async function POST(request: NextRequest) {
   try {
-    const { message, context } = await request.json();
+    const { message, contexts } = await request.json();
     
     console.log('=== CEO AGENT: Processing request ===');
     console.log('Message:', message);
-    console.log('Context:', context);
+    console.log('Contexts:', contexts);
 
     let contextContent = '';
     
-    // Get project context if provided
-    if (context?.path) {
+    // Get project contexts if provided
+    if (contexts && Array.isArray(contexts) && contexts.length > 0) {
       try {
-        const contextUrl = context.specificFile 
-          ? `/api/projects/context?path=${encodeURIComponent(context.path)}&file=${encodeURIComponent(context.specificFile)}`
-          : `/api/projects/context?path=${encodeURIComponent(context.path)}`;
+        const contextContents: string[] = [];
         
-        console.log('Fetching context from:', contextUrl);
-        
-        const contextResponse = await fetch(`${request.nextUrl.origin}${contextUrl}`);
-        if (contextResponse.ok) {
-          const contextData = await contextResponse.json();
-          contextContent = contextData.data.content;
-          console.log('Context loaded successfully, length:', contextContent.length);
-        } else {
-          console.error('Failed to fetch context:', contextResponse.status);
+        for (const context of contexts) {
+          if (context?.path) {
+            const contextUrl = context.specificFile 
+              ? `/api/projects/context?path=${encodeURIComponent(context.path)}&file=${encodeURIComponent(context.specificFile)}`
+              : `/api/projects/context?path=${encodeURIComponent(context.path)}`;
+            
+            console.log('Fetching context from:', contextUrl);
+            
+            const contextResponse = await fetch(`${request.nextUrl.origin}${contextUrl}`);
+            if (contextResponse.ok) {
+              const contextData = await contextResponse.json();
+              const fileName = context.specificFile ? context.specificFile.split('/').pop() : context.title;
+              contextContents.push(`=== CONTEXT: ${fileName} ===\n\n${contextData.data.content}\n\n=== END CONTEXT ===`);
+              console.log('Context loaded successfully, length:', contextData.data.content.length);
+            } else {
+              console.error('Failed to fetch context:', contextResponse.status);
+            }
+          }
         }
+        
+        contextContent = contextContents.join('\n\n');
+        console.log('Total contexts loaded:', contexts.length);
       } catch (error) {
-        console.error('Error fetching context:', error);
+        console.error('Error fetching contexts:', error);
       }
     }
 

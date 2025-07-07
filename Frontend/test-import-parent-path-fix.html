@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Import Parent Path Fix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+        .test-section {
+            background-color: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        .success { color: #4ade80; }
+        .error { color: #f87171; }
+        .info { color: #60a5fa; }
+        .warning { color: #fbbf24; }
+        button {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #2563eb;
+        }
+        .test-result {
+            background-color: #1f1f1f;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            border-left: 4px solid #3b82f6;
+        }
+        .test-result.success { border-left-color: #4ade80; }
+        .test-result.error { border-left-color: #f87171; }
+        .test-result.warning { border-left-color: #fbbf24; }
+        pre {
+            background-color: #1f1f1f;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Import Parent Path Fix</h1>
+    
+    <div class="test-section">
+        <h2>Parent Path Validation Tests</h2>
+        <p>This test verifies that the import system correctly handles parent paths and prevents the "file already exists, mkdir" error.</p>
+        
+        <button onclick="testValidParentPath()">Test Valid Parent Path (Folder)</button>
+        <button onclick="testInvalidParentPath()">Test Invalid Parent Path (File)</button>
+        <button onclick="testNoParentPath()">Test No Parent Path (Root)</button>
+        <button onclick="testNonExistentParentPath()">Test Non-existent Parent Path</button>
+        <button onclick="runAllTests()">Run All Tests</button>
+        
+        <div id="test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Cases</h2>
+        <ul>
+            <li><strong>Valid Parent Path:</strong> Should import files into the specified folder</li>
+            <li><strong>Invalid Parent Path (File):</strong> Should import files to root instead of trying to create directory with file name</li>
+            <li><strong>No Parent Path:</strong> Should import files to project root</li>
+            <li><strong>Non-existent Parent Path:</strong> Should import files to root instead of failing</li>
+        </ul>
+    </div>
+
+    <script>
+        const testResults = document.getElementById('test-results');
+        
+        function addTestResult(title, status, message, details = null) {
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${status}`;
+            
+            let content = `<h4>${title}</h4><p>${message}</p>`;
+            if (details) {
+                content += `<pre>${JSON.stringify(details, null, 2)}</pre>`;
+            }
+            
+            resultDiv.innerHTML = content;
+            testResults.appendChild(resultDiv);
+        }
+
+        async function testValidParentPath() {
+            addTestResult('Valid Parent Path Test', 'info', 'Testing import with valid folder as parent path...');
+            
+            try {
+                const response = await fetch('/api/unified-file-operations', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'import',
+                        projectPath: 'GHOST_Proyectos/libros/test-project',
+                        files: [
+                            {
+                                name: 'test-file-1.md',
+                                content: '# Test File 1\n\nThis is test content 1.'
+                            }
+                        ],
+                        parentPath: 'test-folder' // Valid folder name
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    addTestResult('Valid Parent Path Test', 'success', '✓ Successfully imported file into folder', data);
+                } else {
+                    addTestResult('Valid Parent Path Test', 'error', `✗ Failed: ${data.message}`, data);
+                }
+            } catch (error) {
+                addTestResult('Valid Parent Path Test', 'error', `✗ Error: ${error.message}`);
+            }
+        }
+
+        async function testInvalidParentPath() {
+            addTestResult('Invalid Parent Path Test', 'info', 'Testing import with file name as parent path (should be handled gracefully)...');
+            
+            try {
+                const response = await fetch('/api/unified-file-operations', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'import',
+                        projectPath: 'GHOST_Proyectos/libros/test-project',
+                        files: [
+                            {
+                                name: 'test-file-2.md',
+                                content: '# Test File 2\n\nThis is test content 2.'
+                            }
+                        ],
+                        parentPath: 'Guia 101 Tips.md' // Invalid: file name instead of folder
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    addTestResult('Invalid Parent Path Test', 'success', '✓ Successfully imported file to root (parent path was ignored)', data);
+                } else if (data.message && data.message.includes('EEXIST') && data.message.includes('mkdir')) {
+                    addTestResult('Invalid Parent Path Test', 'error', '✗ Still getting mkdir error - fix not working', data);
+                } else {
+                    addTestResult('Invalid Parent Path Test', 'warning', `⚠ Import failed but not due to mkdir error: ${data.message}`, data);
+                }
+            } catch (error) {
+                addTestResult('Invalid Parent Path Test', 'error', `✗ Error: ${error.message}`);
+            }
+        }
+
+        async function testNoParentPath() {
+            addTestResult('No Parent Path Test', 'info', 'Testing import without parent path...');
+            
+            try {
+                const response = await fetch('/api/unified-file-operations', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'import',
+                        projectPath: 'GHOST_Proyectos/libros/test-project',
+                        files: [
+                            {
+                                name: 'test-file-3.md',
+                                content: '# Test File 3\n\nThis is test content 3.'
+                            }
+                        ]
+                        // No parentPath specified
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    addTestResult('No Parent Path Test', 'success', '✓ Successfully imported file to root', data);
+                } else {
+                    addTestResult('No Parent Path Test', 'error', `✗ Failed: ${data.message}`, data);
+                }
+            } catch (error) {
+                addTestResult('No Parent Path Test', 'error', `✗ Error: ${error.message}`);
+            }
+        }
+
+        async function testNonExistentParentPath() {
+            addTestResult('Non-existent Parent Path Test', 'info', 'Testing import with non-existent folder as parent path...');
+            
+            try {
+                const response = await fetch('/api/unified-file-operations', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'import',
+                        projectPath: 'GHOST_Proyectos/libros/test-project',
+                        files: [
+                            {
+                                name: 'test-file-4.md',
+                                content: '# Test File 4\n\nThis is test content 4.'
+                            }
+                        ],
+                        parentPath: 'non-existent-folder' // Non-existent folder
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    addTestResult('Non-existent Parent Path Test', 'success', '✓ Successfully imported file to root (non-existent parent was ignored)', data);
+                } else {
+                    addTestResult('Non-existent Parent Path Test', 'error', `✗ Failed: ${data.message}`, data);
+                }
+            } catch (error) {
+                addTestResult('Non-existent Parent Path Test', 'error', `✗ Error: ${error.message}`);
+            }
+        }
+
+        async function runAllTests() {
+            testResults.innerHTML = '<h3>Running all tests...</h3>';
+            
+            await testValidParentPath();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await testInvalidParentPath();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await testNoParentPath();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await testNonExistentParentPath();
+            
+            addTestResult('All Tests Complete', 'info', 'All tests have been completed. Check results above.');
+        }
+
+        // Test the parent path validation logic
+        function testParentPathValidation() {
+            console.log('Testing parent path validation logic...');
+            
+            const testCases = [
+                { path: 'folder-name', expected: 'valid' },
+                { path: 'file.md', expected: 'invalid' },
+                { path: 'file.txt', expected: 'invalid' },
+                { path: 'folder/file.md', expected: 'valid' },
+                { path: undefined, expected: 'valid' },
+                { path: '', expected: 'valid' }
+            ];
+            
+            testCases.forEach(testCase => {
+                const hasExtension = testCase.path && testCase.path.includes('.');
+                const isValid = !hasExtension;
+                const status = isValid === (testCase.expected === 'valid') ? 'PASS' : 'FAIL';
+                
+                console.log(`${status}: "${testCase.path}" - hasExtension: ${hasExtension}, isValid: ${isValid}, expected: ${testCase.expected}`);
+            });
+        }
+
+        // Run validation test on page load
+        window.addEventListener('load', () => {
+            console.log('Parent path validation test page loaded');
+            testParentPathValidation();
+        });
+    </script>
+</body>
+</html> 

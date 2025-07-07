@@ -1,0 +1,89 @@
+[
+  {
+    "id": 1751908321223,
+    "text": "Remove the tooltip for the quick todo shortcut",
+    "done": false,
+    "priority": "low",
+    "complexity": "simple",
+    "description": "Remove texto ctrl + / from the screen \n",
+    "createdAt": "2025-07-07T17:12:01.223Z",
+    "updatedAt": "2025-07-07T17:12:01.223Z"
+  },
+  {
+    "id": 1751908347927,
+    "text": "Terminar @ghost workspace for TipsBooks",
+    "done": false,
+    "deadline": "2025-07-07",
+    "taggedAgents": [
+      "GHOST"
+    ],
+    "createdAt": "2025-07-07T17:12:27.927Z",
+    "updatedAt": "2025-07-07T17:12:27.927Z"
+  },
+  {
+    "id": 1751908380925,
+    "text": "recuperar funcionalidad del calendario con los iconos de los agentes ",
+    "done": false,
+    "createdAt": "2025-07-07T17:13:00.925Z",
+    "updatedAt": "2025-07-07T17:13:00.925Z"
+  },
+  {
+    "id": 1751915172095,
+    "text": "Fix the on/off buttons for the agened drawer.",
+    "done": false,
+    "priority": "low",
+    "description": "We need to ensure that the buttons will start and stop the agents when pressed. So far seems that they are starting but not stoping on comand. ",
+    "createdAt": "2025-07-07T19:06:12.095Z",
+    "updatedAt": "2025-07-07T19:06:12.095Z"
+  },
+  {
+    "id": 1751915379514,
+    "text": "Fix Delete project for @ghost Book Working Space",
+    "done": false,
+    "deadline": "2025-07-07",
+    "taggedAgents": [
+      "ghost"
+    ],
+    "priority": "low",
+    "complexity": "simple",
+    "description": "We need to add a second screen for the pop up that will ensure that its being deleted or has being deleted porperly, as well to refresh the Books dashboard in the @ghost dashboard. ",
+    "createdAt": "2025-07-07T19:09:39.514Z",
+    "updatedAt": "2025-07-07T19:09:39.514Z"
+  },
+  {
+    "id": 1751915485373,
+    "text": "Add background glass for New Project pop up Window @ghost",
+    "done": false,
+    "deadline": "2025-07-07",
+    "taggedAgents": [
+      "ghost"
+    ],
+    "priority": "low",
+    "complexity": "simple",
+    "description": "Adding the background to ease readability on the creation of a new project. \n",
+    "createdAt": "2025-07-07T19:11:25.373Z",
+    "updatedAt": "2025-07-07T19:11:25.373Z"
+  },
+  {
+    "id": 1751917408816,
+    "text": "Uniform style for dialogs",
+    "done": false,
+    "deadline": "2025-07-08",
+    "description": "can you apply the same stile for all dialogs in the project? we have the browser ones still poping out when deleteing files for example, it feels unprofesional or lack of desing. aply to the project in general not only the bookworkspace. ",
+    "createdAt": "2025-07-07T19:43:28.816Z",
+    "updatedAt": "2025-07-07T19:43:28.816Z"
+  },
+  {
+    "id": 1751918042860,
+    "text": "Sync to do list con el dashboard de @ghost",
+    "done": false,
+    "deadline": "2025-07-08",
+    "taggedAgents": [
+      "ghost"
+    ],
+    "priority": "low",
+    "description": "Muestra items pendientes del todo list que correspondan a dicho agente. ",
+    "createdAt": "2025-07-07T19:54:02.860Z",
+    "updatedAt": "2025-07-07T19:54:02.860Z"
+  }
+]

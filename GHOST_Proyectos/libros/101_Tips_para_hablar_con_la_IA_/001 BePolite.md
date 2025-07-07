@@ -28,11 +28,11 @@ El resultado fue rotundo: los prompts educados obtuvieron respuestas más claras
 
 ### 1. La forma en que hablas moldea tu forma de pensar.
 
-Decir *"dame esto"* y *"me haces esto"* puede sonar funcional, pero es lo que se espera de un robot… y tú no lo eres. Cuanto más automático te vuelves, más se entumece tu pensamiento crítico. Las palabras que eliges son los ladrillos de tu percepción.
+Decir *“dame esto”* y *“me haces esto”* puede sonar funcional, pero es lo que se espera de un robot… y tú no lo eres. Cuanto más automático te vuelves, más se entumece tu pensamiento crítico. Las palabras que eliges son los ladrillos de tu percepción.
 
 ### 2. Entrenas tu cerebro cada vez que te expresas.
 
-Cada palabra que eliges crea rutas neuronales. Decir *"por favor"*, *"gracias"*, *"¿podrías ayudarme con esto?"* no es solo educación: es gimnasia cognitiva. Activa tu empatía, tu atención al otro y tu capacidad de adaptarte a distintos contextos.
+Cada palabra que eliges crea rutas neuronales. Decir *“por favor”*, *“gracias”*, *“¿podrías ayudarme con esto?”* no es solo educación: es gimnasia cognitiva. Activa tu empatía, tu atención al otro y tu capacidad de adaptarte a distintos contextos.
 
 ### 3. Algún día liderarás un equipo —y las formas importan.
 
@@ -44,21 +44,21 @@ Cada palabra que eliges crea rutas neuronales. Decir *"por favor"*, *"gracias"*,
 
 ### 1. Inicia con cortesía
 
-Un simple "Hola" abre una conversación con mejor tono. Pide en lugar de ordenar:
+Un simple “Hola” abre una conversación con mejor tono. Pide en lugar de ordenar:
 
-> "Hola, ¿me ayudas con un resumen de este texto?"
+> “Hola, ¿me ayudas con un resumen de este texto?”
 
 ### 2. Agradece los buenos resultados
 
 Reconocer un buen output refuerza la conexión con el proceso:
 
-> "Gracias, esta respuesta fue muy útil. ¿Podrías ampliarla con un ejemplo más técnico?"
+> “Gracias, esta respuesta fue muy útil. ¿Podrías ampliarla con un ejemplo más técnico?”
 
 ### 3. Corrige con amabilidad
 
 No todas las respuestas serán perfectas, pero tú sí puedes serlo al corregir:
 
-> "Esto no es exactamente lo que buscaba. ¿Te explico mejor mi necesidad para ajustarlo?"
+> “Esto no es exactamente lo que buscaba. ¿Te explico mejor mi necesidad para ajustarlo?”
 
 ### 4. Usa un lenguaje conversacional
 
@@ -80,13 +80,13 @@ Sé natural, humano. No escribas como si estuvieras programando comandos:
 **Resultado comparado:**  
 El segundo prompt genera una tabla más completa, con subtítulos organizados, mejor tono explicativo, e incluso sugerencias adicionales. El primero fue directo, sí, pero más pobre en resultados.
 
-Esto no ocurre porque la IA "sienta" algo. Ocurre porque tú, al ser más humano, das mejores instrucciones.
+Esto no ocurre porque la IA “sienta” algo. Ocurre porque tú, al ser más humano, das mejores instrucciones.
 
 ---
 
 ## 💬 Frase para recordar
 
-> **"La IA no necesita respeto, pero tú sí necesitas mantenerlo."**
+> **“La IA no necesita respeto, pero tú sí necesitas mantenerlo.”**
 
 ---
 

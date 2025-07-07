@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test File Operations - Ghost Agent</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test File Operations - Ghost Agent</h1>
+        <p>Esta página prueba las operaciones de archivos del Ghost Agent para verificar que funcionan correctamente.</p>
+
+        <div class="test-section">
+            <h3>1. Crear Directorio</h3>
+            <p>Prueba crear el directorio "Generated_Content" en el proyecto.</p>
+            <button onclick="testCreateDirectory()">Crear Directorio</button>
+            <div id="dir-result" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>2. Crear Archivo Simple</h3>
+            <p>Prueba crear un archivo simple con contenido básico.</p>
+            <button onclick="testCreateSimpleFile()">Crear Archivo Simple</button>
+            <div id="simple-file-result" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>3. Crear Archivo con Contenido Completo</h3>
+            <p>Prueba crear un archivo con contenido completo usando el formato FILE_OPERATION.</p>
+            <button onclick="testCreateFullFile()">Crear Archivo Completo</button>
+            <div id="full-file-result" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>4. Verificar Archivos Creados</h3>
+            <p>Verifica que los archivos se crearon correctamente.</p>
+            <button onclick="checkFiles()">Verificar Archivos</button>
+            <div id="check-result" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        async function testCreateDirectory() {
+            const resultDiv = document.getElementById('dir-result');
+            resultDiv.innerHTML = '🔄 Creando directorio...';
+            resultDiv.className = 'result info';
+
+            try {
+                const response = await fetch('/api/ai/ghost-agent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: `Crea el directorio Generated_Content en GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA si no existe. Usa el formato === FILE_OPERATION === para crear la carpeta:
+
+=== FILE_OPERATION ===
+{
+  "type": "create_folder",
+  "targetProject": "Boceto_101_Tips_para_Hablar_con_la_IA",
+  "folderName": "Generated_Content"
+}
+=== END_FILE_OPERATION ===`
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `✅ Directorio creado exitosamente\n\nRespuesta: ${data.response}\n\nOperaciones de archivo: ${JSON.stringify(data.fileOperations, null, 2)}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.innerHTML = `❌ Error: ${data.error || 'Error desconocido'}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Error de conexión: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        async function testCreateSimpleFile() {
+            const resultDiv = document.getElementById('simple-file-result');
+            resultDiv.innerHTML = '🔄 Creando archivo simple...';
+            resultDiv.className = 'result info';
+
+            try {
+                const response = await fetch('/api/ai/ghost-agent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: `Crea un archivo de prueba simple usando el formato === FILE_OPERATION ===:
+
+=== FILE_OPERATION ===
+{
+  "type": "create_file",
+  "targetProject": "Boceto_101_Tips_para_Hablar_con_la_IA",
+  "fileName": "Generated_Content/test_simple.md",
+  "content": "# Archivo de Prueba Simple\n\nEste es un archivo de prueba creado el ${new Date().toLocaleString()}.\n\n## Contenido\n\n- Punto 1\n- Punto 2\n- Punto 3\n\n## Conclusión\n\nEste archivo se creó correctamente.`
+}
+=== END_FILE_OPERATION ===`
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `✅ Archivo simple creado exitosamente\n\nRespuesta: ${data.response}\n\nOperaciones de archivo: ${JSON.stringify(data.fileOperations, null, 2)}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.innerHTML = `❌ Error: ${data.error || 'Error desconocido'}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Error de conexión: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        async function testCreateFullFile() {
+            const resultDiv = document.getElementById('full-file-result');
+            resultDiv.innerHTML = '🔄 Creando archivo completo...';
+            resultDiv.className = 'result info';
+
+            try {
+                const response = await fetch('/api/ai/ghost-agent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: `Crea un archivo completo con el formato de tip usando === FILE_OPERATION ===:
+
+=== FILE_OPERATION ===
+{
+  "type": "create_file",
+  "targetProject": "Boceto_101_Tips_para_Hablar_con_la_IA",
+  "fileName": "Generated_Content/Item_99_Test_Complete.md",
+  "content": "# 99 – Test Complete: Prueba Completa de Formato\n\n\n**Categoría:** Pruebas y Verificación\n**Nivel:** Avanzado\n**Tiempo de lectura estimado:** 3 minutos\n---\n\n## 🧠 Resumen\n\nEste es un archivo de prueba completo que verifica que el formato de FILE_OPERATION funciona correctamente. Incluye todas las secciones necesarias para un tip completo.\n\n---\n\n## ✍️ Una breve historia\n\nEste archivo fue creado como parte de las pruebas del sistema de generación automática de contenido. Su propósito es verificar que el Ghost Agent puede crear archivos con el formato correcto.\n\n---\n\n## ❓ ¿Por qué importa?\n\n### 1. Verificación del sistema\n\nEs importante verificar que el sistema funciona correctamente antes de generar contenido real.\n\n### 2. Formato consistente\n\nAsegura que todos los archivos generados tengan el formato correcto.\n\n### 3. Funcionalidad completa\n\nConfirma que las operaciones de archivo funcionan como se espera.\n\n---\n\n## 🛠️ Cómo aplicarlo\n\n### 1. Ejecutar pruebas\n\nSiempre ejecuta pruebas antes de usar el sistema en producción.\n\n### 2. Verificar resultados\n\nRevisa que los archivos se creen con el contenido correcto.\n\n### 3. Documentar problemas\n\nSi hay errores, documenta los problemas encontrados.\n\n---\n\n## 🧪 Ejemplo práctico\n\nEste archivo es un ejemplo práctico de cómo debe verse un tip generado automáticamente.\n\n---\n\n## 💬 Frase para recordar\n\n> **"Las pruebas son la base de un sistema confiable."**\n\n---\n\n## 📌 Tips extra\n\n- Siempre prueba antes de usar\n- Verifica el formato de salida\n- Documenta los resultados\n- Mantén un registro de pruebas\n\n---\n\n## 📍 ¿Dónde aplicarlo?\n\n- En el desarrollo de sistemas\n- Antes de generar contenido masivo\n- Para verificar funcionalidades\n- Como parte del control de calidad\n\n---\n\n## ✅ Mini reto práctico\n\n**Crea un archivo de prueba similar y verifica que se genera correctamente.**\n\n---\n\n## ✒️ Cierre\n\nEste archivo confirma que el sistema de generación automática funciona correctamente y puede crear contenido con el formato apropiado.`
+}
+=== END_FILE_OPERATION ===`
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `✅ Archivo completo creado exitosamente\n\nRespuesta: ${data.response}\n\nOperaciones de archivo: ${JSON.stringify(data.fileOperations, null, 2)}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.innerHTML = `❌ Error: ${data.error || 'Error desconocido'}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Error de conexión: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        async function checkFiles() {
+            const resultDiv = document.getElementById('check-result');
+            resultDiv.innerHTML = '🔄 Verificando archivos...';
+            resultDiv.className = 'result info';
+
+            try {
+                // Try to check if the files exist by attempting to read them
+                const response = await fetch('/api/projects/context?path=GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `✅ Proyecto accesible\n\nEstructura del proyecto: ${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.innerHTML = `❌ No se puede acceder al proyecto: ${response.status}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Error al verificar archivos: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+    </script>
+</body>
+</html> 

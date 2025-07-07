@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Import Fix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+        .test-section {
+            background-color: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        .success { color: #4ade80; }
+        .error { color: #f87171; }
+        .info { color: #60a5fa; }
+        button {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #2563eb;
+        }
+        pre {
+            background-color: #1f1f1f;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Import Fix</h1>
+    
+    <div class="test-section">
+        <h2>Test File Creation</h2>
+        <p>This test will create a sample markdown file and test the import functionality.</p>
+        <button onclick="createTestFile()">Create Test File</button>
+        <button onclick="testImport()">Test Import</button>
+        <div id="test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Sample Markdown Content</h2>
+        <pre id="sample-content"># Test Document
+
+This is a test document to verify import functionality.
+
+## Section 1
+
+Content for section 1.
+
+### Subsection 1.1
+
+More detailed content here.
+
+## Section 2
+
+Content for section 2.
+
+### Subsection 2.1
+
+Additional content.
+
+## Section 3
+
+Final section content.</pre>
+    </div>
+
+    <script>
+        function createTestFile() {
+            const content = document.getElementById('sample-content').textContent;
+            const blob = new Blob([content], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'test-import-file.md';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            document.getElementById('test-results').innerHTML = 
+                '<p class="success">✓ Test file created successfully!</p>';
+        }
+
+        async function testImport() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<p class="info">Testing import functionality...</p>';
+            
+            try {
+                // Test the unified file operations API
+                const response = await fetch('/api/unified-file-operations', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'import',
+                        projectPath: 'GHOST_Proyectos/libros/test-project',
+                        files: [
+                            {
+                                name: 'test-file-1.md',
+                                content: '# Test File 1\n\nThis is test content 1.'
+                            },
+                            {
+                                name: 'test-file-2.md',
+                                content: '# Test File 2\n\nThis is test content 2.'
+                            }
+                        ]
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultsDiv.innerHTML = `
+                        <p class="success">✓ Import test successful!</p>
+                        <p class="info">Message: ${data.message}</p>
+                        <p class="info">Files imported: ${data.data?.length || 0}</p>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = `
+                        <p class="error">✗ Import test failed!</p>
+                        <p class="error">Error: ${data.message}</p>
+                    `;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <p class="error">✗ Import test failed!</p>
+                    <p class="error">Error: ${error.message}</p>
+                `;
+            }
+        }
+
+        // Test file parsing logic
+        function testFileParsing() {
+            const content = document.getElementById('sample-content').textContent;
+            const lines = content.split('\n');
+            const tempTree = [];
+            const parentStack = [];
+
+            lines.forEach((line, lineIndex) => {
+                const match = line.match(/^(#+)\s(.*)/);
+                if (match) {
+                    const level = match[1].length;
+                    const title = match[2].trim();
+                    
+                    // Find the content for this heading (until the next heading or end of file)
+                    let content = '';
+                    let nextLineIndex = lineIndex + 1;
+                    while (nextLineIndex < lines.length) {
+                        const nextLine = lines[nextLineIndex];
+                        if (nextLine.match(/^(#+)\s/)) {
+                            break; // Found next heading
+                        }
+                        content += nextLine + '\n';
+                        nextLineIndex++;
+                    }
+                    
+                    // Clean up the content - remove trailing newlines and normalize
+                    const cleanContent = content.trim().replace(/\n{3,}/g, '\n\n');
+                    
+                    const newItem = {
+                        id: 'test-' + Math.random().toString(36).substr(2, 9),
+                        title: title.endsWith('.md') ? title : title + '.md',
+                        type: 'file',
+                        content: cleanContent,
+                        children: []
+                    };
+
+                    while (parentStack.length >= level) {
+                        parentStack.pop();
+                    }
+
+                    const parent = parentStack[parentStack.length - 1];
+                    if (parent) {
+                        parent.children = parent.children || [];
+                        parent.children.push(newItem);
+                    } else {
+                        tempTree.push(newItem);
+                    }
+                    parentStack.push(newItem);
+                }
+            });
+
+            console.log('Parsed structure:', tempTree);
+            return tempTree;
+        }
+
+        // Run parsing test on page load
+        window.addEventListener('load', () => {
+            console.log('Testing file parsing...');
+            const parsed = testFileParsing();
+            console.log('Parsed items:', parsed.length);
+            parsed.forEach(item => {
+                console.log(`- ${item.title}: ${item.content?.length || 0} characters`);
+            });
+        });
+    </script>
+</body>
+</html> 

@@ -41,6 +41,7 @@ export class UnifiedFileManager {
     private maxFileSize = 1024 * 1024; // 1MB
 
     constructor(projectsRoot: string) {
+        console.log('[UnifiedFileManager] Initializing with projects root:', projectsRoot);
         this.projectsRoot = projectsRoot;
     }
 
@@ -182,6 +183,55 @@ export class UnifiedFileManager {
                 success: false,
                 message: `Failed to create folder: ${error.message}`,
                 error: 'CREATE_FAILED'
+            };
+        }
+    }
+
+    /**
+     * Get file content
+     */
+    async getFileContent(projectPath: string, filePath: string): Promise<FileOperationResult> {
+        try {
+            const fullProjectPath = this.resolveProjectPath(projectPath);
+            const fullFilePath = path.join(fullProjectPath, filePath);
+            
+            // Check if file exists
+            if (!await fs.pathExists(fullFilePath)) {
+                return {
+                    success: false,
+                    message: `File not found: ${filePath}`,
+                    error: 'FILE_NOT_FOUND'
+                };
+            }
+
+            // Check if it's a file (not a directory)
+            const stats = await fs.stat(fullFilePath);
+            if (!stats.isFile()) {
+                return {
+                    success: false,
+                    message: `Path is not a file: ${filePath}`,
+                    error: 'NOT_A_FILE'
+                };
+            }
+
+            // Read file content
+            const content = await this.readFileWithEncoding(fullFilePath);
+            
+            return {
+                success: true,
+                message: `File content retrieved successfully`,
+                data: {
+                    content,
+                    size: stats.size,
+                    lastModified: stats.mtime
+                }
+            };
+        } catch (error) {
+            console.error('[UnifiedFileManager] Error getting file content:', error);
+            return {
+                success: false,
+                message: `Failed to get file content: ${error.message}`,
+                error: 'READ_FAILED'
             };
         }
     }
@@ -349,6 +399,29 @@ export class UnifiedFileManager {
     async importFiles(projectPath: string, files: Array<{ name: string; content: string }>, parentPath?: string): Promise<FileOperationResult> {
         try {
             const fullProjectPath = this.resolveProjectPath(projectPath);
+            
+            // Validate parentPath - if it has a file extension, it's not a valid directory
+            if (parentPath && path.extname(parentPath)) {
+                console.warn('[UnifiedFileManager] parentPath appears to be a file, not a directory:', parentPath);
+                // Remove the parentPath and import to the project root instead
+                parentPath = undefined;
+            }
+            
+            // Additional validation: check if parentPath exists and is actually a directory
+            if (parentPath) {
+                const parentFullPath = path.join(fullProjectPath, parentPath);
+                try {
+                    const stats = await fs.stat(parentFullPath);
+                    if (!stats.isDirectory()) {
+                        console.warn('[UnifiedFileManager] parentPath exists but is not a directory:', parentPath);
+                        parentPath = undefined;
+                    }
+                } catch (error) {
+                    console.warn('[UnifiedFileManager] parentPath does not exist, importing to root:', parentPath);
+                    parentPath = undefined;
+                }
+            }
+            
             const targetPath = parentPath ? path.join(fullProjectPath, parentPath) : fullProjectPath;
             
             // Ensure target directory exists
@@ -356,6 +429,19 @@ export class UnifiedFileManager {
             
             const importedItems: FileItem[] = [];
             const errors: string[] = [];
+            const existingFiles = new Set<string>();
+            
+            // Get list of existing files to avoid conflicts
+            try {
+                const entries = await fs.readdir(targetPath, { withFileTypes: true });
+                entries.forEach(entry => {
+                    if (entry.isFile()) {
+                        existingFiles.add(entry.name);
+                    }
+                });
+            } catch (error) {
+                console.warn('[UnifiedFileManager] Could not read existing files:', error);
+            }
             
             for (const file of files) {
                 try {
@@ -368,13 +454,20 @@ export class UnifiedFileManager {
                         finalFileName = sanitizedName + '.md';
                     }
                     
-                    const filePath = path.join(targetPath, finalFileName);
-                    
-                    // Check if file already exists
-                    if (await fs.pathExists(filePath)) {
-                        errors.push(`File already exists: ${finalFileName}`);
-                        continue;
+                    // Handle file conflicts by creating unique names
+                    let counter = 1;
+                    let originalFileName = finalFileName;
+                    while (existingFiles.has(finalFileName)) {
+                        const nameWithoutExt = originalFileName.replace(/\.md$/, '');
+                        const ext = originalFileName.endsWith('.md') ? '.md' : '';
+                        finalFileName = `${nameWithoutExt}_${counter}${ext}`;
+                        counter++;
                     }
+                    
+                    // Add to existing files set to prevent conflicts within the same import
+                    existingFiles.add(finalFileName);
+                    
+                    const filePath = path.join(targetPath, finalFileName);
                     
                     // Create the file with proper UTF-8 encoding
                     await fs.writeFile(filePath, file.content, { encoding: 'utf8' });
@@ -391,8 +484,12 @@ export class UnifiedFileManager {
                         size: stats.size,
                         path: relativePath
                     });
+                    
+                    console.log(`[UnifiedFileManager] Successfully imported: ${finalFileName}`);
                 } catch (error) {
-                    errors.push(`Failed to import ${file.name}: ${error.message}`);
+                    const errorMsg = `Failed to import ${file.name}: ${error.message}`;
+                    console.error('[UnifiedFileManager]', errorMsg);
+                    errors.push(errorMsg);
                 }
             }
             
@@ -404,9 +501,14 @@ export class UnifiedFileManager {
                 };
             }
             
+            const successMessage = `Imported ${importedItems.length} files successfully`;
+            const errorMessage = errors.length > 0 ? ` (${errors.length} failed)` : '';
+            
+            console.log(`[UnifiedFileManager] Import completed: ${successMessage}${errorMessage}`);
+            
             return {
                 success: true,
-                message: `Imported ${importedItems.length} files successfully${errors.length > 0 ? ` (${errors.length} failed)` : ''}`,
+                message: successMessage + errorMessage,
                 data: importedItems
             };
         } catch (error) {
@@ -508,9 +610,18 @@ export class UnifiedFileManager {
      * Private helper methods
      */
     private resolveProjectPath(projectPath: string): string {
+        console.log('[UnifiedFileManager] Resolving project path:', { projectPath, projectsRoot: this.projectsRoot });
+        
+        if (!projectPath) {
+            throw new Error('Project path is required');
+        }
+        
         // Remove GHOST_Proyectos prefix if present
         const cleanPath = projectPath.replace(/^GHOST_Proyectos[\/\\]/, '');
-        return path.join(this.projectsRoot, cleanPath);
+        const resolvedPath = path.join(this.projectsRoot, cleanPath);
+        
+        console.log('[UnifiedFileManager] Resolved path:', { cleanPath, resolvedPath });
+        return resolvedPath;
     }
 
     private sanitizeFileName(name: string): string {

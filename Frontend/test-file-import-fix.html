@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test File Import Fix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        .test-section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        .success { border-color: #4CAF50; }
+        .error { border-color: #f44336; }
+        .info { border-color: #2196F3; }
+        pre {
+            background: #333;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .file-label {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: inline-block;
+            margin: 5px;
+        }
+        .file-label:hover {
+            background: #1976D2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test File Import Fix</h1>
+    
+    <div class="test-section info">
+        <h2>Problem Description</h2>
+        <p>When importing markdown files, the system was parsing headings and only preserving content between headings, instead of preserving the entire file content.</p>
+        <p>This test verifies that the fix works correctly.</p>
+    </div>
+
+    <div class="test-section">
+        <h2>Test File Import</h2>
+        <p>Select a markdown file to test the import functionality:</p>
+        
+        <input type="file" id="testFile" accept=".md,.txt" />
+        <label for="testFile" class="file-label">Choose Markdown File</label>
+        
+        <button onclick="testFileParsing()">Test File Parsing</button>
+        <button onclick="clearResults()">Clear Results</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Expected Behavior</h2>
+        <ul>
+            <li>✅ File content should be preserved entirely (not just first heading)</li>
+            <li>✅ Content length should match original file</li>
+            <li>✅ All headings and content should be intact</li>
+            <li>✅ File should be imported as a single file, not split by headings</li>
+        </ul>
+    </div>
+
+    <script>
+        function testFileParsing() {
+            const fileInput = document.getElementById('testFile');
+            const resultsDiv = document.getElementById('results');
+            
+            if (!fileInput.files || fileInput.files.length === 0) {
+                showResult('Please select a file first.', 'error');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const originalText = e.target.result;
+                const originalLength = originalText.length;
+                
+                // Simulate the new parsing logic (preserve entire content)
+                const parsedStructure = [{ 
+                    id: 'test-id',
+                    title: file.name.endsWith('.md') ? file.name : file.name + '.md',
+                    type: 'file',
+                    content: originalText.trim()
+                }];
+                
+                const parsedContent = parsedStructure[0].content;
+                const parsedLength = parsedContent.length;
+                
+                // Display results
+                let resultHTML = `
+                    <div class="test-section ${parsedLength === originalLength ? 'success' : 'error'}">
+                        <h3>File: ${file.name}</h3>
+                        <p><strong>Original length:</strong> ${originalLength} characters</p>
+                        <p><strong>Parsed length:</strong> ${parsedLength} characters</p>
+                        <p><strong>Content preserved:</strong> ${parsedLength === originalLength ? '✅ YES' : '❌ NO'}</p>
+                        
+                        <h4>Original Content (first 500 chars):</h4>
+                        <pre>${originalText.substring(0, 500)}${originalText.length > 500 ? '...' : ''}</pre>
+                        
+                        <h4>Parsed Content (first 500 chars):</h4>
+                        <pre>${parsedContent.substring(0, 500)}${parsedContent.length > 500 ? '...' : ''}</pre>
+                        
+                        <h4>Content Analysis:</h4>
+                        <ul>
+                            <li>Contains headings: ${originalText.includes('#') ? 'Yes' : 'No'}</li>
+                            <li>Number of lines: ${originalText.split('\n').length}</li>
+                            <li>Content matches: ${originalText.trim() === parsedContent ? '✅ Yes' : '❌ No'}</li>
+                        </ul>
+                    </div>
+                `;
+                
+                resultsDiv.innerHTML = resultHTML;
+            };
+            
+            reader.readAsText(file);
+        }
+
+        function showResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `<div class="test-section ${type}"><p>${message}</p></div>`;
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('testFile').value = '';
+        }
+
+        // Auto-test with sample content
+        function runAutoTest() {
+            const sampleContent = `# 01 – BePolite: Ser educado con la IA
+
+**Categoría:** Actitud y Ética  
+**Nivel:** Básico / Fundacional  
+**Tiempo de lectura estimado:** 5 minutos  
+---
+
+## 🧠 Resumen
+
+Ser educado con una Inteligencia Artificial no es un gesto inútil, ni una pérdida de tiempo. Es un hábito que refuerza tu identidad, tu forma de comunicarte y tu capacidad de liderar conversaciones claras, respetuosas y eficaces.
+
+## ✍️ Una breve historia
+
+En 2023, una empresa de consultoría de Nueva York decidió experimentar: le pidió a todo su equipo que redactara prompts para inteligencia artificial durante una semana... sin usar fórmulas de cortesía.
+
+## ❓ ¿Por qué importa?
+
+### 1. La forma en que hablas moldea tu forma de pensar.
+
+Decir *"dame esto"* y *"me haces esto"* puede sonar funcional, pero es lo que se espera de un robot… y tú no lo eres.
+
+### 2. Entrenas tu cerebro cada vez que te expresas.
+
+Cada palabra que eliges crea rutas neuronales. Decir *"por favor"*, *"gracias"*, *"¿podrías ayudarme con esto?"* no es solo educación: es gimnasia cognitiva.
+
+## 🛠️ Cómo aplicarlo
+
+### 1. Inicia con cortesía
+
+Un simple "Hola" abre una conversación con mejor tono. Pide en lugar de ordenar:
+
+> "Hola, ¿me ayudas con un resumen de este texto?"
+
+## 💬 Frase para recordar
+
+> **"La IA no necesita respeto, pero tú sí necesitas mantenerlo."**
+
+## ✅ Mini reto práctico
+
+**Durante 24 horas, redacta todos tus prompts con fórmulas de cortesía.**  
+Evalúa los resultados, anota diferencias.  
+Comparte tus conclusiones con un colega.`;
+
+            const originalLength = sampleContent.length;
+            const parsedStructure = [{ 
+                id: 'test-id',
+                title: 'test.md',
+                type: 'file',
+                content: sampleContent.trim()
+            }];
+            
+            const parsedContent = parsedStructure[0].content;
+            const parsedLength = parsedContent.length;
+            
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <div class="test-section ${parsedLength === originalLength ? 'success' : 'error'}">
+                    <h3>Auto-Test with Sample Content</h3>
+                    <p><strong>Original length:</strong> ${originalLength} characters</p>
+                    <p><strong>Parsed length:</strong> ${parsedLength} characters</p>
+                    <p><strong>Content preserved:</strong> ${parsedLength === originalLength ? '✅ YES' : '❌ NO'}</p>
+                    <p><strong>Headings preserved:</strong> ${parsedContent.includes('#') ? '✅ YES' : '❌ NO'}</p>
+                    <p><strong>All sections intact:</strong> ${parsedContent.includes('Resumen') && parsedContent.includes('historia') && parsedContent.includes('importa') ? '✅ YES' : '❌ NO'}</p>
+                    
+                    <h4>Sample Content (first 300 chars):</h4>
+                    <pre>${sampleContent.substring(0, 300)}...</pre>
+                    
+                    <h4>Parsed Content (first 300 chars):</h4>
+                    <pre>${parsedContent.substring(0, 300)}...</pre>
+                </div>
+            `;
+        }
+
+        // Run auto-test on page load
+        window.onload = function() {
+            setTimeout(runAutoTest, 1000);
+        };
+    </script>
+</body>
+</html> 

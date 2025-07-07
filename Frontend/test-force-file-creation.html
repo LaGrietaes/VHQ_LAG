@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Force File Creation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Force File Creation</h1>
+        <p>Prueba que fuerza al agente a usar el formato FILE_OPERATION correcto.</p>
+
+        <button onclick="testForceFileCreation()">Forzar Creación de Archivo</button>
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        async function testForceFileCreation() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '🔄 Forzando creación de archivo...';
+            resultDiv.className = 'result info';
+
+            try {
+                const response = await fetch('/api/ai/ghost-agent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: `Crea un archivo de prueba usando EXACTAMENTE este formato, sin explicaciones adicionales:
+
+=== FILE_OPERATION ===
+{
+  "type": "create_file",
+  "targetProject": "Boceto_101_Tips_para_Hablar_con_la_IA",
+  "fileName": "Generated_Content/test_forced.md",
+  "content": "# Archivo de Prueba Forzado\n\nEste archivo fue creado usando el formato FILE_OPERATION correcto.\n\n## Contenido\n\n- Punto 1: El formato funciona\n- Punto 2: Los archivos se crean\n- Punto 3: El sistema está operativo\n\n## Fecha de creación\n\n${new Date().toLocaleString()}\n\n## Estado\n\n✅ Funcionando correctamente`
+}
+=== END_FILE_OPERATION ===
+
+NO escribas nada más. SOLO el formato FILE_OPERATION con el contenido completo.`
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `✅ Respuesta recibida\n\nRespuesta: ${data.response}\n\nOperaciones de archivo: ${JSON.stringify(data.fileOperations, null, 2)}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.innerHTML = `❌ Error: ${data.error || 'Error desconocido'}\n\nStatus: ${response.status}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Error de conexión: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+    </script>
+</body>
+</html> 

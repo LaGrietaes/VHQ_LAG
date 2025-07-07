@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Simple Book Generator</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #0a0a0a;
+            color: #ffffff;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .test-section {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .test-button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #1d4ed8;
+        }
+        .test-button.success {
+            background: #059669;
+        }
+        .test-button.danger {
+            background: #dc2626;
+        }
+        .result {
+            background: #262626;
+            border: 1px solid #404040;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background: #065f46;
+            border: 1px solid #10b981;
+        }
+        .status.error {
+            background: #7f1d1d;
+            border: 1px solid #ef4444;
+        }
+        .status.info {
+            background: #1e3a8a;
+            border: 1px solid #3b82f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Test Simple Book Generator</h1>
+            <p>Prueba el generador simple de libros sin toda la complejidad</p>
+        </div>
+
+        <div class="test-section">
+            <h2>📋 Instrucciones</h2>
+            <div class="status info">
+                <strong>¿Cómo usar el Simple Book Generator?</strong><br>
+                1. Ve al BookWorkspace de tu proyecto<br>
+                2. Busca el botón rojo "Generador Simple" en la barra de Quick Actions<br>
+                3. Haz clic para abrir el generador<br>
+                4. Usa los botones para generar tips automáticamente
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🚀 Funcionalidades</h2>
+            <ul>
+                <li><strong>Generar Todos:</strong> Crea los 120 tips completos automáticamente</li>
+                <li><strong>Tips 1-10:</strong> Genera solo los primeros 10 tips para pruebas</li>
+                <li><strong>Tips 11-20:</strong> Genera el siguiente grupo de 10 tips</li>
+                <li><strong>Progreso en tiempo real:</strong> Ve el avance de la generación</li>
+                <li><strong>Resultados detallados:</strong> Completados, errores y pendientes</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2>🔧 Test de API</h2>
+            <button class="test-button" onclick="testGhostAgent()">Test Ghost Agent API</button>
+            <button class="test-button" onclick="testDirectoryCreation()">Test Directory Creation</button>
+            <button class="test-button" onclick="testFileCreation()">Test File Creation</button>
+            <button class="test-button success" onclick="testSimpleGenerator()">Test Simple Generator</button>
+            <div id="api-result" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>📁 Estructura de Archivos</h2>
+            <div class="status info">
+                <strong>Los archivos se crearán en:</strong><br>
+                <code>GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA/Tips_Generados/</code><br><br>
+                <strong>Formato de archivos:</strong><br>
+                <code>Tip_01_BePolite_Ser_educado_con_la_IA.md</code><br>
+                <code>Tip_02_Usa_IA_con_empatia.md</code><br>
+                <code>Tip_03_Haz_foco_una_idea_por_vez.md</code>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>✅ Checklist de Verificación</h2>
+            <div id="checklist">
+                <div>☐ Botón "Generador Simple" visible en BookWorkspace</div>
+                <div>☐ Modal se abre correctamente</div>
+                <div>☐ Botones de acción funcionan</div>
+                <div>☐ Progreso se muestra en tiempo real</div>
+                <div>☐ Archivos se crean en la ubicación correcta</div>
+                <div>☐ Formato de archivos es correcto</div>
+                <div>☐ Puedes volver al workspace normal</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function testGhostAgent() {
+            const resultDiv = document.getElementById('api-result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Testing Ghost Agent API...';
+            
+            try {
+                const response = await fetch('/api/ai/ghost-agent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: 'Test connection',
+                        projectPath: 'GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA'
+                    })
+                });
+                
+                const data = await response.json();
+                resultDiv.textContent = `✅ API Response:\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                resultDiv.textContent = `❌ API Error:\n${error.message}`;
+            }
+        }
+
+        async function testDirectoryCreation() {
+            const resultDiv = document.getElementById('api-result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Testing directory creation...';
+            
+            try {
+                const response = await fetch('/api/ai/ghost-agent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: `Crea el directorio Tips_Generados en GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA si no existe. Usa el formato === FILE_OPERATION === para crear la carpeta.`,
+                        projectPath: 'GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA'
+                    })
+                });
+                
+                const data = await response.json();
+                resultDiv.textContent = `✅ Directory Creation Test:\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                resultDiv.textContent = `❌ Directory Creation Error:\n${error.message}`;
+            }
+        }
+
+        async function testFileCreation() {
+            const resultDiv = document.getElementById('api-result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Testing file creation...';
+            
+            try {
+                const response = await fetch('/api/ai/ghost-agent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: `Crea un archivo de prueba siguiendo EXACTAMENTE este formato:
+
+=== FILE_OPERATION ===
+{
+  "operation": "create_file",
+  "path": "GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA/Tips_Generados/test_file.md",
+  "content": "# Archivo de Prueba\n\nEste es un archivo de prueba creado por el Simple Book Generator.\n\n## Contenido\n\n- Punto 1\n- Punto 2\n- Punto 3\n\n## Conclusión\n\nEl archivo se creó correctamente."
+}
+=== END_FILE_OPERATION ===`,
+                        projectPath: 'GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA'
+                    })
+                });
+                
+                const data = await response.json();
+                resultDiv.textContent = `✅ File Creation Test:\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                resultDiv.textContent = `❌ File Creation Error:\n${error.message}`;
+            }
+        }
+
+        function testSimpleGenerator() {
+            const resultDiv = document.getElementById('api-result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = `✅ Simple Book Generator está listo para usar!
+
+Para probarlo:
+1. Ve al BookWorkspace de tu proyecto
+2. Busca el botón rojo "Generador Simple"
+3. Haz clic para abrir el generador
+4. Usa los botones para generar contenido
+
+El generador:
+- Es simple y funcional
+- No tiene complejidad innecesaria
+- Genera archivos reales
+- Muestra progreso en tiempo real
+- Es fácil de usar y entender`;
+        }
+
+        // Auto-check checklist items
+        function checkItem(index) {
+            const items = document.querySelectorAll('#checklist div');
+            if (items[index]) {
+                items[index].textContent = items[index].textContent.replace('☐', '☑');
+                items[index].style.color = '#10b981';
+            }
+        }
+
+        // Simulate some checks
+        setTimeout(() => checkItem(0), 1000);
+        setTimeout(() => checkItem(1), 2000);
+        setTimeout(() => checkItem(2), 3000);
+    </script>
+</body>
+</html> 

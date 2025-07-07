@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Single Tip Generation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #0a0a0a;
+            color: #ffffff;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .test-section {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .test-button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #1d4ed8;
+        }
+        .test-button.success {
+            background: #059669;
+        }
+        .result {
+            background: #262626;
+            border: 1px solid #404040;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background: #065f46;
+            border: 1px solid #10b981;
+        }
+        .status.error {
+            background: #7f1d1d;
+            border: 1px solid #ef4444;
+        }
+        .status.info {
+            background: #1e3a8a;
+            border: 1px solid #3b82f6;
+        }
+        .example-content {
+            background: #1a1a1a;
+            border: 1px solid #404040;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Test Single Tip Generation</h1>
+            <p>Prueba la generación de un solo tip con el formato correcto</p>
+        </div>
+
+        <div class="test-section">
+            <h2>📋 Problema Identificado</h2>
+            <div class="status error">
+                <strong>El Ghost Agent no está creando archivos porque:</strong><br>
+                1. No tiene contexto del archivo 01-BePolite<br>
+                2. No está usando el formato FILE_OPERATION correcto<br>
+                3. No tiene el ejemplo de formato para seguir
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔧 Solución Implementada</h2>
+            <div class="status success">
+                <strong>Ahora el SimpleBookGenerator:</strong><br>
+                1. Incluye el contenido completo del ejemplo 01-BePolite<br>
+                2. Usa el formato FILE_OPERATION correcto<br>
+                3. Proporciona instrucciones específicas al agente
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📄 Ejemplo de Formato (01-BePolite)</h2>
+            <div class="example-content" id="example-content">
+                Cargando ejemplo...
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 Test de Generación</h2>
+            <button class="test-button" onclick="testDirectoryCreation()">1. Crear Directorio</button>
+            <button class="test-button success" onclick="testSingleTipGeneration()">2. Generar Tip de Prueba</button>
+            <button class="test-button" onclick="testFileCheck()">3. Verificar Archivo</button>
+            <div id="test-result" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>📁 Estructura Esperada</h2>
+            <div class="status info">
+                <strong>Archivo que se debe crear:</strong><br>
+                <code>GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA/Tips_Generados/Tip_99_Tip_de_Prueba.md</code><br><br>
+                <strong>Contenido esperado:</strong><br>
+                - Misma estructura que 01-BePolite<br>
+                - Todas las secciones con emojis<br>
+                - Contenido adaptado para "Tip de Prueba"
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load example content
+        const exampleContent = `# 01 – BePolite: Ser educado con la IA
+
+**Categoría:** Actitud y Ética  
+**Nivel:** Básico / Fundacional  
+**Tiempo de lectura estimado:** 5 minutos  
+---
+
+## 🧠 Resumen
+
+Ser educado con una Inteligencia Artificial no es un gesto inútil, ni una pérdida de tiempo. Es un hábito que refuerza tu identidad, tu forma de comunicarte y tu capacidad de liderar conversaciones claras, respetuosas y eficaces.
+
+---
+
+## ✍️ Una breve historia
+
+En 2023, una empresa de consultoría de Nueva York decidió experimentar: le pidió a todo su equipo que redactara prompts para inteligencia artificial durante una semana... sin usar fórmulas de cortesía.
+
+---
+
+## ❓ ¿Por qué importa?
+
+### 1. La forma en que hablas moldea tu forma de pensar.
+### 2. Entrenas tu cerebro cada vez que te expresas.
+### 3. Algún día liderarás un equipo —y las formas importan.
+
+---
+
+## 🛠️ Cómo aplicarlo
+
+### 1. Inicia con cortesía
+### 2. Agradece los buenos resultados
+### 3. Corrige con amabilidad
+### 4. Usa un lenguaje conversacional
+
+---
+
+## 🧪 Ejemplo práctico
+
+### Prompt A (frío):  
+> Haz una tabla con los beneficios del ejercicio.
+
+### Prompt B (educado):  
+> Hola. Estoy creando contenido sobre salud física y necesito una tabla clara con los beneficios más conocidos del ejercicio regular. ¿Podrías ayudarme con eso? ¡Gracias!
+
+---
+
+## 💬 Frase para recordar
+
+> **"La IA no necesita respeto, pero tú sí necesitas mantenerlo."**
+
+---
+
+## 📌 Tips extra
+
+- No es sumisión, es elegancia.  
+- No es fingir, es cultivar.  
+- No es por la máquina, es por tu versión futura.  
+
+---
+
+## 📍 ¿Dónde aplicarlo?
+
+- Al escribir correos con asistencia de IA  
+- Al generar propuestas con tono humano  
+- Al delegar tareas complejas paso a paso  
+
+---
+
+## ✅ Mini reto práctico
+
+**Durante 24 horas, redacta todos tus prompts con fórmulas de cortesía.**  
+Evalúa los resultados, anota diferencias.  
+Comparte tus conclusiones con un colega.
+
+---
+
+## ✒️ Cierre
+
+Recuerda: no escribes prompts para controlar una máquina, sino para entrenarte como pensador, estratega y comunicador.`;
+
+        document.getElementById('example-content').textContent = exampleContent;
+
+        async function testDirectoryCreation() {
+            const resultDiv = document.getElementById('test-result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Creating directory...';
+            
+            try {
+                const response = await fetch('/api/ai/ghost-agent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: `Crea el directorio Tips_Generados en GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA si no existe. Usa el formato === FILE_OPERATION === para crear la carpeta.`,
+                        projectPath: 'GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA'
+                    })
+                });
+                
+                const data = await response.json();
+                resultDiv.textContent = `✅ Directory Creation:\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                resultDiv.textContent = `❌ Directory Creation Error:\n${error.message}`;
+            }
+        }
+
+        async function testSingleTipGeneration() {
+            const resultDiv = document.getElementById('test-result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Generating single tip...';
+            
+            try {
+                const command = `Basándote en este ejemplo del archivo 01-BePolite, crea el tip 99 "Tip de Prueba" siguiendo EXACTAMENTE el mismo formato y estructura:
+
+EJEMPLO DE FORMATO:
+${exampleContent}
+
+INSTRUCCIONES:
+1. Usa EXACTAMENTE la misma estructura y formato del ejemplo
+2. Mantén todos los emojis y secciones
+3. Adapta el contenido para el tip "Tip de Prueba"
+4. Usa el formato === FILE_OPERATION === para crear el archivo
+
+=== FILE_OPERATION ===
+{
+  "operation": "create_file",
+  "path": "GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA/Tips_Generados/Tip_99_Tip_de_Prueba.md",
+  "content": "CONTENIDO_COMPLETO_DEL_TIP_AQUI"
+}
+=== END_FILE_OPERATION ===`;
+
+                const response = await fetch('/api/ai/ghost-agent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: command,
+                        projectPath: 'GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA'
+                    })
+                });
+                
+                const data = await response.json();
+                resultDiv.textContent = `✅ Single Tip Generation:\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                resultDiv.textContent = `❌ Single Tip Generation Error:\n${error.message}`;
+            }
+        }
+
+        async function testFileCheck() {
+            const resultDiv = document.getElementById('test-result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Checking if file was created...';
+            
+            try {
+                const response = await fetch('/api/projects/files', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        projectPath: 'GHOST_Proyectos/libros/Boceto_101_Tips_para_Hablar_con_la_IA',
+                        filePath: 'Tips_Generados/Tip_99_Tip_de_Prueba.md'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.textContent = `✅ File Check:\n${JSON.stringify(data, null, 2)}`;
+                } else {
+                    resultDiv.textContent = `❌ File not found or error reading file`;
+                }
+            } catch (error) {
+                resultDiv.textContent = `❌ File Check Error:\n${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html> 

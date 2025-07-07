@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Import Dialog</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+        .test-section {
+            background-color: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        .success { color: #4ade80; }
+        .error { color: #f87171; }
+        .info { color: #60a5fa; }
+        button {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #2563eb;
+        }
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .dialog-content {
+            background-color: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .dialog-header {
+            margin-bottom: 20px;
+        }
+        .dialog-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .dialog-description {
+            color: #888;
+            font-size: 0.9em;
+        }
+        .dialog-body {
+            margin-bottom: 20px;
+        }
+        .dialog-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .btn-ghost {
+            background-color: transparent;
+            border: 1px solid #666;
+        }
+        .btn-ghost:hover {
+            background-color: #333;
+        }
+        .btn-success {
+            background-color: #22c55e;
+        }
+        .btn-success:hover {
+            background-color: #16a34a;
+        }
+        .btn-error {
+            background-color: #ef4444;
+        }
+        .btn-error:hover {
+            background-color: #dc2626;
+        }
+        .btn-disabled {
+            background-color: #666;
+            cursor: not-allowed;
+        }
+        .btn-disabled:hover {
+            background-color: #666;
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 20px;
+            display: block;
+        }
+        .icon.success { color: #22c55e; }
+        .icon.error { color: #ef4444; }
+        .icon.loading { color: #3b82f6; }
+    </style>
+</head>
+<body>
+    <h1>Test Import Dialog States</h1>
+    
+    <div class="test-section">
+        <h2>Dialog State Testing</h2>
+        <p>Test the different states of the import dialog:</p>
+        <button onclick="showDialog('selecting')">Show Selection State</button>
+        <button onclick="showDialog('uploading')">Show Uploading State</button>
+        <button onclick="showDialog('success')">Show Success State</button>
+        <button onclick="showDialog('error')">Show Error State</button>
+        <button onclick="testFullFlow()">Test Full Flow</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Dialog Information</h2>
+        <p><strong>Current State:</strong> <span id="current-state">None</span></p>
+        <p><strong>Auto-close Timer:</strong> <span id="timer">Not active</span></p>
+    </div>
+
+    <!-- Dialog Overlay -->
+    <div id="dialog-overlay" class="dialog-overlay" style="display: none;">
+        <div class="dialog-content">
+            <div id="dialog-content">
+                <!-- Content will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentState = 'none';
+        let autoCloseTimer = null;
+
+        function showDialog(state) {
+            currentState = state;
+            document.getElementById('current-state').textContent = state;
+            document.getElementById('dialog-overlay').style.display = 'flex';
+            
+            const content = document.getElementById('dialog-content');
+            
+            switch (state) {
+                case 'selecting':
+                    content.innerHTML = `
+                        <div class="dialog-header">
+                            <div class="dialog-title">Importar Outline</div>
+                            <div class="dialog-description">Revisa los archivos y selecciona los elementos del outline que quieres importar.</div>
+                        </div>
+                        <div class="dialog-body">
+                            <p>This would show the file selection interface...</p>
+                            <ul>
+                                <li>Sample file 1.md</li>
+                                <li>Sample file 2.md</li>
+                                <li>Sample folder/</li>
+                            </ul>
+                        </div>
+                        <div class="dialog-footer">
+                            <button class="btn-ghost" onclick="hideDialog()">Cancelar</button>
+                            <button onclick="showDialog('uploading')">Importar Selección</button>
+                        </div>
+                    `;
+                    break;
+                
+                case 'uploading':
+                    content.innerHTML = `
+                        <div class="dialog-header">
+                            <div class="dialog-title">Importando Archivos</div>
+                            <div class="dialog-description">Por favor espera mientras se importan los archivos...</div>
+                        </div>
+                        <div class="dialog-body" style="text-align: center;">
+                            <div class="loading-spinner icon loading"></div>
+                            <p>Importando archivos...</p>
+                        </div>
+                        <div class="dialog-footer">
+                            <button class="btn-ghost btn-disabled" disabled>Cancelar</button>
+                            <button class="btn-disabled" disabled>
+                                <span class="loading-spinner"></span>
+                                Importando...
+                            </button>
+                        </div>
+                    `;
+                    
+                    // Simulate upload process
+                    setTimeout(() => {
+                        showDialog('success');
+                    }, 2000);
+                    break;
+                
+                case 'success':
+                    content.innerHTML = `
+                        <div class="dialog-header">
+                            <div class="dialog-title">Importación Exitosa</div>
+                            <div class="dialog-description">Los archivos se han importado correctamente.</div>
+                        </div>
+                        <div class="dialog-body" style="text-align: center;">
+                            <div class="icon success">✓</div>
+                            <p>Importación exitosa: 3 archivos importados.</p>
+                            <p style="font-size: 0.8em; color: #888;">El diálogo se cerrará automáticamente en unos segundos...</p>
+                        </div>
+                        <div class="dialog-footer">
+                            <button class="btn-ghost" onclick="hideDialog()">Cerrar Ahora</button>
+                        </div>
+                    `;
+                    
+                    // Auto-close after 3 seconds
+                    startAutoCloseTimer();
+                    break;
+                
+                case 'error':
+                    content.innerHTML = `
+                        <div class="dialog-header">
+                            <div class="dialog-title">Error en la Importación</div>
+                            <div class="dialog-description">Ha ocurrido un error durante la importación.</div>
+                        </div>
+                        <div class="dialog-body" style="text-align: center;">
+                            <div class="icon error">✗</div>
+                            <p>Error al importar: File already exists</p>
+                        </div>
+                        <div class="dialog-footer">
+                            <button class="btn-ghost" onclick="showDialog('selecting')">Volver</button>
+                            <button onclick="hideDialog()">Cerrar</button>
+                        </div>
+                    `;
+                    break;
+            }
+        }
+
+        function hideDialog() {
+            document.getElementById('dialog-overlay').style.display = 'none';
+            currentState = 'none';
+            document.getElementById('current-state').textContent = 'None';
+            stopAutoCloseTimer();
+        }
+
+        function startAutoCloseTimer() {
+            stopAutoCloseTimer();
+            let countdown = 3;
+            document.getElementById('timer').textContent = `${countdown} seconds`;
+            
+            autoCloseTimer = setInterval(() => {
+                countdown--;
+                document.getElementById('timer').textContent = `${countdown} seconds`;
+                
+                if (countdown <= 0) {
+                    hideDialog();
+                }
+            }, 1000);
+        }
+
+        function stopAutoCloseTimer() {
+            if (autoCloseTimer) {
+                clearInterval(autoCloseTimer);
+                autoCloseTimer = null;
+            }
+            document.getElementById('timer').textContent = 'Not active';
+        }
+
+        async function testFullFlow() {
+            console.log('Starting full flow test...');
+            
+            // Show selection state
+            showDialog('selecting');
+            
+            // Wait 2 seconds, then show uploading
+            setTimeout(() => {
+                showDialog('uploading');
+            }, 2000);
+            
+            // Wait 2 seconds, then show success
+            setTimeout(() => {
+                showDialog('success');
+            }, 4000);
+            
+            // Dialog will auto-close after 3 seconds (at 7 seconds total)
+        }
+
+        // Close dialog when clicking outside
+        document.getElementById('dialog-overlay').addEventListener('click', (e) => {
+            if (e.target.id === 'dialog-overlay') {
+                hideDialog();
+            }
+        });
+
+        // Test the full flow on page load
+        window.addEventListener('load', () => {
+            console.log('Import dialog test page loaded');
+            console.log('Available functions:');
+            console.log('- showDialog(state): Show dialog in specific state');
+            console.log('- testFullFlow(): Test the complete flow');
+            console.log('- hideDialog(): Hide the dialog');
+        });
+    </script>
+</body>
+</html> 

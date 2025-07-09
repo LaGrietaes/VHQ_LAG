@@ -244,7 +244,7 @@ Integraciones:
 03_PSICO_LAG para psicología
 02_CM_LAG para redes
 07_CASH_LAG para ingresos
-👩‍💼 14_DONNA_LAG - Agente Asistente Ejecutiva Personal
+👩‍💼 14_TASE_LAG - Agente Asistente Ejecutiva Personal
 Responsabilidades:
 Supervisar calidad de contenido antes de publicación
 Controlar calendarios y deadlines de agentes
@@ -286,7 +286,7 @@ Integraciones:
 03_PSICO_LAG para análisis emocional y engagement
 01_SEO_LAG para optimización y posicionamiento
 00_CEO_LAG para aprobaciones y reportes ejecutivos
-14_DONNA_LAG para revisión de calidad y deadlines
+14_TASE_LAG para revisión de calidad y deadlines
 Obsidian para sincronización y edición colaborativa
 🔄 FLUJOS DE TRABAJO TIPO
 Workflow 1: Producción de Video Completa
@@ -324,13 +324,13 @@ Workflow 7: Gestión de Contenido Web
 11_WPM_LAG → Publica y optimiza posts
 13_ADS_LAG → Sugiere estrategias y temas
 01_SEO_LAG → Mejora SEO
-14_DONNA_LAG → Audita y aprueba contenido
+14_TASE_LAG → Audita y aprueba contenido
 00_CEO_LAG → Supervisa y ajusta
 Workflow 8: Desarrollo de Proyectos
 12_DEV_LAG → Crea webs y apps
 07_CASH_LAG → Genera presupuestos
 08_LAW_LAG → Revisa legalidad
-14_DONNA_LAG → Coordina deadlines
+14_TASE_LAG → Coordina deadlines
 00_CEO_LAG → Aprueba lanzamiento
 Workflow 9: Producción de Contenido Escrito
 00_CEO_LAG → Define proyecto de escritura y objetivos
@@ -339,7 +339,7 @@ Workflow 9: Producción de Contenido Escrito
 03_PSICO_LAG → Analiza impacto emocional en fases clave
 01_SEO_LAG → Optimiza títulos y estructura para visibilidad
 15_GHOST_LAG → Integra feedback y finaliza contenido
-14_DONNA_LAG → Revisa calidad y coherencia final
+14_TASE_LAG → Revisa calidad y coherencia final
 15_GHOST_LAG → Exporta en formatos requeridos
 00_CEO_LAG → Aprueba publicación y distribución
 📊 MÉTRICAS DE COORDINACIÓN

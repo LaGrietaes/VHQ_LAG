@@ -59,25 +59,25 @@ export function SystemMonitor() {
   }, []);
 
   const getUsageColor = (usage: number) => {
-    if (usage >= 90) return "text-red-400"
-    if (usage >= 60) return "text-yellow-400"
-    return "text-gray-400"
+    if (usage >= 90) return "text-primary"
+    if (usage >= 60) return "text-orange-400"
+    return "text-muted-foreground"
   }
 
   const getAgentColor = (online: number, total: number) => {
-    if (total === 0) return "text-gray-400";
+    if (total === 0) return "text-muted-foreground";
     const percentage = (online / total) * 100;
-    if (percentage < 50) return "text-red-400";
-    if (percentage < 80) return "text-yellow-400";
-    return "text-gray-400";
+    if (percentage < 50) return "text-primary";
+    if (percentage < 80) return "text-orange-400";
+    return "text-muted-foreground";
   }
 
   if (error) {
-    return <div className="text-xs text-red-500">Error: Could not load stats.</div>;
+    return <div className="text-xs text-primary">Error: Could not load stats.</div>;
   }
 
   if (!stats) {
-    return <div className="text-xs text-gray-500">Loading system stats...</div>;
+    return <div className="text-xs text-muted-foreground">Loading system stats...</div>;
   }
 
   // Calculate memory usage percentage
@@ -92,49 +92,49 @@ export function SystemMonitor() {
     <div className="flex items-center gap-6 text-xs font-mono h-9">
       {/* Agent Monitor */}
       <div className="flex items-center space-x-1">
-        <Users className="h-3 w-3 text-white" />
-        <span className="text-gray-400">AGENTS:</span>
+        <Users className="h-3 w-3 text-foreground" />
+        <span className="text-muted-foreground">AGENTS:</span>
         <span className={getAgentColor(onlineAgents, totalAgents)}>{onlineAgents}/{totalAgents}</span>
       </div>
 
       {/* CPU Monitor */}
       <div className="flex items-center space-x-1">
-        <Cpu className="h-3 w-3 text-white" />
-        <span className="text-gray-400">CPU:</span>
+        <Cpu className="h-3 w-3 text-foreground" />
+        <span className="text-muted-foreground">CPU:</span>
         {stats.cpu?.error ? (
-          <span className="text-red-400">N/A</span>
+          <span className="text-primary">N/A</span>
         ) : (
           <>
-            <span className="text-gray-400">{stats.cpu?.cores || 'N/A'} cores</span>
-        <span className="text-gray-500">|</span>
-            <span className="text-gray-400">{stats.cpu?.brand || 'Unknown'}</span>
+            <span className="text-muted-foreground">{stats.cpu?.cores || 'N/A'} cores</span>
+            <span className="text-muted-foreground">|</span>
+            <span className="text-muted-foreground">{stats.cpu?.brand || 'Unknown'}</span>
           </>
         )}
       </div>
 
       {/* Memory Monitor */}
       <div className="flex items-center space-x-1">
-        <Zap className="h-3 w-3 text-white" />
-        <span className="text-gray-400">RAM:</span>
+        <Zap className="h-3 w-3 text-foreground" />
+        <span className="text-muted-foreground">RAM:</span>
         {stats.mem?.error ? (
-          <span className="text-red-400">N/A</span>
+          <span className="text-primary">N/A</span>
         ) : (
           <span className={getUsageColor(memoryUsagePercentage)}>
             {memoryUsedGB}GB/{memoryTotalGB}GB ({memoryUsagePercentage}%)
-        </span>
+          </span>
         )}
       </div>
 
       {/* OS Monitor */}
       <div className="flex items-center space-x-1">
-        <HardDrive className="h-3 w-3 text-white" />
-        <span className="text-gray-400">OS:</span>
+        <HardDrive className="h-3 w-3 text-foreground" />
+        <span className="text-muted-foreground">OS:</span>
         {stats.os?.error ? (
-          <span className="text-red-400">N/A</span>
+          <span className="text-primary">N/A</span>
         ) : (
-          <span className="text-gray-400">
+          <span className="text-muted-foreground">
             {stats.os?.platform || 'Unknown'} {stats.os?.arch || ''}
-        </span>
+          </span>
         )}
       </div>
     </div>

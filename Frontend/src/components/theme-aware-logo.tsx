@@ -15,24 +15,9 @@ export function ThemeAwareLogo({
 }: ThemeAwareLogoProps) {
   const { theme, systemTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [isPortrait, setIsPortrait] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-
-    // Set up portrait mode detection
-    const mediaQuery = window.matchMedia("(orientation: portrait)");
-    setIsPortrait(mediaQuery.matches);
-
-    const handleOrientationChange = (e: MediaQueryListEvent) => {
-      setIsPortrait(e.matches);
-    };
-
-    mediaQuery.addEventListener('change', handleOrientationChange);
-
-    return () => {
-      mediaQuery.removeEventListener('change', handleOrientationChange);
-    };
   }, []);
 
   if (!mounted) {
@@ -41,20 +26,11 @@ export function ThemeAwareLogo({
     );
   }
 
-  const currentTheme = theme === 'system' ? systemTheme : theme;
-  const isDark = currentTheme === 'dark';
+  // Use the proper brand logo
+  const logoPath = '/LAG_VHQ_LOGO_W.svg';
 
-  // Use LA_VHQ for portrait mode on tablets/phones, otherwise use full VHQ_LAG
-  const useCompactLogo = isPortrait || variant === 'small';
-  
-  const logoPath = useCompactLogo
-    ? isDark ? '/LA_VHQ_W.svg' : '/LA_VHQ_B.svg'
-    : isDark ? '/VHQ_LAG_White.svg' : '/VHQ_LAG_Black.svg';
-
-  // Calculate dimensions based on logo type
-  const dimensions = useCompactLogo
-    ? { width: 120, height: 57 } // LA_VHQ (312.1:149.05 aspect ratio, scaled down)
-    : { width: 244, height: 60 }; // VHQ_LAG (keeping the same dimensions)
+  // Dimensions based on the logo's aspect ratio (760.61:187)
+  const dimensions = { width: 200, height: 49 }; // Maintaining the 4:1 aspect ratio
 
   return (
     <div className={`relative flex items-center ${className}`}>
@@ -68,7 +44,7 @@ export function ThemeAwareLogo({
       >
         <Image
           src={logoPath}
-          alt="VHQ Logo"
+          alt="VHQ LAG Logo"
           fill
           className="object-contain object-center"
           priority

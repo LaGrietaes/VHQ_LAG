@@ -1,7 +1,7 @@
 "use client"
 
 import { useParams } from 'next/navigation'
-import { agentsData, Agent } from '@/lib/agents-data'
+import { agentsData } from '@/lib/agents-data'
 import { Sidebar } from '@/components/sidebar'
 import { ThemeAwareLogo } from '@/components/theme-aware-logo'
 import { SystemMonitor } from '@/components/system-monitor'

@@ -1,15 +1,13 @@
-const { fontFamily } = require("tailwindcss/defaultTheme")
+import type { Config } from "tailwindcss";
 
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+const config: Config = {
   darkMode: ["class"],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
+    './src/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
   ],
-  prefix: "",
   theme: {
     container: {
       center: true,
@@ -53,11 +51,18 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        brand: {
+          red: '#ca2026',
+          'red-dark': '#a01a1f',
+          'red-light': '#dc2626',
+        },
       },
       borderRadius: {
         lg: "0",
-        md: "0",
+        md: "0", 
         sm: "0",
+        none: "0",
+        full: "9999px",
       },
       keyframes: {
         "accordion-down": {
@@ -89,10 +94,16 @@ module.exports = {
         "glitch-in": "glitch-in 0.2s ease-in-out",
       },
       fontFamily: {
-        sans: ["var(--font-sans)", ...fontFamily.sans],
-        mono: ["var(--font-mono)", ...fontFamily.mono],
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "monospace"],
+      },
+      backgroundImage: {
+        'gradient-card': 'linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%)',
+        'gradient-card-hover': 'linear-gradient(135deg, hsl(var(--accent)) 0%, hsl(var(--muted)) 100%)',
       },
     },
   },
   plugins: [require("tailwindcss-animate")],
-} 
+};
+
+export default config; 

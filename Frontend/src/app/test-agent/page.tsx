@@ -20,7 +20,7 @@ Crea un archivo con este contenido exacto:
   "type": "create_file",
   "targetProject": "Boceto_101_Tips_para_Hablar_con_la_IA",
   "fileName": "Generated_Content/agent_test.md",
-  "content": "# Test del Agente\\n\\nEste archivo fue creado por el agente Ghost.\\n\\n## Información\\n- Creado: ${currentDate}\\n- Método: Agente Ghost\\n- Estado: Funcionando\\n\\n## Verificación\\n✅ El agente está operativo\\n✅ Los archivos se crean correctamente\\n✅ El formato FILE_OPERATION funciona\\n\\n## Conclusión\\nEl agente está funcionando perfectamente.`
+  "content": "# Test del Agente\\n\\nEste archivo fue creado por el agente Ghost.\\n\\n## Información\\n- Creado: ${currentDate}\\n- Método: Agente Ghost\\n- Estado: Funcionando\\n\\n## Verificación\\n✅ El agente está operativo\\n✅ Los archivos se crean correctamente\\n✅ El formato FILE_OPERATION funciona\\n\\n## Conclusión\\nEl agente está funcionando perfectamente."
 }
 === END_FILE_OPERATION ===
 

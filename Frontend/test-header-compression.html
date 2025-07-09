@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Header Compression Test - Content-Preserving Sidebar</title>
+    <style>
+        body {
+            font-family: 'IBM Plex Mono', monospace;
+            margin: 0;
+            padding: 0;
+            background: #0a0a0a;
+            color: #ffffff;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #333;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 96px;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+        
+        .logo {
+            font-weight: bold;
+            color: #22c55e;
+        }
+        
+        .title {
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 0.1em;
+            color: #22c55e;
+            text-transform: uppercase;
+            text-align: center;
+            flex: 1;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+        
+        .button {
+            background: #22c55e;
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+        }
+        
+        .button:hover {
+            background: #16a34a;
+        }
+        
+        .button.secondary {
+            background: #333;
+            color: #fff;
+        }
+        
+        .button.secondary:hover {
+            background: #444;
+        }
+        
+        .sidebar-trigger {
+            position: fixed;
+            left: 0;
+            top: 96px;
+            width: 8px;
+            height: 80px;
+            background: transparent;
+            transition: background-color 0.3s ease;
+            z-index: 40;
+        }
+        
+        .sidebar-trigger:hover {
+            background: rgba(34, 197, 94, 0.2);
+        }
+        
+        .sidebar-trigger.hidden {
+            display: none;
+        }
+        
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 96px;
+            height: calc(100vh - 96px);
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(8px);
+            border-right: 1px solid #333;
+            transition: width 0.3s ease;
+            z-index: 40;
+        }
+        
+        .sidebar.collapsed {
+            width: 80px;
+        }
+        
+        .sidebar.expanded {
+            width: 256px;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            transition: margin-right 0.3s ease;
+            margin-left: 80px; /* Account for collapsed sidebar width */
+        }
+        
+        .main-content.chat-open {
+            margin-right: 500px;
+        }
+        
+        .content {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+        }
+        
+        .chat-drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 500px;
+            height: 100vh;
+            background: #0a0a0a;
+            border-left: 2px solid #22c55e;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 50;
+        }
+        
+        .chat-drawer.open {
+            transform: translateX(0);
+        }
+        
+        .status {
+            background: #1a1a1a;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+        
+        .status h3 {
+            margin: 0 0 8px 0;
+            color: #22c55e;
+        }
+        
+        .status p {
+            margin: 4px 0;
+            font-size: 14px;
+        }
+        
+        .highlight {
+            color: #22c55e;
+            font-weight: bold;
+        }
+        
+        .warning {
+            color: #f59e0b;
+        }
+        
+        .success {
+            color: #10b981;
+        }
+        
+        .info {
+            color: #3b82f6;
+        }
+        
+        .demo-content {
+            background: linear-gradient(45deg, #1a1a1a, #2a2a2a);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border: 1px solid #333;
+        }
+        
+        .demo-content h4 {
+            color: #22c55e;
+            margin: 0 0 10px 0;
+        }
+        
+        .demo-content p {
+            margin: 5px 0;
+            color: #ccc;
+        }
+        
+        .agent-item {
+            padding: 8px;
+            margin-bottom: 4px;
+            border-radius: 8px;
+            position: relative;
+        }
+        
+        .agent-item.ceo {
+            background: rgba(51, 51, 51, 0.5);
+        }
+        
+        .ollama-icon {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            background: #1a1a1a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            border: 1px solid #333;
+        }
+        
+        .ollama-icon.active {
+            color: #22c55e;
+            border-color: #22c55e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div style="width: 128px; padding-left: 8px;">
+                <div class="logo">VHQ_LAG</div>
+            </div>
+            <div class="title">Dashboard</div>
+            <div style="width: 192px; display: flex; justify-content: flex-end; align-items: center; gap: 32px;">
+                <div style="color: #666;">System Monitor</div>
+                <button class="button" onclick="toggleChat()">Toggle Chat</button>
+            </div>
+        </div>
+        
+        <!-- Sidebar Trigger (when collapsed) -->
+        <div class="sidebar-trigger" id="sidebarTrigger" onmouseenter="expandSidebar()"></div>
+        
+        <!-- Sidebar (Agent Roster) - Starts below header, no title -->
+        <div class="sidebar collapsed" id="sidebar">
+            <div style="padding: 8px;">
+                <!-- Ollama Robot Icon - First item -->
+                <div class="agent-item" style="margin-bottom: 16px;">
+                    <div style="color: #22c55e; font-size: 20px;">🤖</div>
+                    <div style="font-size: 12px; margin-top: 4px;">Ollama</div>
+                    <div class="ollama-icon active" title="Ollama Running">⚡</div>
+                </div>
+                
+                <!-- Divider -->
+                <div style="border-top: 1px solid #333; margin: 8px 0;"></div>
+                
+                <div class="agent-item ceo">
+                    <div style="color: #22c55e;">👑</div>
+                    <div style="font-size: 12px; margin-top: 4px;">CEO</div>
+                </div>
+                <div class="agent-item">
+                    <div style="color: #666;">📊</div>
+                    <div style="font-size: 12px; margin-top: 4px;">SEO</div>
+                </div>
+                <div class="agent-item">
+                    <div style="color: #666;">🎨</div>
+                    <div style="font-size: 12px; margin-top: 4px;">CM</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <!-- Content -->
+            <div class="content">
+                <div class="status">
+                    <h3>Content-Preserving Sidebar - Header Compression Test</h3>
+                    <p><span class="highlight">✓</span> Header only compresses when <strong>Chat Drawer</strong> is open</p>
+                    <p><span class="highlight">✓</span> Collapsed sidebar pushes content (80px width)</p>
+                    <p><span class="highlight">✓</span> Expanded sidebar overlays content (quick action)</p>
+                    <p><span class="info">ℹ</span> Ollama robot icon (26x25) as first item in sidebar</p>
+                    <p><span class="success">🎯</span> Logo moved all the way to the left (128px width)</p>
+                </div>
+                
+                <div class="status">
+                    <h3>Current State</h3>
+                    <p>Sidebar (Agent Roster): <span id="sidebarStatus" class="highlight">Collapsed (80px width)</span></p>
+                    <p>Chat Drawer: <span id="chatStatus" class="highlight">Closed</span></p>
+                    <p>Header Compression: <span id="compressionStatus" class="success">None</span></p>
+                    <p>Content Margin: <span id="contentMargin" class="info">80px (pushed by collapsed sidebar)</span></p>
+                </div>
+                
+                <div class="demo-content">
+                    <h4>Demo Content Area</h4>
+                    <p>This content area shows the improved sidebar behavior:</p>
+                    <p>• Collapsed sidebar: 80px width, pushes content (no loss)</p>
+                    <p>• Expanded sidebar: 256px overlay (quick action, content temporarily hidden)</p>
+                    <p>• Ollama robot icon (26x25) with grey/green antenna</p>
+                    <p>• Logo positioned all the way to the left for maximum space</p>
+                </div>
+                
+                <div class="status">
+                    <h3>Test Instructions</h3>
+                    <p>1. Hover over the left edge to expand the sidebar (trigger area)</p>
+                    <p>2. Move mouse away to collapse the sidebar</p>
+                    <p>3. Click "Toggle Chat" to open/close the chat drawer</p>
+                    <p>4. Observe that header only compresses when chat is open</p>
+                    <p>5. Notice no content is lost in collapsed state</p>
+                </div>
+                
+                <div style="display: flex; gap: 16px; margin-top: 24px;">
+                    <button class="button secondary" onclick="toggleSidebar()">Toggle Sidebar</button>
+                    <button class="button" onclick="toggleChat()">Toggle Chat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chat Drawer -->
+    <div class="chat-drawer" id="chatDrawer">
+        <div style="padding: 16px; border-bottom: 1px solid #22c55e;">
+            <h2 style="margin: 0; color: #22c55e;">COMMS_TERMINAL</h2>
+        </div>
+        <div style="padding: 16px;">
+            <p>Chat drawer content would go here...</p>
+            <p>This drawer is 500px wide and slides in from the right.</p>
+            <p>When open, it compresses the main content area.</p>
+        </div>
+    </div>
+    
+    <script>
+        let sidebarExpanded = false;
+        let chatOpen = false;
+        
+        function expandSidebar() {
+            if (!sidebarExpanded) {
+                toggleSidebar();
+            }
+        }
+        
+        function toggleSidebar() {
+            sidebarExpanded = !sidebarExpanded;
+            const sidebar = document.getElementById('sidebar');
+            const trigger = document.getElementById('sidebarTrigger');
+            const status = document.getElementById('sidebarStatus');
+            
+            if (sidebarExpanded) {
+                sidebar.classList.remove('collapsed');
+                sidebar.classList.add('expanded');
+                trigger.classList.add('hidden');
+                status.textContent = 'Expanded (256px overlay)';
+                status.className = 'highlight';
+            } else {
+                sidebar.classList.remove('expanded');
+                sidebar.classList.add('collapsed');
+                trigger.classList.remove('hidden');
+                status.textContent = 'Collapsed (80px width)';
+                status.className = 'highlight';
+            }
+            
+            updateCompressionStatus();
+        }
+        
+        function toggleChat() {
+            chatOpen = !chatOpen;
+            const mainContent = document.getElementById('mainContent');
+            const chatDrawer = document.getElementById('chatDrawer');
+            const status = document.getElementById('chatStatus');
+            
+            if (chatOpen) {
+                mainContent.classList.add('chat-open');
+                chatDrawer.classList.add('open');
+                status.textContent = 'Open';
+                status.className = 'highlight';
+            } else {
+                mainContent.classList.remove('chat-open');
+                chatDrawer.classList.remove('open');
+                status.textContent = 'Closed';
+                status.className = 'highlight';
+            }
+            
+            updateCompressionStatus();
+        }
+        
+        function updateCompressionStatus() {
+            const status = document.getElementById('compressionStatus');
+            
+            if (chatOpen) {
+                status.textContent = 'Chat Drawer Open (500px)';
+                status.className = 'warning';
+            } else {
+                status.textContent = 'None';
+                status.className = 'success';
+            }
+        }
+        
+        // Initialize
+        updateCompressionStatus();
+    </script>
+</body>
+</html> 
